@@ -1,0 +1,723 @@
+/* ============================================
+   Loan Products Page – Premium Light Design
+   ============================================ */
+
+/* ---- Hero ---- */
+.lp-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 8rem 0 3.5rem;
+    background: linear-gradient(160deg, #fffbeb 0%, #fff 100%);
+    text-align: center;
+}
+
+.lp-hero-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.lp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 1rem;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.18);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #d97706;
+    margin-bottom: 1.5rem;
+}
+
+.lp-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #1f2937;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    margin-bottom: 1rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lp-hl {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.lp-subtitle {
+    font-size: 1rem;
+    color: #6b7280;
+    line-height: 1.7;
+    max-width: 620px;
+    margin: 0 auto 2rem;
+}
+
+.lp-subtitle strong {
+    color: #1f2937;
+}
+
+/* Quick stats */
+.lp-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.lp-stat {
+    text-align: center;
+}
+
+.lp-stat-val {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #d97706;
+}
+
+.lp-stat-lbl {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.lp-stat-sep {
+    width: 1px;
+    height: 30px;
+    background: #e5e7eb;
+}
+
+/* ---- Tabs ---- */
+.lp-tabs-wrap {
+    background: #fff;
+    border-bottom: 1px solid #f3f4f6;
+    position: sticky;
+    top: 60px;
+    z-index: 20;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.lp-tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: center;
+}
+
+.lp-tab {
+    padding: 1rem 1.75rem;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.lp-tab:hover {
+    color: #1f2937;
+}
+
+.lp-tab--active {
+    color: #d97706;
+    border-bottom-color: #f59e0b;
+}
+
+/* ---- SEO Intro ---- */
+.lp-seo-intro {
+    padding: 3rem 0 2rem;
+    background: #fafafa;
+    text-align: center;
+}
+
+.seo-block {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.seo-h2 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #1f2937;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+}
+
+.seo-text {
+    font-size: 0.92rem;
+    color: #6b7280;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+}
+
+.seo-text strong {
+    color: #1f2937;
+}
+
+.seo-cta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.lp-link {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #d97706;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.lp-link:hover {
+    color: #f59e0b;
+}
+
+/* ---- Loan Cards (Centered Alignment) ---- */
+.lp-cards-section {
+    padding: 2rem 0 4rem;
+    scroll-margin-top: 120px;
+}
+
+.lp-loan-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.lp-loan-card {
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.lp-loan-card:hover {
+    border-color: rgba(245, 158, 11, 0.25);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.lp-card-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.lp-card-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: rgba(245, 158, 11, 0.2);
+    line-height: 1;
+}
+
+.lp-card-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.lp-card-desc {
+    font-size: 0.92rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 700px;
+}
+
+/* Stats row inside card */
+.lp-card-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 1.2rem 0;
+    border-top: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.lp-card-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lp-cs-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9ca3af;
+    margin-bottom: 0.3rem;
+}
+
+.lp-cs-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #d97706;
+}
+
+/* Features (centered block, left aligned items) */
+.lp-card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 0.6rem 2.5rem;
+    max-width: max-content;
+    text-align: left;
+}
+
+.lp-card-features li {
+    position: relative;
+    padding-left: 1.4rem;
+    font-size: 0.88rem;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.lp-card-features li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #f59e0b;
+    font-weight: 800;
+}
+
+/* Card actions */
+.lp-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.lp-card-btn {
+    padding: 0.8rem 2rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+}
+
+.lp-card-link {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #d97706;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.lp-card-link:hover {
+    color: #f59e0b;
+}
+
+/* ---- How It Works ---- */
+.lp-how-section {
+    padding: 4rem 0;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.lp-sec-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.lp-sec-sub {
+    font-size: 0.92rem;
+    color: #9ca3af;
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.lp-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.lp-step {
+    text-align: center;
+    padding: 1.5rem;
+    background: #fafafa;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.lp-step:hover {
+    border-color: rgba(245, 158, 11, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.lp-step-num {
+    display: inline-block;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: rgba(245, 158, 11, 0.3);
+    margin-bottom: 0.5rem;
+}
+
+.lp-step h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.3rem;
+}
+
+.lp-step p {
+    font-size: 0.82rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ---- FAQ ---- */
+.lp-faq-section {
+    padding: 4rem 0;
+    background: #fafafa;
+}
+
+.faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.faq-item:hover,
+.faq-item--open {
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+.faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2937;
+    transition: color 0.2s ease;
+}
+
+.faq-q:hover {
+    color: #d97706;
+}
+
+.faq-chevron {
+    flex-shrink: 0;
+    color: #d1d5db;
+    transition: transform 0.3s ease;
+}
+
+.faq-item--open .faq-chevron {
+    transform: rotate(180deg);
+    color: #f59e0b;
+}
+
+.faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
+
+.faq-item--open .faq-a {
+    max-height: 500px;
+}
+
+.faq-a p {
+    padding: 0 1.5rem 1.25rem;
+    font-size: 0.88rem;
+    color: #4b5563;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ---- Disclaimer ---- */
+.lp-disclaimer-section {
+    padding: 0 0 3rem;
+    background: #fafafa;
+}
+
+.lp-disclaimer {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    border-left: 4px solid #f59e0b;
+    border-radius: 12px;
+}
+
+.lp-disclaimer svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.lp-disclaimer p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.lp-disclaimer strong {
+    color: #1f2937;
+}
+
+/* ---- CTA ---- */
+.lp-cta {
+    padding: 4rem 0 3.5rem;
+    background: #fbbf24;
+}
+
+.lp-cta-h {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.lp-cta-p {
+    font-size: 0.98rem;
+    color: rgba(31, 41, 55, 0.8);
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+.btn-cta-dark {
+    background: #1f2937;
+    color: #fff;
+    border: none;
+    padding: 0.9rem 2.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 999px;
+    text-decoration: none;
+    display: inline-flex;
+    transition: all 0.3s ease;
+}
+
+.btn-cta-dark:hover {
+    background: #111827;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .lp-steps {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lp-tabs {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .lp-hero {
+        padding: 6rem 0 3rem;
+    }
+
+    .lp-title {
+        font-size: 2rem;
+    }
+
+    .seo-h2 {
+        font-size: 1.4rem;
+    }
+
+    .lp-sec-title {
+        font-size: 1.5rem;
+    }
+
+    .lp-steps {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .lp-stats {
+        gap: 1rem;
+    }
+
+    .lp-stat-val {
+        font-size: 1.2rem;
+    }
+
+    .lp-tab {
+        padding: 0.75rem 1.2rem;
+        font-size: 0.78rem;
+        text-align: center;
+    }
+
+    .lp-cta-h {
+        font-size: 1.6rem;
+    }
+
+    .lp-card-features {
+        grid-template-columns: 1fr;
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .lp-card-features li {
+        padding-left: 0;
+        padding-top: 1.2rem;
+    }
+
+    .lp-card-features li::before {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .lp-title {
+        font-size: 1.6rem;
+    }
+
+    .lp-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .lp-card-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .lp-card-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .lp-card-btn {
+        text-align: center;
+    }
+}
+
+/* ===== DARK MODE ===== */
+[data-theme="dark"] .lp-hero,
+[data-theme="dark"] .lp-body {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .lp-title,
+[data-theme="dark"] .lp-section-title {
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .lp-subtitle,
+[data-theme="dark"] .lp-section-sub {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .lp-card,
+[data-theme="dark"] .lp-tab-content {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .lp-card:hover {
+    border-color: #f59e0b;
+}
+
+[data-theme="dark"] .lp-card-title {
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .lp-card-desc,
+[data-theme="dark"] .lp-card-feature {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .lp-tabs {
+    background: #111827;
+}
+
+[data-theme="dark"] .lp-tab {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .lp-tab.active,
+[data-theme="dark"] .lp-tab:hover {
+    color: #f59e0b;
+}
+
+[data-theme="dark"] .lp-products-bg {
+    background: #111827;
+}
+
+[data-theme="dark"] .lp-stat-val {
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .lp-stat-lbl {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .lp-card-btn {
+    border-color: #374151;
+    color: #f59e0b;
+}
+
+[data-theme="dark"] .lp-card-btn:hover {
+    background: #f59e0b;
+    color: #111827;
+}

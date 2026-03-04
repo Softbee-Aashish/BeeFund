@@ -1,0 +1,265 @@
+/* ============================================
+   BeePosterCarrier V2 – Individual flying cards
+   ============================================ */
+
+/* ---- Flying Card Container ---- */
+.bee-card-wrapper {
+    position: relative;
+    display: inline-block;
+    will-change: transform, opacity;
+    z-index: 5;
+}
+
+/* ---- The Product Card ---- */
+.bee-card {
+    position: relative;
+    width: 280px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1.5px solid rgba(245, 158, 11, 0.15);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 1.5rem;
+    transition: box-shadow 0.3s ease;
+    overflow: visible;
+}
+
+.bee-card:hover {
+    box-shadow:
+        0 16px 50px rgba(245, 158, 11, 0.12),
+        0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.bee-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    border-radius: 18px 18px 0 0;
+}
+
+/* Card icon */
+.bee-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.bee-card-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.bee-card-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.4rem;
+}
+
+.bee-card-desc {
+    font-size: 0.82rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.bee-card-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.bee-card-tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    background: rgba(251, 191, 36, 0.12);
+    color: #d97706;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.bee-card-btn {
+    display: block;
+    width: 100%;
+    padding: 0.65rem 1.2rem;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    background: transparent;
+    color: #d97706;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bee-card-btn:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+/* ---- Carrier Bees ---- */
+.card-bee {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    z-index: 12;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12));
+    transition: transform 0.2s ease;
+}
+
+.card-bee--1 {
+    top: -16px;
+    left: 40px;
+}
+
+.card-bee--2 {
+    top: -14px;
+    right: 40px;
+}
+
+.card-bee--3 {
+    bottom: 10px;
+    right: -14px;
+}
+
+/* Thread lines */
+.card-thread {
+    position: absolute;
+    width: 1.5px;
+    height: 16px;
+    background: rgba(217, 119, 6, 0.25);
+    border-radius: 1px;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.card-thread--1 {
+    top: 0;
+    left: 54px;
+    transform: rotate(-6deg);
+}
+
+.card-thread--2 {
+    top: 0;
+    right: 54px;
+    transform: rotate(6deg);
+}
+
+.card-thread--3 {
+    bottom: 26px;
+    right: 0;
+    transform: rotate(12deg);
+}
+
+/* Wing flap */
+@keyframes card-wing-flap {
+
+    0%,
+    100% {
+        transform: rotate(-22deg);
+    }
+
+    50% {
+        transform: rotate(22deg);
+    }
+}
+
+@keyframes card-wing-flap-r {
+
+    0%,
+    100% {
+        transform: rotate(22deg);
+    }
+
+    50% {
+        transform: rotate(-22deg);
+    }
+}
+
+@keyframes card-wing-struggle {
+
+    0%,
+    100% {
+        transform: rotate(-40deg);
+    }
+
+    50% {
+        transform: rotate(40deg);
+    }
+}
+
+@keyframes card-wing-struggle-r {
+
+    0%,
+    100% {
+        transform: rotate(40deg);
+    }
+
+    50% {
+        transform: rotate(-40deg);
+    }
+}
+
+.card-bee .wing-l {
+    animation: card-wing-flap 0.1s ease-in-out infinite;
+    transform-origin: 12px 10px;
+}
+
+.card-bee .wing-r {
+    animation: card-wing-flap-r 0.1s ease-in-out infinite;
+    transform-origin: 12px 10px;
+}
+
+.card-bee.bee-struggle .wing-l {
+    animation-name: card-wing-struggle;
+    animation-duration: 0.07s;
+}
+
+.card-bee.bee-struggle .wing-r {
+    animation-name: card-wing-struggle-r;
+    animation-duration: 0.07s;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+    .bee-card {
+        width: 250px;
+        padding: 1.25rem;
+    }
+
+    .card-bee {
+        width: 26px;
+        height: 26px;
+    }
+
+    .bee-card-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .card-bee .wing-l,
+    .card-bee .wing-r {
+        animation: none !important;
+    }
+}

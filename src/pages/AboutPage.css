@@ -1,0 +1,861 @@
+/* ============================================
+   About Page – Premium Design
+   ============================================ */
+
+/* ---- Hero ---- */
+.about-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 8rem 0 4rem;
+    background: linear-gradient(160deg, #fffbeb 0%, #fff 100%);
+    text-align: center;
+}
+
+.about-hero-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.about-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.18);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #d97706;
+    margin-bottom: 1.5rem;
+}
+
+.about-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1f2937;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    margin-bottom: 1.25rem;
+    max-width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.about-highlight {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about-subtitle {
+    font-size: 1.05rem;
+    color: #6b7280;
+    line-height: 1.7;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.about-subtitle strong {
+    color: #1f2937;
+}
+
+/* ---- Sections ---- */
+.about-section {
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-section--alt {
+    background: #fafafa;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.section-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1f2937;
+    letter-spacing: -0.02em;
+}
+
+.section-sub {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    margin-bottom: 2rem;
+    margin-top: -0.5rem;
+}
+
+/* ---- Timeline ---- */
+.timeline {
+    position: relative;
+    padding-left: 2.5rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #fbbf24, #f59e0b, #d97706);
+    border-radius: 2px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -2.5rem;
+    top: 0.5rem;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #fbbf24;
+    z-index: 2;
+}
+
+.timeline-dot--active {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.timeline-dot--now {
+    border-color: #d97706;
+    background: #f59e0b;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+}
+
+.timeline-card {
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.timeline-card:hover {
+    border-color: rgba(245, 158, 11, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.timeline-year {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.4rem;
+}
+
+.timeline-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.timeline-card strong {
+    color: #1f2937;
+}
+
+/* ---- Financial Cards ---- */
+.financial-cards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.fin-card {
+    text-align: center;
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    min-width: 240px;
+    transition: all 0.3s ease;
+}
+
+.fin-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.fin-card--current {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: linear-gradient(160deg, #fffbeb, #fff);
+}
+
+.fin-badge {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.fin-badge--gold {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.fin-entity {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+}
+
+.fin-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.fin-amount {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1f2937;
+    line-height: 1.1;
+}
+
+.fin-label {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+}
+
+.fin-growth {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.fin-arrow {
+    display: flex;
+    align-items: center;
+}
+
+.fin-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---- Partners Grid ---- */
+.partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+}
+
+.partner-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.25rem 0.75rem;
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.partner-card:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.partner-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+}
+
+.partner-card:hover .partner-logo {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.partner-logo--more {
+    background: rgba(245, 158, 11, 0.08);
+    color: #d97706;
+    font-size: 0.9rem;
+}
+
+.partner-name {
+    font-size: 0.72rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+}
+
+.partner-card--more .partner-name {
+    color: #d97706;
+}
+
+/* ---- Leaders ---- */
+.leaders-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.leader-card {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.leader-card:hover {
+    border-color: rgba(245, 158, 11, 0.25);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px);
+}
+
+.leader-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.leader-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.leader-role {
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.leader-bio {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ---- Expanded Team Card ---- */
+.team-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+    border: 1.5px solid #f3f4f6;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.team-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+.team-image {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.team-card h3 {
+    font-size: 1.4rem;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    text-align: center;
+    font-weight: 800;
+}
+
+.team-title {
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border-radius: 8px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+}
+
+.team-title-wrap {
+    text-align: center;
+}
+
+.team-bio p {
+    color: #4b5563;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+    font-size: 0.92rem;
+    text-align: left;
+}
+
+.team-bio strong {
+    color: #1f2937;
+}
+
+/* ---- Stats ---- */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Team Appreciation */
+.team-appreciation {
+    margin-top: 4rem;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(217, 119, 6, 0.05));
+    border-radius: 20px;
+    border: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.team-appreciation h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.team-appreciation p {
+    font-size: 1rem;
+    color: #4b5563;
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.team-appreciation strong {
+    color: #d97706;
+}
+
+
+
+.stat-card {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #f59e0b;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.stat-desc {
+    font-size: 0.78rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* Clients */
+.clients-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.clients-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #d1d5db;
+}
+
+.clients-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.client-pill {
+    padding: 0.35rem 0.85rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    transition: all 0.3s ease;
+}
+
+.client-pill:hover {
+    background: #f59e0b;
+    color: #fff;
+    border-color: #f59e0b;
+}
+
+/* ---- Compliance ---- */
+.compliance-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.compliance-row {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1.5rem;
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.compliance-row:hover {
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.compliance-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9ca3af;
+    margin-bottom: 0.3rem;
+}
+
+.compliance-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f2937;
+    word-break: break-word;
+}
+
+/* ---- Why Partner ---- */
+.why-partner-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.wp-card {
+    padding: 2rem;
+    background: #fff;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+}
+
+.wp-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+.wp-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 1rem;
+}
+
+.wp-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.4rem;
+}
+
+.wp-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ---- CTA ---- */
+.about-cta {
+    padding: 5rem 0 4rem;
+    background: #1f2937;
+}
+
+.about-cta-h {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.about-cta-p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2rem;
+}
+
+.about-cta-btns {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .about-title {
+        font-size: 2.5rem;
+    }
+
+    .leaders-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .why-partner-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 6rem 0 3rem;
+    }
+
+    .about-title {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .leaders-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .compliance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .why-partner-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .financial-cards {
+        flex-direction: column;
+    }
+
+    .fin-arrow {
+        transform: rotate(90deg);
+    }
+
+    .about-cta-h {
+        font-size: 1.7rem;
+    }
+
+    .partners-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .about-title {
+        font-size: 1.65rem;
+    }
+
+    .about-section {
+        padding: 2.5rem 0;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+
+    .partners-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-cta-h {
+        font-size: 1.4rem;
+    }
+}
+
+/* ===== DARK MODE ===== */
+[data-theme="dark"] .about-hero {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .about-title,
+[data-theme="dark"] .about-section-title {
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .about-subtitle,
+[data-theme="dark"] .about-mission p,
+[data-theme="dark"] .about-section-sub {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .about-section,
+[data-theme="dark"] .about-values-section {
+    background: #111827;
+}
+
+[data-theme="dark"] .about-value-card,
+[data-theme="dark"] .about-stat-card,
+[data-theme="dark"] .team-card {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .team-card:hover,
+[data-theme="dark"] .about-value-card:hover {
+    border-color: #f59e0b;
+}
+
+[data-theme="dark"] .team-name,
+[data-theme="dark"] .about-value-title,
+[data-theme="dark"] .about-stat-val {
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .team-role,
+[data-theme="dark"] .team-bio,
+[data-theme="dark"] .about-value-desc,
+[data-theme="dark"] .about-stat-lbl {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .about-cta {
+    background: #1a2332;
+}

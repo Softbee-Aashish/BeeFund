@@ -1,0 +1,160 @@
+/* WhatsApp Widget Global Styles */
+.whatsapp-widget {
+    position: fixed;
+    bottom: 80px;
+    /* Above the bottom navigation if it exists */
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .whatsapp-widget {
+        bottom: 30px;
+        right: 30px;
+    }
+}
+
+/* Tooltip Message Box */
+.whatsapp-widget-tooltip {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-width: 250px;
+    font-size: 0.85rem;
+    color: #374151;
+    position: relative;
+    opacity: 0;
+    transform: translateX(20px) scale(0.95);
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: right center;
+}
+
+/* Right pointer arrow */
+.whatsapp-widget-tooltip::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+}
+
+/* Show tooltip on group hover */
+.whatsapp-widget:hover .whatsapp-widget-tooltip {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+.whatsapp-widget-tooltip p {
+    margin: 0;
+    line-height: 1.4;
+    cursor: default;
+}
+
+.whatsapp-widget-tooltip strong {
+    color: #25D366;
+    /* WhatsApp Green */
+}
+
+/* The Button itself */
+.whatsapp-widget-btn {
+    width: 60px;
+    height: 60px;
+    background-color: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: shakePulse 3.5s infinite;
+}
+
+.whatsapp-widget-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
+    animation: none;
+    /* stop shaking when hovered */
+}
+
+/* WhatsApp Icon SVG styling */
+.whatsapp-widget-btn svg {
+    width: 35px;
+    height: 35px;
+    fill: #ffffff;
+}
+
+/* Red Notification Dot */
+.whatsapp-notification-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    background-color: #ef4444;
+    /* Red notification color */
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+/* Animations */
+@keyframes shakePulse {
+
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    5% {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    10% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    15% {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    20% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    25% {
+        transform: scale(1.1) rotate(0deg);
+    }
+
+    30%,
+    95% {
+        transform: scale(1) rotate(0deg);
+        /* long pause */
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
