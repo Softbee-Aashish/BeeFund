@@ -163,12 +163,6 @@
     transform: rotate(6deg);
 }
 
-.card-thread--3 {
-    bottom: 26px;
-    right: 0;
-    transform: rotate(12deg);
-}
-
 /* Wing flap */
 @keyframes card-wing-flap {
 

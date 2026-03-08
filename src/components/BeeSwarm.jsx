@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const BEE_COUNT = 8;
+const BEE_COUNT = 3;
 const random = (min, max) => Math.random() * (max - min) + min;
 
 // Track displaced elements so bees can "grab" text

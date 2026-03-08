@@ -285,10 +285,8 @@ const BeePosterCarrier = ({
             <div ref={cardRef} className="bee-card" style={{ opacity: 0 }}>
                 <div className={`${beeClass} card-bee--1`}><BeeSVG /></div>
                 <div className={`${beeClass} card-bee--2`}><BeeSVG /></div>
-                <div className={`${beeClass} card-bee--3`}><BeeSVG /></div>
                 <div className="card-thread card-thread--1" />
                 <div className="card-thread card-thread--2" />
-                <div className="card-thread card-thread--3" />
                 <div className="bee-card-icon">{iconSvg}</div>
                 <div className="bee-card-name">{name}</div>
                 <div className="bee-card-desc">{description}</div>
