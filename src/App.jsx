@@ -5,7 +5,9 @@ import BottomNav from './components/BottomNav';
 import BeeSwarm from './components/BeeSwarm';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import DarkModeToggle from './components/DarkModeToggle';
+import PamphletModal from './components/PamphletModal';
 import { ThemeProvider } from './context/ThemeContext';
+import { EnquireModalProvider } from './context/EnquireModalContext';
 
 // Pages
 const HomePage = React.lazy(() => import('./pages/HomePage'));
@@ -28,47 +30,56 @@ const InflationCalculator = React.lazy(() => import('./pages/tools/InflationCalc
 const AffordabilityCalculator = React.lazy(() => import('./pages/tools/AffordabilityCalculator'));
 const ROICalculator = React.lazy(() => import('./pages/tools/ROICalculator'));
 const FixedVsFloating = React.lazy(() => import('./pages/tools/FixedVsFloating'));
+const ODCCCalculator = React.lazy(() => import('./pages/tools/ODCCCalculator'));
+const RepaymentScheduleGenerator = React.lazy(() => import('./pages/tools/RepaymentScheduleGenerator'));
 
 import './styles/global.css';
 
 function App() {
   return (
     <ThemeProvider>
-      <Router>
-        <div className="app-container">
-          <BeeSwarm />
-          <Header />
-          <main className="main-content">
-            <React.Suspense fallback={<div className="loading" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: 'var(--primary-color)' }}>Loading...</div>}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/loans" element={<LoanProductsPage />} />
-                <Route path="/tools" element={<ToolsHome />} />
-                <Route path="/tools/emi-calculator" element={<EMICalculatorPage />} />
-                <Route path="/tools/eligibility" element={<EligibilityCalculator />} />
-                <Route path="/tools/loan-comparison" element={<LoanComparison />} />
-                <Route path="/tools/gst-calculator" element={<GSTCalculator />} />
-                <Route path="/tools/tax-benefit" element={<TaxBenefitCalculator />} />
-                <Route path="/tools/inflation-impact" element={<InflationCalculator />} />
-                <Route path="/tools/affordability" element={<AffordabilityCalculator />} />
-                <Route path="/tools/roi-calculator" element={<ROICalculator />} />
-                <Route path="/tools/fixed-vs-floating" element={<FixedVsFloating />} />
-                {/* Keep old route as redirect */}
-                <Route path="/emi-calculator" element={<EMICalculatorPage />} />
-                <Route path="/blog" element={<BlogListPage />} />
-                <Route path="/blog/:slug" element={<BlogPostPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/apply" element={<ApplyPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/thank-you" element={<ThankYouPage />} />
-              </Routes>
-            </React.Suspense>
-          </main>
-          <WhatsAppWidget />
-          <DarkModeToggle />
-          <BottomNav />
-        </div>
-      </Router>
+      <EnquireModalProvider>
+        <Router>
+          <div className="app-container">
+            <BeeSwarm />
+            <Header />
+            <main className="main-content">
+              <React.Suspense fallback={<div className="loading" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: 'var(--primary-color)' }}>Loading...</div>}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/loans" element={<LoanProductsPage />} />
+                  <Route path="/tools" element={<ToolsHome />} />
+                  <Route path="/tools/emi-calculator" element={<EMICalculatorPage />} />
+                  <Route path="/tools/eligibility" element={<EligibilityCalculator />} />
+                  <Route path="/tools/loan-comparison" element={<LoanComparison />} />
+                  <Route path="/tools/gst-calculator" element={<GSTCalculator />} />
+                  <Route path="/tools/tax-benefit" element={<TaxBenefitCalculator />} />
+                  <Route path="/tools/inflation-impact" element={<InflationCalculator />} />
+                  <Route path="/tools/affordability" element={<AffordabilityCalculator />} />
+                  <Route path="/tools/roi-calculator" element={<ROICalculator />} />
+                  <Route path="/tools/fixed-vs-floating" element={<FixedVsFloating />} />
+                  <Route path="/tools/od-cc-calculator" element={<ODCCCalculator />} />
+                  <Route path="/tools/repayment-schedule" element={<RepaymentScheduleGenerator />} />
+                  {/* Keep aliases for direct access */}
+                  <Route path="/od-cc-calculator" element={<ODCCCalculator />} />
+                  <Route path="/repayment-schedule" element={<RepaymentScheduleGenerator />} />
+                  <Route path="/emi-calculator" element={<EMICalculatorPage />} />
+                  <Route path="/blog" element={<BlogListPage />} />
+                  <Route path="/blog/:slug" element={<BlogPostPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/apply" element={<ApplyPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/thank-you" element={<ThankYouPage />} />
+                </Routes>
+              </React.Suspense>
+            </main>
+            <WhatsAppWidget />
+            <DarkModeToggle />
+            <BottomNav />
+            <PamphletModal />
+          </div>
+        </Router>
+      </EnquireModalProvider>
     </ThemeProvider>
   );
 }

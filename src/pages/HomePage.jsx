@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import BeePosterCarrier from '../components/BeePosterCarrier';
 import HexagonBackground from '../components/HexagonBackground';
+import { useEnquiryModal } from '../context/EnquireModalContext';
 import './HomePage.css';
 
 /* ---- All products — Apply links now go to specific loan sections ---- */
@@ -19,6 +20,8 @@ const products = [
 ];
 
 const HomePage = () => {
+    const { openEnquiryModal } = useEnquiryModal();
+
     return (
         <div className="home-page">
             {/* ====== HERO ====== */}
@@ -48,7 +51,9 @@ const HomePage = () => {
                         <div className="hero-stat"><span className="stat-val">Zero</span><span className="stat-lbl">Collateral</span></div>
                     </div>
                     <div className="hero-actions">
-                        <Link to="/apply" className="btn btn-primary btn-lg" id="hero-apply">Apply Now</Link>
+                        <button type="button" onClick={() => openEnquiryModal({ source: 'Hero Button' })} className="btn btn-primary btn-lg" id="hero-apply">
+                            Enquire Now
+                        </button>
                         <Link to="/tools/emi-calculator" className="btn-ghost" id="hero-emi">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
                             EMI Calculator
@@ -65,9 +70,18 @@ const HomePage = () => {
                     <p className="sec-sub text-center">Scroll down — our bees will deliver each product to you.</p>
                     <div className="products-grid">
                         {products.map((p, i) => (
-                            <BeePosterCarrier key={i} direction={p.dir} icon={p.icon} name={p.name}
-                                description={p.desc} tags={p.tags} ctaText="Learn More"
-                                ctaLink={p.ctaLink} delay={80 + (i % 3) * 150} />
+                            <BeePosterCarrier
+                                key={i}
+                                direction={p.dir}
+                                icon={p.icon}
+                                name={p.name}
+                                description={p.desc}
+                                tags={p.tags}
+                                ctaText="Enquire for it"
+                                ctaLink={p.ctaLink}
+                                onCtaClick={() => openEnquiryModal({ loanType: p.name, source: `Home Card - ${p.name}` })}
+                                delay={80 + (i % 3) * 150}
+                            />
                         ))}
                     </div>
                 </div>
@@ -142,7 +156,9 @@ const HomePage = () => {
                     <h2 className="cta-h">Ready to fund your next big move?</h2>
                     <p className="cta-p">Join thousands of businesses that trust BeeFund.</p>
                     <div className="cta-btns">
-                        <Link to="/apply" className="btn btn-primary btn-lg" id="cta-apply">Get Started — Free</Link>
+                        <button type="button" onClick={() => openEnquiryModal({ source: 'Home Final CTA' })} className="btn btn-primary btn-lg" id="cta-apply">
+                            Enquire Now — Free
+                        </button>
                         <Link to="/contact" className="btn-ghost btn-ghost--dark" id="cta-contact">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.13.81.36 1.6.68 2.34a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.74.32 1.53.55 2.34.68a2 2 0 011.72 2.03z" /></svg>
                             Talk to Expert

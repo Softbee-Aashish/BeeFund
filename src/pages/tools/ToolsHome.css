@@ -477,3 +477,141 @@
         font-size: 1.4rem;
     }
 }
+
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+[data-theme="dark"] .tools-home-page {
+    background-color: #0b1120;
+}
+
+[data-theme="dark"] .th-hero {
+    background: #0b1120 !important;
+}
+
+[data-theme="dark"] .th-badge {
+    background: #451a03 !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .th-title,
+[data-theme="dark"] .th-sec-title,
+[data-theme="dark"] .th-seo-h2 {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .th-subtitle,
+[data-theme="dark"] .th-sec-sub,
+[data-theme="dark"] .th-seo-text {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .th-subtitle strong,
+[data-theme="dark"] .th-seo-text strong {
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .th-stat-val {
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .th-stat-lbl {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .th-stat-sep {
+    background: #334155 !important;
+}
+
+[data-theme="dark"] .th-seo {
+    background: #0f172a !important;
+}
+
+[data-theme="dark"] .th-grid-section {
+    background: #0b1120 !important;
+}
+
+[data-theme="dark"] .th-card {
+    background: #1e293b !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.25) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .th-card:hover {
+    border-color: #f59e0b !important;
+    transform: translateY(-6px) !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(245, 158, 11, 0.15) !important;
+}
+
+[data-theme="dark"] .th-card-title {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .th-card-desc {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .th-card-num {
+    color: rgba(245, 158, 11, 0.35) !important;
+}
+
+[data-theme="dark"] .th-card-cta {
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .th-why {
+    background: #0f172a !important;
+}
+
+[data-theme="dark"] .th-why-card {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+[data-theme="dark"] .th-why-card:hover {
+    border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+[data-theme="dark"] .th-why-card h3 {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .th-why-card p {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .th-faq {
+    background: #0b1120 !important;
+}
+
+[data-theme="dark"] .faq-item {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .faq-q {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .faq-a {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .th-cta {
+    background: #0f172a !important;
+}
+
+[data-theme="dark"] .btn-cta-dark {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #0b1120 !important;
+}
+
+[data-theme="dark"] .btn-cta-dark:hover {
+    background: #fbbf24 !important;
+    color: #0b1120 !important;
+}
+
+[data-theme="dark"] .th-cta-link {
+    color: #fbbf24 !important;
+}

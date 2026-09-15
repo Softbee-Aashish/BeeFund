@@ -195,6 +195,144 @@
     scroll-margin-top: 120px;
 }
 
+/* ---- Loan Cards Carousel ---- */
+.lp-carousel-wrapper {
+    max-width: 940px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.lp-carousel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+}
+
+.lp-carousel-counter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lp-carousel-counter .current-num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #d97706;
+    line-height: 1;
+}
+
+.lp-carousel-counter .counter-sep {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #cbd5e1;
+}
+
+.lp-carousel-counter .total-num {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.lp-carousel-counter .counter-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #334155;
+    margin-left: 0.75rem;
+    padding-left: 0.75rem;
+    border-left: 2px solid #e2e8f0;
+}
+
+/* Carousel Stage: Card in between 2 side arrows */
+.lp-carousel-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    position: relative;
+    width: 100%;
+}
+
+.lp-side-arrow {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid rgba(245, 158, 11, 0.35);
+    background: #ffffff;
+    color: #d97706;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    z-index: 15;
+}
+
+.lp-side-arrow:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+    border-color: #f59e0b;
+    transform: scale(1.1);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+}
+
+.lp-side-arrow:active {
+    transform: scale(0.95);
+}
+
+.lp-carousel-viewport {
+    overflow: hidden;
+    width: 100%;
+    border-radius: 24px;
+    user-select: none;
+}
+
+.lp-carousel-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: transform;
+}
+
+.lp-carousel-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.25rem 0.25rem;
+}
+
+/* Dots */
+.lp-carousel-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 2rem;
+}
+
+.lp-dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    border: none;
+    background: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lp-dot:hover {
+    background: #cbd5e1;
+}
+
+.lp-dot--active {
+    width: 28px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
 .lp-loan-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -624,6 +762,15 @@
         transform: translateX(-50%);
         top: 0;
     }
+
+    .lp-carousel-stage {
+        gap: 0.5rem;
+    }
+
+    .lp-side-arrow {
+        width: 42px;
+        height: 42px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -653,71 +800,192 @@
 
 /* ===== DARK MODE ===== */
 [data-theme="dark"] .lp-hero,
-[data-theme="dark"] .lp-body {
-    background: #0f172a;
+[data-theme="dark"] .lp-body,
+[data-theme="dark"] .lp-cards-section {
+    background: #0b1120 !important;
 }
 
 [data-theme="dark"] .lp-title,
-[data-theme="dark"] .lp-section-title {
-    color: #f9fafb;
+[data-theme="dark"] .lp-section-title,
+[data-theme="dark"] .seo-h2 {
+    color: #f8fafc !important;
 }
 
 [data-theme="dark"] .lp-subtitle,
-[data-theme="dark"] .lp-section-sub {
-    color: #9ca3af;
+[data-theme="dark"] .lp-section-sub,
+[data-theme="dark"] .seo-text {
+    color: #cbd5e1 !important;
 }
 
-[data-theme="dark"] .lp-card,
-[data-theme="dark"] .lp-tab-content {
-    background: #1f2937;
-    border-color: #374151;
-    color: #f9fafb;
+[data-theme="dark"] .seo-text strong {
+    color: #fbbf24 !important;
 }
 
-[data-theme="dark"] .lp-card:hover {
-    border-color: #f59e0b;
+[data-theme="dark"] .lp-badge {
+    background: #451a03 !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+    color: #fbbf24 !important;
 }
 
-[data-theme="dark"] .lp-card-title {
-    color: #f9fafb;
+[data-theme="dark"] .lp-card-num {
+    color: rgba(245, 158, 11, 0.35) !important;
 }
 
-[data-theme="dark"] .lp-card-desc,
-[data-theme="dark"] .lp-card-feature {
-    color: #9ca3af;
+[data-theme="dark"] .lp-carousel-counter .current-num {
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .lp-carousel-counter .counter-sep {
+    color: #334155 !important;
+}
+
+[data-theme="dark"] .lp-carousel-counter .total-num {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .lp-link {
+    color: #fbbf24 !important;
+}
+
+/* Category Tabs in Dark Mode */
+[data-theme="dark"] .lp-tabs-wrap {
+    background: #0f172a !important;
+    border-bottom: 1px solid #334155 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 [data-theme="dark"] .lp-tabs {
-    background: #111827;
+    background: #0f172a !important;
 }
 
 [data-theme="dark"] .lp-tab {
-    color: #9ca3af;
+    color: #94a3b8 !important;
 }
 
-[data-theme="dark"] .lp-tab.active,
 [data-theme="dark"] .lp-tab:hover {
-    color: #f59e0b;
+    color: #fbbf24 !important;
 }
 
-[data-theme="dark"] .lp-products-bg {
-    background: #111827;
+[data-theme="dark"] .lp-tab--active {
+    color: #fbbf24 !important;
+    border-bottom-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .lp-seo-intro {
+    background: #0f172a !important;
+}
+
+/* Loan Carousel Card in Dark Mode */
+[data-theme="dark"] .lp-loan-card {
+    background: #1e293b !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.25) !important;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .lp-loan-card:hover {
+    border-color: #f59e0b !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(245, 158, 11, 0.15) !important;
+}
+
+[data-theme="dark"] .lp-card-name {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .lp-card-desc {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .lp-card-stats {
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .lp-cs-label {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .lp-cs-val {
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .lp-card-features li {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .lp-card-link {
+    color: #fbbf24 !important;
 }
 
 [data-theme="dark"] .lp-stat-val {
-    color: #f9fafb;
+    color: #fbbf24 !important;
 }
 
 [data-theme="dark"] .lp-stat-lbl {
-    color: #9ca3af;
+    color: #94a3b8 !important;
 }
 
-[data-theme="dark"] .lp-card-btn {
-    border-color: #374151;
-    color: #f59e0b;
+[data-theme="dark"] .lp-stat-sep {
+    background: #334155 !important;
 }
 
-[data-theme="dark"] .lp-card-btn:hover {
-    background: #f59e0b;
-    color: #111827;
+[data-theme="dark"] .lp-carousel-counter .counter-label {
+    color: #f8fafc !important;
+    border-left-color: #334155 !important;
+}
+
+[data-theme="dark"] .lp-arrow-btn,
+[data-theme="dark"] .lp-side-arrow {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #fbbf24 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .lp-arrow-btn:hover,
+[data-theme="dark"] .lp-side-arrow:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #0b1120 !important;
+    border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .lp-dot {
+    background: #334155 !important;
+}
+
+[data-theme="dark"] .lp-dot--active {
+    background: #f59e0b !important;
+}
+
+/* How it Works & FAQ in Dark Mode */
+[data-theme="dark"] .lp-how-section {
+    background: #0f172a !important;
+}
+
+[data-theme="dark"] .lp-step {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .lp-step-t {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .lp-step-d {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .lp-faq-section {
+    background: #0b1120 !important;
+}
+
+[data-theme="dark"] .faq-item {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .faq-q {
+    color: #f8fafc !important;
+}
+
+[data-theme="dark"] .faq-a {
+    color: #cbd5e1 !important;
 }

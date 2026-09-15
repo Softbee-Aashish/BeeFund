@@ -57,9 +57,10 @@ const BeePosterCarrier = ({
     name = 'Loan Product',
     description = '',
     tags = [],
-    ctaText = 'Apply Now',
+    ctaText = 'Enquire for it',
     ctaLink = '/apply',
     delay = 0,
+    onCtaClick = null,
 }) => {
     const wrapperRef = useRef(null);
     const cardRef = useRef(null);
@@ -295,7 +296,15 @@ const BeePosterCarrier = ({
                         {tags.map((t, i) => <span key={i} className="bee-card-tag">{t}</span>)}
                     </div>
                 )}
-                <Link to={ctaLink} className="bee-card-btn">{ctaText}</Link>
+                {onCtaClick ? (
+                    <button type="button" onClick={onCtaClick} className="bee-card-btn">
+                        {ctaText}
+                    </button>
+                ) : (
+                    <Link to={ctaLink} className="bee-card-btn">
+                        {ctaText}
+                    </Link>
+                )}
             </div>
         </div>
     );

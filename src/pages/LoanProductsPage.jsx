@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import HexagonBackground from '../components/HexagonBackground';
+import { useEnquiryModal } from '../context/EnquireModalContext';
 import './LoanProductsPage.css';
 
 /* ================================================
@@ -76,8 +77,19 @@ const faqs = [
 
 const LoanProductsPage = () => {
     const location = useLocation();
+    const { openEnquiryModal } = useEnquiryModal();
     const [activeCategory, setActiveCategory] = useState(loanCategories[0].id);
+    const [currentSlide, setCurrentSlide] = useState(0);
     const [openFaq, setOpenFaq] = useState(null);
+    const [isHovered, setIsHovered] = useState(false);
+
+    const touchStartX = useRef(0);
+    const touchEndX = useRef(0);
+
+    // Reset slide index when category changes
+    useEffect(() => {
+        setCurrentSlide(0);
+    }, [activeCategory]);
 
     useEffect(() => {
         const hash = location.hash.replace('#', '');
@@ -94,6 +106,41 @@ const LoanProductsPage = () => {
     }, [location.hash]);
 
     const activeCat = loanCategories.find(c => c.id === activeCategory);
+    const totalSlides = activeCat.loans.length;
+
+    const nextSlide = () => setCurrentSlide(prev => (prev === totalSlides - 1 ? 0 : prev + 1));
+    const prevSlide = () => setCurrentSlide(prev => (prev === 0 ? totalSlides - 1 : prev - 1));
+
+    // Auto-scroll every 4.5 seconds (4-5s interval), pauses on hover or touch
+    useEffect(() => {
+        if (isHovered) return;
+
+        const interval = setInterval(() => {
+            setCurrentSlide(prev => (prev === totalSlides - 1 ? 0 : prev + 1));
+        }, 4500);
+
+        return () => clearInterval(interval);
+    }, [totalSlides, isHovered, activeCategory]);
+
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchMove = (e) => {
+        touchEndX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+        if (!touchStartX.current || !touchEndX.current) return;
+        const diff = touchStartX.current - touchEndX.current;
+        if (diff > 50) {
+            nextSlide();
+        } else if (diff < -50) {
+            prevSlide();
+        }
+        touchStartX.current = 0;
+        touchEndX.current = 0;
+    };
 
     return (
         <div className="loan-products-page">
@@ -156,50 +203,137 @@ const LoanProductsPage = () => {
                             {activeCat.description} At BeeFund, powered by AADYASHIV CONSULTING PRIVATE LIMITED, we process your loan application through 25+ authorized banking partners including SBI, HDFC, ICICI, Axis Bank, and more — ensuring you get the <strong>lowest interest rates</strong> and <strong>fastest approval</strong> available in the market.
                         </p>
                         <div className="seo-cta-row">
-                            <Link to="/apply" className="btn btn-primary" id="lp-apply-top">Check Eligibility — Free</Link>
+                            <button
+                                type="button"
+                                onClick={() => openEnquiryModal({ loanType: activeCat.title, source: 'Loans Top SEO CTA' })}
+                                className="btn btn-primary"
+                                id="lp-apply-top"
+                            >
+                                Check Eligibility — Free
+                            </button>
                             <Link to="/tools/emi-calculator" className="lp-link">Calculate EMI →</Link>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* === LOAN CARDS === */}
+            {/* === LOAN CARDS CAROUSEL === */}
             <section className="lp-cards-section" id={`cat-${activeCat.id}`}>
                 <div className="container">
-                    <div className="lp-loan-grid">
-                        {activeCat.loans.map((loan, idx) => (
-                            <article className="lp-loan-card" key={loan.id} id={`loan-${loan.id}`}>
-                                <div className="lp-card-top">
-                                    <span className="lp-card-num">0{idx + 1}</span>
-                                    <h3 className="lp-card-name">{loan.name}</h3>
-                                </div>
-                                <p className="lp-card-desc">{loan.desc}</p>
+                    <div className="lp-carousel-wrapper">
+                        {/* Carousel Navigation Bar (Counter) */}
+                        <div className="lp-carousel-nav">
+                            <div className="lp-carousel-counter">
+                                <span className="current-num">0{currentSlide + 1}</span>
+                                <span className="counter-sep">/</span>
+                                <span className="total-num">0{totalSlides}</span>
+                                <span className="counter-label">{activeCat.loans[currentSlide]?.name}</span>
+                            </div>
+                        </div>
 
-                                <div className="lp-card-stats">
-                                    <div className="lp-card-stat">
-                                        <span className="lp-cs-label">Max Amount</span>
-                                        <span className="lp-cs-val">{loan.amount}</span>
-                                    </div>
-                                    <div className="lp-card-stat">
-                                        <span className="lp-cs-label">Interest Rate</span>
-                                        <span className="lp-cs-val">{loan.rate}</span>
-                                    </div>
-                                    <div className="lp-card-stat">
-                                        <span className="lp-cs-label">Tenure</span>
-                                        <span className="lp-cs-val">{loan.tenure}</span>
-                                    </div>
-                                </div>
+                        {/* Carousel Stage: Left Arrow, Card in Between, Right Arrow */}
+                        <div
+                            className="lp-carousel-stage"
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        >
+                            {/* Left Navigation Arrow */}
+                            <button
+                                type="button"
+                                className="lp-side-arrow lp-side-arrow--prev"
+                                onClick={prevSlide}
+                                aria-label="Previous loan product"
+                            >
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </button>
 
-                                <ul className="lp-card-features">
-                                    {loan.features.map((f, i) => <li key={i}>{f}</li>)}
-                                </ul>
+                            {/* Carousel Viewport (Card in between) */}
+                            <div
+                                className="lp-carousel-viewport"
+                                onTouchStart={(e) => {
+                                    setIsHovered(true);
+                                    handleTouchStart(e);
+                                }}
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={() => {
+                                    setIsHovered(false);
+                                    handleTouchEnd();
+                                }}
+                            >
+                                <div
+                                    className="lp-carousel-track"
+                                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                                >
+                                    {activeCat.loans.map((loan, idx) => (
+                                        <div className="lp-carousel-slide" key={loan.id}>
+                                            <article className="lp-loan-card" id={`loan-${loan.id}`}>
+                                                <div className="lp-card-top">
+                                                    <span className="lp-card-num">0{idx + 1}</span>
+                                                    <h3 className="lp-card-name">{loan.name}</h3>
+                                                </div>
+                                                <p className="lp-card-desc">{loan.desc}</p>
 
-                                <div className="lp-card-actions">
-                                    <Link to={`/apply?product=${loan.id}`} className="btn btn-primary lp-card-btn">Apply Now</Link>
-                                    <Link to="/tools/emi-calculator" className="lp-card-link">Calculate EMI →</Link>
+                                                <div className="lp-card-stats">
+                                                    <div className="lp-card-stat">
+                                                        <span className="lp-cs-label">Max Amount</span>
+                                                        <span className="lp-cs-val">{loan.amount}</span>
+                                                    </div>
+                                                    <div className="lp-card-stat">
+                                                        <span className="lp-cs-label">Interest Rate</span>
+                                                        <span className="lp-cs-val">{loan.rate}</span>
+                                                    </div>
+                                                    <div className="lp-card-stat">
+                                                        <span className="lp-cs-label">Tenure</span>
+                                                        <span className="lp-cs-val">{loan.tenure}</span>
+                                                    </div>
+                                                </div>
+
+                                                <ul className="lp-card-features">
+                                                    {loan.features.map((f, i) => <li key={i}>{f}</li>)}
+                                                </ul>
+
+                                                <div className="lp-card-actions">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openEnquiryModal({ loanType: loan.name, source: `Loan Carousel - ${loan.name}` })}
+                                                        className="btn btn-primary lp-card-btn"
+                                                    >
+                                                        Enquire Now
+                                                    </button>
+                                                    <Link to="/tools/emi-calculator" className="lp-card-link">Calculate EMI →</Link>
+                                                </div>
+                                            </article>
+                                        </div>
+                                    ))}
                                 </div>
-                            </article>
-                        ))}
+                            </div>
+
+                            {/* Right Navigation Arrow */}
+                            <button
+                                type="button"
+                                className="lp-side-arrow lp-side-arrow--next"
+                                onClick={nextSlide}
+                                aria-label="Next loan product"
+                            >
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Carousel Pagination Dots */}
+                        <div className="lp-carousel-dots">
+                            {activeCat.loans.map((_, dotIdx) => (
+                                <button
+                                    key={dotIdx}
+                                    className={`lp-dot ${currentSlide === dotIdx ? 'lp-dot--active' : ''}`}
+                                    onClick={() => setCurrentSlide(dotIdx)}
+                                    aria-label={`Go to slide ${dotIdx + 1}`}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
@@ -266,7 +400,14 @@ const LoanProductsPage = () => {
                 <div className="container text-center">
                     <h2 className="lp-cta-h">Ready to get the best loan rates in India?</h2>
                     <p className="lp-cta-p">Apply in 2 minutes. Zero fees. Expert guidance from AADYASHIV CONSULTING's team.</p>
-                    <Link to="/apply" className="btn-cta-dark" id="lp-cta-apply">Apply Now — It's Free</Link>
+                    <button
+                        type="button"
+                        onClick={() => openEnquiryModal({ source: 'Loans Page Bottom CTA' })}
+                        className="btn-cta-dark"
+                        id="lp-cta-apply"
+                    >
+                        Enquire Now — It's Free
+                    </button>
                 </div>
             </section>
         </div>

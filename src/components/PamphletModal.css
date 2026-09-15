@@ -1,0 +1,693 @@
+/* ========================================================
+   BeeFund – Bee-Carried Pamphlet Modal Styles & Animations
+   ======================================================== */
+
+.pamphlet-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    overflow-y: auto;
+    animation: pamphletOverlayIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pamphletOverlayIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Wrapper */
+.pamphlet-container {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    perspective: 1200px;
+}
+
+/* Carrier Rig (Bees + Hanging Threads) */
+.pamphlet-carrier-rig {
+    position: relative;
+    width: 82%;
+    display: flex;
+    justify-content: space-between;
+    height: 48px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.bee-rope-anchor {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 44px;
+}
+
+.bee-anchor-left {
+    animation: carrierBeeHoverLeft 5s ease-in-out infinite alternate;
+}
+
+.bee-anchor-right {
+    animation: carrierBeeHoverRight 5.5s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes carrierBeeHoverLeft {
+    0% {
+        transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+        transform: translateY(-5px) rotate(3deg);
+    }
+    100% {
+        transform: translateY(2px) rotate(-1deg);
+    }
+}
+
+@keyframes carrierBeeHoverRight {
+    0% {
+        transform: translateY(-2px) rotate(2deg);
+    }
+    50% {
+        transform: translateY(3px) rotate(-3deg);
+    }
+    100% {
+        transform: translateY(-4px) rotate(1deg);
+    }
+}
+
+/* Carrier Bee SVG & Wings */
+.pamphlet-bee {
+    width: 36px;
+    height: 36px;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+}
+
+.bee-flipped {
+    transform: scaleX(-1);
+}
+
+.carrier-bee-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.wing-left {
+    animation: p-wing-left 0.09s ease-in-out infinite alternate;
+    transform-origin: 12px 10px;
+}
+
+.wing-right {
+    animation: p-wing-right 0.09s ease-in-out infinite alternate;
+    transform-origin: 12px 10px;
+}
+
+@keyframes p-wing-left {
+    from {
+        transform: rotate(-25deg);
+    }
+    to {
+        transform: rotate(20deg);
+    }
+}
+
+@keyframes p-wing-right {
+    from {
+        transform: rotate(20deg);
+    }
+    to {
+        transform: rotate(-25deg);
+    }
+}
+
+/* Golden Suspension Threads */
+.pamphlet-rope {
+    width: 2px;
+    height: 18px;
+    background: linear-gradient(180deg, #d97706 0%, #fbbf24 100%);
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+    transform-origin: top center;
+}
+
+.pamphlet-grommet {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d97706;
+    border: 1.5px solid #fbbf24;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    margin-top: -3px;
+}
+
+/* ========================================================
+   THE PAMPHLET SCROLL — Wind-Wave & Organic Movement
+   ======================================================== */
+.pamphlet-body {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 22px;
+    border: 1.5px solid rgba(245, 158, 11, 0.28);
+    box-shadow:
+        0 25px 60px -10px rgba(0, 0, 0, 0.25),
+        0 0 30px rgba(245, 158, 11, 0.12);
+    padding: 2.5rem 2.2rem 2.2rem;
+    overflow: visible;
+    transform-origin: 50% 0%;
+    /* Smooth, subtle, organic slow wind-wave */
+    animation:
+        pamphletWindSway 9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate,
+        pamphletPaperWave 14s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* Slow, organic pendulum & breeze movement */
+@keyframes pamphletWindSway {
+    0% {
+        transform: rotate(0deg) translate3d(0, 0, 0);
+    }
+    20% {
+        transform: rotate(0.45deg) translate3d(2px, -0.5px, 0);
+    }
+    45% {
+        transform: rotate(-0.35deg) translate3d(-1.5px, 1px, 0);
+    }
+    70% {
+        transform: rotate(0.55deg) translate3d(1.5px, 0.5px, 0);
+    }
+    85% {
+        transform: rotate(-0.25deg) translate3d(-1px, -0.5px, 0);
+    }
+    100% {
+        transform: rotate(0.1deg) translate3d(0.5px, 0, 0);
+    }
+}
+
+/* Sub-pixel subtle parchment breathing / wind ripple */
+@keyframes pamphletPaperWave {
+    0%, 100% {
+        border-bottom-left-radius: 22px;
+        border-bottom-right-radius: 22px;
+    }
+    33% {
+        border-bottom-left-radius: 26px;
+        border-bottom-right-radius: 19px;
+    }
+    66% {
+        border-bottom-left-radius: 19px;
+        border-bottom-right-radius: 26px;
+    }
+}
+
+/* Golden Decorative Trim */
+.pamphlet-trim {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #d97706);
+    border-radius: 22px 22px 0 0;
+}
+
+/* Close Button */
+.pamphlet-close-btn {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 20;
+}
+
+.pamphlet-close-btn:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+/* Pamphlet Header */
+.pamphlet-header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+
+.pamphlet-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.85rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #d97706;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+    animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.pamphlet-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+}
+
+.pamphlet-brand {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pamphlet-subtitle {
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.5;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* Form Layout */
+.pamphlet-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.p-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.p-input-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.p-input-group label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155;
+    letter-spacing: 0.01em;
+}
+
+.p-input-group input,
+.p-input-group textarea,
+.p-select-wrap select {
+    width: 100%;
+    padding: 0.75rem 0.95rem;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 0.92rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.p-input-group input:focus,
+.p-input-group textarea:focus,
+.p-select-wrap select:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.phone-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.phone-input-wrap:focus-within {
+    background: #ffffff;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.phone-prefix {
+    padding: 0.75rem 0.75rem 0.75rem 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #64748b;
+    background: #f1f5f9;
+    border-right: 1px solid #e2e8f0;
+}
+
+.phone-input-wrap input {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding-left: 0.75rem;
+}
+
+/* Custom Select */
+.p-select-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.p-select-wrap select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: 2.5rem;
+}
+
+.p-select-chevron {
+    position: absolute;
+    right: 0.95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.p-input-group textarea {
+    resize: vertical;
+    min-height: 75px;
+}
+
+/* Error Banner */
+.p-error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+/* Footer & Submit */
+.pamphlet-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.pamphlet-submit-btn {
+    width: 100%;
+    padding: 0.95rem 1.5rem;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+    transition: all 0.25s ease;
+}
+
+.pamphlet-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+
+.pamphlet-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.p-btn-icon {
+    transition: transform 0.2s ease;
+}
+
+.pamphlet-submit-btn:hover:not(:disabled) .p-btn-icon {
+    transform: translate(3px, -3px);
+}
+
+.p-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: pSpin 0.7s linear infinite;
+}
+
+@keyframes pSpin {
+    to { transform: rotate(360deg); }
+}
+
+.p-privacy-note {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Success View */
+.pamphlet-success-view {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: successFadeIn 0.4s ease-out;
+}
+
+@keyframes successFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.p-success-badge {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1.5px solid rgba(16, 185, 129, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    animation: pSuccessPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pSuccessPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.pamphlet-success-view h3 {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 0.6rem;
+}
+
+.pamphlet-success-view p {
+    font-size: 0.92rem;
+    color: #64748b;
+    line-height: 1.6;
+    max-width: 440px;
+    margin-bottom: 1.5rem;
+}
+
+.p-success-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.85rem 1.25rem;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: 1.75rem;
+}
+
+.pamphlet-ok-btn {
+    padding: 0.8rem 2.5rem;
+    border-radius: 999px;
+    border: none;
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pamphlet-ok-btn:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+/* ========================================================
+   DARK MODE SUPPORT
+   ======================================================== */
+[data-theme="dark"] .pamphlet-body {
+    background: #1e293b;
+    border-color: rgba(245, 158, 11, 0.35);
+    box-shadow:
+        0 25px 60px -10px rgba(0, 0, 0, 0.6),
+        0 0 35px rgba(245, 158, 11, 0.15);
+}
+
+[data-theme="dark"] .pamphlet-title,
+[data-theme="dark"] .pamphlet-success-view h3 {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .pamphlet-subtitle,
+[data-theme="dark"] .pamphlet-success-view p {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .pamphlet-close-btn {
+    background: #0f172a;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .pamphlet-close-btn:hover {
+    background: #450a0a;
+    border-color: #7f1d1d;
+    color: #f87171;
+}
+
+[data-theme="dark"] .p-input-group label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .p-input-group input,
+[data-theme="dark"] .p-input-group textarea,
+[data-theme="dark"] .p-select-wrap select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .p-input-group input:focus,
+[data-theme="dark"] .p-input-group textarea:focus,
+[data-theme="dark"] .p-select-wrap select:focus {
+    background: #0f172a;
+    border-color: #f59e0b;
+}
+
+[data-theme="dark"] .phone-input-wrap {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .phone-prefix {
+    background: #1e293b;
+    border-right-color: #334155;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .p-success-meta {
+    background: #0f172a;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .pamphlet-ok-btn {
+    background: #f59e0b;
+    color: #0f172a;
+}
+
+/* ========================================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================================== */
+@media (max-width: 640px) {
+    .pamphlet-body {
+        padding: 2rem 1.25rem 1.5rem;
+        border-radius: 18px;
+    }
+
+    .pamphlet-carrier-rig {
+        width: 88%;
+        height: 42px;
+    }
+
+    .pamphlet-title {
+        font-size: 1.45rem;
+    }
+
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+    }
+
+    .pamphlet-close-btn {
+        top: 0.85rem;
+        right: 0.85rem;
+        width: 32px;
+        height: 32px;
+    }
+}
