@@ -612,6 +612,29 @@
     display: flex;
     align-items: center;
     gap: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.btn-export-excel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ffffff;
+    border: none;
+    padding: 0.8rem 1.35rem;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+    transition: all 0.25s ease;
+}
+
+.btn-export-excel:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
 }
 
 .btn-download-pdf {
@@ -630,6 +653,219 @@
 }
 
 .btn-download-pdf:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+/* Cache Badge Banner */
+.cache-badge-banner {
+    background: #ecfdf5;
+    border: 1.5px solid #10b981;
+    color: #065f46;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+/* Obligation Section */
+.obligation-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2.5rem 2.25rem;
+    border: 1.5px solid rgba(245, 158, 11, 0.25);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
+    margin-bottom: 3rem;
+}
+
+.obligation-header-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.section-kicker {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #d97706;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.3rem;
+}
+
+.obligation-filter-tabs {
+    display: flex;
+    background: #f1f5f9;
+    padding: 0.3rem;
+    border-radius: 10px;
+    gap: 0.25rem;
+}
+
+.obligation-filter-tabs .tab-btn {
+    border: none;
+    background: transparent;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.obligation-filter-tabs .tab-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* KPI Cards */
+.obligation-kpis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1.15rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.45rem;
+}
+
+.kpi-val {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 0.25rem;
+}
+
+.kpi-val.emi-highlight {
+    color: #d97706;
+}
+
+.kpi-sub {
+    font-size: 0.76rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* Obligation Table */
+.obligation-table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+
+.obligation-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    text-align: left;
+}
+
+.obligation-table th {
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 800;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid #cbd5e1;
+    white-space: nowrap;
+}
+
+.obligation-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.obligation-table tr:hover td {
+    background: #fffdf5;
+}
+
+.obligation-total-row td {
+    background: #fef3c7 !important;
+    color: #78350f !important;
+    border-top: 2px solid #f59e0b;
+    font-size: 0.92rem;
+}
+
+.ob-status-badge {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-closed {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.table-actions-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.btn-table-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-table-export.excel {
+    background: #059669;
+    color: #ffffff;
+}
+
+.btn-table-export.excel:hover {
+    background: #047857;
+    transform: translateY(-1px);
+}
+
+.btn-table-export.pdf {
+    background: #1e293b;
+    color: #ffffff;
+}
+
+.btn-table-export.pdf:hover {
     background: #d97706;
     transform: translateY(-1px);
 }
@@ -1431,10 +1667,67 @@
 [data-theme="dark"] .gauge-hero-card,
 [data-theme="dark"] .factor-card,
 [data-theme="dark"] .offer-card,
+[data-theme="dark"] .obligation-section,
 [data-theme="dark"] .credit-guide-article {
     background: #1e293b;
     border-color: rgba(245, 158, 11, 0.2);
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .obligation-filter-tabs {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .obligation-filter-tabs .tab-btn {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .obligation-filter-tabs .tab-btn.active {
+    background: #1e293b;
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .kpi-card {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .kpi-val {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .kpi-val.emi-highlight {
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .obligation-table-wrap {
+    border-color: #334155;
+}
+
+[data-theme="dark"] .obligation-table th {
+    background: #0f172a;
+    color: #f8fafc;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .obligation-table td {
+    border-color: #1e293b;
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .obligation-table tr:hover td {
+    background: rgba(245, 158, 11, 0.06);
+}
+
+[data-theme="dark"] .obligation-total-row td {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border-top-color: #f59e0b;
+}
+
+[data-theme="dark"] .status-closed {
+    background: #334155;
+    color: #cbd5e1;
 }
 
 [data-theme="dark"] .flow-card-header h2,

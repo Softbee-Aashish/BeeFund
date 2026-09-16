@@ -6,43 +6,40 @@ import {
     cleanMobileInput,
     validateEmail,
     validatePAN,
-    validatePincode,
-    validateAge
+    validatePincode
 } from '../utils/validation';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import {
+    fetchDecentroCreditReport,
+    exportObligationChartToExcel,
+    downloadBureauReportPdf,
+    formatINR
+} from '../utils/decentroService';
 import './CreditReportPage.css';
 
-/* ==========================================================================
-   DECENTRO CREDIT BUREAU API CONFIGURATION (READY FOR DROP-IN CREDENTIALS)
-   ========================================================================== */
-/**
- * When live Decentro API keys are provisioned, update these constants:
- * Endpoint: POST https://in.staging.decentro.tech/v2/financial_services/credit_score
- * Headers:
- *   client_id:     YOUR_DECENTRO_CLIENT_ID
- *   client_secret: YOUR_DECENTRO_CLIENT_SECRET
- *   module_secret: YOUR_MODULE_SECRET
- */
-const DECENTRO_API_URL = 'https://in.staging.decentro.tech/v2/financial_services/credit_score';
-
 const ADDRESS_TYPES = [
-    { value: 'Residence', label: 'Residential Address (Current)' },
-    { value: 'Office', label: 'Office / Business Address' },
-    { value: 'Permanent', label: 'Permanent Address' }
+    { value: 'H', label: 'Residential / Home Address (Primary)' },
+    { value: 'O', label: 'Office / Business Address' },
+    { value: 'X', label: 'Permanent Address' }
 ];
 
 const INQUIRY_PURPOSES = [
-    { value: 'Comprehensive Review', label: 'Comprehensive Credit Health & Eligibility Check' },
-    { value: 'Business Loan', label: 'Business Loan Application Pre-Check' },
-    { value: 'Home Loan / LAP', label: 'Home Loan / LAP Qualification' },
-    { value: 'Personal Loan', label: 'Personal Loan Rate Optimization' }
+    { value: 'BL', label: 'Business Loan (BL)' },
+    { value: 'PL', label: 'Personal Loan (PL)' },
+    { value: 'HL', label: 'Home Loan / LAP (HL)' },
+    { value: 'CC', label: 'Credit Card / Working Capital (CC)' },
+    { value: 'CL', label: 'Commercial Vehicle / Auto Loan (CL)' }
+];
+
+const BUREAU_OPTIONS = [
+    { value: 'EQ', label: 'Equifax & CIBIL Hybrid (Recommended)' },
+    { value: 'EX', label: 'Experian Credit Bureau' },
+    { value: 'CR', label: 'CRIF High Mark' }
 ];
 
 const CreditReportPage = () => {
     const { openEnquiryModal } = useEnquiryModal();
 
-    // Steps: 1 = KYC details filler, 2 = OTP screen, 3 = Score Report Dashboard
+    // Steps: 1 = KYC details filler, 2 = OTP screen, 3 = Score & Obligation Dashboard
     const [step, setStep] = useState(1);
 
     // Form inputs structured strictly per Decentro API spec
@@ -52,9 +49,12 @@ const CreditReportPage = () => {
         email: '',
         dob: '',
         pan: '',
+        address: '',
         pincode: '',
-        addressType: 'Residence',
-        inquiryPurpose: 'Comprehensive Review',
+        addressType: 'H',
+        inquiryPurpose: 'BL',
+        bureauCode: 'EQ',
+        consentPurpose: 'Fetching credit report for loan eligibility assessment',
         consent: true
     });
 
@@ -70,11 +70,15 @@ const CreditReportPage = () => {
     const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
     const otpInputRefs = useRef([]);
 
-    // Report Result Data (Simulated / Decentro ready)
+    // Report Result Data from Decentro (Parsed)
     const [reportData, setReportData] = useState(null);
+    const [wasFromCache, setWasFromCache] = useState(false);
 
     // FAQ Accordion Active Index
     const [activeFaq, setActiveFaq] = useState(null);
+
+    // Obligation Filter ('all', 'active', 'closed')
+    const [obligationFilter, setObligationFilter] = useState('all');
 
     // Simulator score adjustment
     const [simulatedAdjustment, setSimulatedAdjustment] = useState(0);
@@ -115,8 +119,8 @@ const CreditReportPage = () => {
     // Field Blur Validation
     const handleBlur = (field) => {
         if (field === 'name') {
-            if (!formData.name.trim() || formData.name.trim().length < 3) {
-                setFieldErrors((prev) => ({ ...prev, name: 'Please enter your full name as per PAN.' }));
+            if (!formData.name.trim() || formData.name.trim().length < 2) {
+                setFieldErrors((prev) => ({ ...prev, name: 'Please enter your full name as per PAN (2-40 characters).' }));
             }
         } else if (field === 'mobile') {
             const res = validateIndianMobile(formData.mobile);
@@ -130,6 +134,10 @@ const CreditReportPage = () => {
         } else if (field === 'pincode') {
             const res = validatePincode(formData.pincode);
             if (!res.isValid) setFieldErrors((prev) => ({ ...prev, pincode: res.message }));
+        } else if (field === 'address') {
+            if (!formData.address.trim() || formData.address.trim().length < 5) {
+                setFieldErrors((prev) => ({ ...prev, address: 'Please enter a valid street/flat address.' }));
+            }
         } else if (field === 'dob') {
             if (!formData.dob) {
                 setFieldErrors((prev) => ({ ...prev, dob: 'Please select your date of birth.' }));
@@ -137,7 +145,7 @@ const CreditReportPage = () => {
                 const birthDate = new Date(formData.dob);
                 const ageDiff = (Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
                 if (isNaN(ageDiff) || ageDiff < 18) {
-                    setFieldErrors((prev) => ({ ...prev, dob: 'You must be at least 18 years old.' }));
+                    setFieldErrors((prev) => ({ ...prev, dob: 'Borrower must be at least 18 years old.' }));
                 }
             }
         }
@@ -153,7 +161,8 @@ const CreditReportPage = () => {
         const emailCheck = validateEmail(formData.email);
         const panCheck = validatePAN(formData.pan);
         const pincodeCheck = validatePincode(formData.pincode);
-        const nameValid = formData.name && formData.name.trim().length >= 3;
+        const nameValid = formData.name && formData.name.trim().length >= 2;
+        const addressValid = formData.address && formData.address.trim().length >= 5;
 
         let dobValid = false;
         if (formData.dob) {
@@ -165,11 +174,12 @@ const CreditReportPage = () => {
         }
 
         const newErrors = {};
-        if (!nameValid) newErrors.name = 'Please enter your full legal name as shown on your PAN card.';
+        if (!nameValid) newErrors.name = 'Please enter your full legal name as shown on your PAN card (2-40 chars).';
         if (!mobileCheck.isValid) newErrors.mobile = mobileCheck.message;
         if (!emailCheck.isValid) newErrors.email = emailCheck.message;
         if (!panCheck.isValid) newErrors.pan = panCheck.message;
         if (!pincodeCheck.isValid) newErrors.pincode = pincodeCheck.message;
+        if (!addressValid) newErrors.address = 'Please enter your residential or business address (min 5 chars).';
         if (!dobValid) newErrors.dob = 'Please provide a valid Date of Birth (minimum age 18).';
         if (!formData.consent) newErrors.consent = 'You must provide consent under RBI guidelines to fetch your credit report.';
 
@@ -181,20 +191,19 @@ const CreditReportPage = () => {
 
         setIsSubmitting(true);
 
-        // Simulation delay for OTP dispatch / API payload preparation
+        // Advance to OTP verification
         setTimeout(() => {
             setIsSubmitting(false);
             setStep(2);
             setOtpTimer(45);
             setCanResendOtp(false);
             setOtp(['', '', '', '', '', '']);
-            // Focus first OTP box
             setTimeout(() => {
                 if (otpInputRefs.current[0]) {
                     otpInputRefs.current[0].focus();
                 }
             }, 100);
-        }, 1000);
+        }, 800);
     };
 
     // Step 2: Handle OTP Input
@@ -205,7 +214,7 @@ const CreditReportPage = () => {
         setOtp(newOtp);
         setOtpError('');
 
-        // Move focus forward
+        // Auto move focus forward
         if (cleanVal && index < 5 && otpInputRefs.current[index + 1]) {
             otpInputRefs.current[index + 1].focus();
         }
@@ -226,7 +235,7 @@ const CreditReportPage = () => {
         if (otpInputRefs.current[0]) otpInputRefs.current[0].focus();
     };
 
-    // Verify OTP & Generate / Fetch Report
+    // Verify OTP & Fetch Decentro Credit Report
     const handleVerifyOtp = async (e) => {
         e.preventDefault();
         const enteredOtp = otp.join('');
@@ -238,162 +247,31 @@ const CreditReportPage = () => {
         setIsVerifyingOtp(true);
         setOtpError('');
 
-        /**
-         * READY FOR PRODUCTION DECENTRO API:
-         * In production, dispatch:
-         * const decentroPayload = {
-         *   reference_id: `BF_CR_${Date.now()}`,
-         *   consent: true,
-         *   consent_purpose: "I hereby give my free consent to BeeFund to obtain my credit information from credit bureaus (CIBIL/Experian) on my behalf.",
-         *   name: formData.name.trim(),
-         *   mobile: formData.mobile,
-         *   email: formData.email.trim(),
-         *   date_of_birth: formData.dob,
-         *   document_type: "PAN",
-         *   document_id: formData.pan,
-         *   address_type: formData.addressType,
-         *   pincode: formData.pincode,
-         *   inquiry_purpose: formData.inquiryPurpose,
-         *   generate_pdf: true
-         * };
-         */
+        try {
+            // Fetch via Decentro Service with automatic Anti-Drain Cache
+            const result = await fetchDecentroCreditReport(formData);
 
-        setTimeout(() => {
-            // Generate a realistic score based on PAN digits or default to high prime band
-            const panNumericPart = parseInt(formData.pan.replace(/\D/g, '').slice(0, 3) || '78', 10);
-            const baseScore = 720 + (panNumericPart % 95); // generates score between 720 and 814
-            const finalScore = Math.min(850, Math.max(680, baseScore));
-
-            const generatedReport = {
-                score: finalScore,
-                bureau: 'Experian & CIBIL Hybrid Engine',
-                reportDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-                panMasked: `${formData.pan.slice(0, 2)}XXXXXX${formData.pan.slice(-2)}`,
-                mobileMasked: `+91 ${formData.mobile.slice(0, 2)}XXXXXX${formData.mobile.slice(-2)}`,
-                fullName: formData.name.toUpperCase(),
-                factors: {
-                    paymentHistory: { score: 100, label: 'Excellent (100%)', status: 'high', impact: 'High Impact', desc: '36/36 on-time EMI and credit card payments' },
-                    creditUtilization: { score: 18, label: '18% Utilized', status: 'high', impact: 'High Impact', desc: '₹36,000 used out of ₹2,00,000 total limit (Ideal < 30%)' },
-                    creditAge: { score: 85, label: '4 Yrs 8 Mos', status: 'med', impact: 'Medium Impact', desc: 'Oldest credit line opened in July 2021' },
-                    creditMix: { score: 80, label: 'Balanced (5 Accounts)', status: 'low', impact: 'Low Impact', desc: '2 Secured Loans + 3 Unsecured Facilities' },
-                    recentEnquiries: { score: 95, label: '1 Hard Inquiry', status: 'low', impact: 'Low Impact', desc: '1 inquiry in last 180 days (Very Safe)' }
-                },
-                recommendations: [
-                    { title: 'Maintain Credit Utilization Below 25%', impact: '+12 pts', text: 'Keeping credit card outstanding below 25% signals low credit risk to underwriting algorithms.' },
-                    { title: 'Keep Oldest Credit Lines Active', impact: '+15 pts', text: 'Do not close your first credit card. Long history boosts the vintage score component by 15%.' },
-                    { title: 'Avoid Simultaneous Applications', impact: '+18 pts', text: 'Multiple hard pulls within 30 days can drop your score. Use BeeFund to pre-qualify with zero hard pulls.' }
-                ],
-                matchedOffers: [
-                    { title: 'Prime Business Loan', rate: 'From 9.99% p.a.', amount: 'Up to ₹75 Lakhs', tenure: '12 - 60 Months', badge: 'High Approval Odds', type: 'BL' },
-                    { title: 'Working Capital (OD / CC)', rate: 'From 9.25% p.a.', amount: 'Up to ₹2 Crores', tenure: 'Annual Renewal', badge: 'Turnover Based', type: 'Working Capital' },
-                    { title: 'Loan Against Property (LAP)', rate: 'From 8.50% p.a.', amount: 'Up to ₹10 Crores', tenure: 'Up to 15 Years', badge: 'Lowest EMI', type: 'LAP' }
-                ]
-            };
-
-            setReportData(generatedReport);
+            setReportData(result.data);
+            setWasFromCache(result.fromCache);
             setIsVerifyingOtp(false);
             setStep(3);
-        }, 1200);
-    };
-
-    // Download PDF Report using jsPDF
-    const handleDownloadPdf = () => {
-        if (!reportData) return;
-
-        const doc = new jsPDF();
-        const primaryColor = [217, 119, 6]; // Amber #d97706
-        const darkColor = [31, 41, 55]; // Gray-800
-
-        // Header Banner
-        doc.setFillColor(245, 158, 11);
-        doc.rect(0, 0, 210, 26, 'F');
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text('BEEFUND - COMPREHENSIVE CREDIT HEALTH REPORT', 14, 16);
-
-        // Subtitle & Timestamp
-        doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Generated for: ${reportData.fullName} | PAN: ${reportData.panMasked} | Date: ${reportData.reportDate}`, 14, 34);
-
-        // Score Highlight Box
-        doc.setFillColor(254, 243, 199);
-        doc.roundedRect(14, 40, 182, 38, 3, 3, 'F');
-
-        doc.setTextColor(180, 83, 9);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text('CREDIT SCORE (CIBIL / EXPERIAN SCALE)', 20, 50);
-
-        doc.setFontSize(28);
-        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        doc.text(`${reportData.score} / 900`, 20, 64);
-
-        doc.setFontSize(11);
-        doc.setTextColor(5, 150, 105);
-        const scoreCategory = reportData.score >= 750 ? 'EXCELLENT CREDIT HEALTH' : reportData.score >= 700 ? 'GOOD' : 'FAIR';
-        doc.text(`Status: ${scoreCategory} (Top Tier Approvals Available)`, 95, 64);
-
-        // Factors Table
-        const factorRows = [
-            ['Payment History (35% weight)', reportData.factors.paymentHistory.label, 'High Impact', 'Excellent - 100% On Time'],
-            ['Credit Utilization (30% weight)', reportData.factors.creditUtilization.label, 'High Impact', 'Optimal - Well Below 30%'],
-            ['Credit Age (15% weight)', reportData.factors.creditAge.label, 'Medium Impact', 'Healthy - 4+ Years Active'],
-            ['Credit Mix (10% weight)', reportData.factors.creditMix.label, 'Low Impact', 'Good Balance of Secured & Unsecured'],
-            ['Recent Hard Inquiries (10% weight)', reportData.factors.recentEnquiries.label, 'Low Impact', 'Minimal Inquiries - Safe']
-        ];
-
-        doc.autoTable({
-            startY: 85,
-            head: [['Credit Factor', 'Your Metric', 'Significance', 'Bureau Assessment']],
-            body: factorRows,
-            theme: 'grid',
-            headStyles: { fillColor: [245, 158, 11], textColor: [255, 255, 255], fontStyle: 'bold' },
-            styles: { fontSize: 9, cellPadding: 4 },
-            alternateRowStyles: { fillColor: [254, 252, 232] }
-        });
-
-        // Recommendations Section
-        const finalY = doc.lastAutoTable.finalY + 12;
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
-        doc.text('AI Actionable Recommendations to Maintain / Boost Score:', 14, finalY);
-
-        let recY = finalY + 8;
-        reportData.recommendations.forEach((rec, idx) => {
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'bold');
-            doc.text(`${idx + 1}. ${rec.title} (${rec.impact})`, 16, recY);
-            doc.setFont('helvetica', 'normal');
-            doc.text(rec.text, 20, recY + 5);
-            recY += 14;
-        });
-
-        // Footer Disclaimer
-        doc.setFontSize(8);
-        doc.setTextColor(107, 114, 128);
-        doc.text('Disclaimer: This credit summary is provided via BeeFund financial tools for informational and eligibility assessment purposes.', 14, 280);
-        doc.text('Soft pull inquiries through BeeFund have zero negative impact on your official credit score.', 14, 285);
-
-        doc.save(`BeeFund_Credit_Report_${formData.name.replace(/\s+/g, '_')}.pdf`);
+        } catch (err) {
+            console.error('Decentro API retrieval error:', err);
+            setIsVerifyingOtp(false);
+            setOtpError(err.message || 'Bureau service temporarily unavailable. Please verify your details or try again.');
+        }
     };
 
     // Calculate dynamic stroke offset for radial gauge meter (scale 300 to 900)
     const effectiveScore = (reportData?.score || 750) + simulatedAdjustment;
     const clampedScore = Math.max(300, Math.min(900, effectiveScore));
-    const scorePct = (clampedScore - 300) / 600; // 0 to 1
-    const gaugeCircumference = 502.65; // 2 * PI * 80
-    const strokeDashoffset = gaugeCircumference * (1 - scorePct * 0.75); // 270 degree arc
+    const scorePct = (clampedScore - 300) / 600;
 
     // Score Tier Category Helper
     const getScoreTier = (sc) => {
-        if (sc >= 750) return { label: 'Excellent', color: '#10b981', badgeClass: 'tier-excellent', desc: 'You qualify for pre-approved loans with lowest market interest rates and expedited sanctioning.' };
-        if (sc >= 700) return { label: 'Good', color: '#f59e0b', badgeClass: 'tier-good', desc: 'Good credit profile. Most public and private banks will readily approve loans.' };
-        if (sc >= 650) return { label: 'Fair / Average', color: '#f97316', badgeClass: 'tier-fair', desc: 'Moderate credit standing. Some lenders may ask for higher margin or collateral.' };
+        if (sc >= 750) return { label: 'Excellent', color: '#10b981', badgeClass: 'tier-excellent', desc: 'You qualify for pre-approved loans with lowest market interest rates and instant sanctioning.' };
+        if (sc >= 700) return { label: 'Good', color: '#f59e0b', badgeClass: 'tier-good', desc: 'Good credit profile. Most public and private sector banks will readily sanction loans.' };
+        if (sc >= 650) return { label: 'Fair / Average', color: '#f97316', badgeClass: 'tier-fair', desc: 'Moderate credit standing. Some lenders may ask for higher margin money or collateral.' };
         return { label: 'Needs Improvement', color: '#ef4444', badgeClass: 'tier-poor', desc: 'High risk tier. Prioritize paying off credit cards and rectifying any delayed payments.' };
     };
 
@@ -402,6 +280,13 @@ const CreditReportPage = () => {
     const toggleFaq = (idx) => {
         setActiveFaq(activeFaq === idx ? null : idx);
     };
+
+    // Filter obligations for table
+    const filteredObligations = (reportData?.obligations || []).filter((acc) => {
+        if (obligationFilter === 'active') return acc.open;
+        if (obligationFilter === 'closed') return !acc.open;
+        return true;
+    });
 
     return (
         <div className="credit-page">
@@ -412,8 +297,8 @@ const CreditReportPage = () => {
                 {JSON.stringify({
                     "@context": "https://schema.org",
                     "@type": "FinancialProduct",
-                    "name": "BeeFund Free Credit Report & Score Check",
-                    "description": "Check your CIBIL and Experian credit score online for free in India. 100% safe soft pull with zero impact on credit score, comprehensive factor breakdown, and instant loan eligibility matches.",
+                    "name": "BeeFund Free Credit Report & Loan Obligation Assessment",
+                    "description": "Check your official bureau credit score online with full loan obligation chart, monthly EMI schedule, Excel and PDF export in India.",
                     "provider": {
                         "@type": "FinancialService",
                         "name": "BeeFund",
@@ -432,13 +317,13 @@ const CreditReportPage = () => {
                 <div className="credit-hero">
                     <div className="credit-badge">
                         <span className="badge-pulse" />
-                        <span>🐝 100% Free • Safe Soft Pull • CIBIL & Experian Scale</span>
+                        <span>🐝 Decentro Powered • 100% Safe Soft Pull • Official Bureau Report</span>
                     </div>
                     <h1 className="credit-title">
-                        Check Your <span className="credit-hl">Credit Score & Detailed Report</span>
+                        Check Your <span className="credit-hl">Credit Score & Obligation Chart</span>
                     </h1>
                     <p className="credit-subtitle">
-                        Get your bureau-verified credit health assessment in under 60 seconds. Know your loan eligibility, identify credit errors, and unlock lower interest rates from 25+ partner banks.
+                        Get your bureau-verified credit health assessment and full debt obligation breakdown in under 60 seconds. Export your complete loan obligation chart to Excel and download your official bureau PDF report.
                     </p>
 
                     {/* Step Progress Pills */}
@@ -455,7 +340,7 @@ const CreditReportPage = () => {
                         <div className="step-line" />
                         <div className={`step-item ${step === 3 ? 'active' : ''}`}>
                             <span className="step-num">3</span>
-                            <span className="step-label">Credit Health Dashboard</span>
+                            <span className="step-label">Report & Obligations</span>
                         </div>
                     </div>
                 </div>
@@ -470,10 +355,10 @@ const CreditReportPage = () => {
                                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                                     </svg>
-                                    <span>Instant Identity Verification</span>
+                                    <span>Official Bureau Retrieval</span>
                                 </div>
                                 <h2>Enter Details to Fetch Official Credit Score</h2>
-                                <p>Provide exact details matching your PAN record for 100% accurate bureau retrieval.</p>
+                                <p>Provide exact details matching your PAN and bank records for 100% accurate bureau matching.</p>
                             </div>
 
                             <form onSubmit={handleFormSubmit} className="credit-form">
@@ -485,7 +370,7 @@ const CreditReportPage = () => {
                                             type="text"
                                             id="cr-name"
                                             name="name"
-                                            placeholder="e.g. RAJESH KUMAR SHARMA"
+                                            placeholder="e.g. RAHUL SANJAY DESHMUKH"
                                             value={formData.name}
                                             onChange={handleChange}
                                             onBlur={() => handleBlur('name')}
@@ -497,7 +382,7 @@ const CreditReportPage = () => {
 
                                     {/* Mobile Number */}
                                     <div className="cr-input-group">
-                                        <label htmlFor="cr-mobile">Mobile Number (Linked with Aadhaar/PAN) *</label>
+                                        <label htmlFor="cr-mobile">Mobile Number (Linked with Bank/PAN) *</label>
                                         <div className={`cr-phone-wrap ${fieldErrors.mobile ? 'cr-input-error' : ''}`}>
                                             <span className="cr-phone-prefix">+91</span>
                                             <input
@@ -522,7 +407,7 @@ const CreditReportPage = () => {
                                             type="email"
                                             id="cr-email"
                                             name="email"
-                                            placeholder="rajesh@example.com"
+                                            placeholder="rahul@example.com"
                                             value={formData.email}
                                             onChange={handleChange}
                                             onBlur={() => handleBlur('email')}
@@ -568,6 +453,23 @@ const CreditReportPage = () => {
                                         {fieldErrors.pan && <span className="cr-error-text">⚠️ {fieldErrors.pan}</span>}
                                     </div>
 
+                                    {/* Street / Flat Address */}
+                                    <div className="cr-input-group">
+                                        <label htmlFor="cr-address">Address (Flat / Street / Area) *</label>
+                                        <input
+                                            type="text"
+                                            id="cr-address"
+                                            name="address"
+                                            placeholder="e.g. 202 SR Ruby Apts, 13 C Main, Indiranagar"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                            onBlur={() => handleBlur('address')}
+                                            className={fieldErrors.address ? 'cr-input-error' : ''}
+                                            required
+                                        />
+                                        {fieldErrors.address && <span className="cr-error-text">⚠️ {fieldErrors.address}</span>}
+                                    </div>
+
                                     {/* Pincode */}
                                     <div className="cr-input-group">
                                         <label htmlFor="cr-pincode">Area Pincode *</label>
@@ -575,7 +477,7 @@ const CreditReportPage = () => {
                                             type="text"
                                             id="cr-pincode"
                                             name="pincode"
-                                            placeholder="110001"
+                                            placeholder="560038"
                                             maxLength="6"
                                             value={formData.pincode}
                                             onChange={handleChange}
@@ -625,6 +527,26 @@ const CreditReportPage = () => {
                                             </select>
                                         </div>
                                     </div>
+
+                                    {/* Bureau Selection */}
+                                    <div className="cr-input-group">
+                                        <label htmlFor="cr-bureau">Preferred Credit Bureau *</label>
+                                        <div className="cr-select-wrap">
+                                            <select
+                                                id="cr-bureau"
+                                                name="bureauCode"
+                                                value={formData.bureauCode}
+                                                onChange={handleChange}
+                                                required
+                                            >
+                                                {BUREAU_OPTIONS.map((b) => (
+                                                    <option key={b.value} value={b.value}>
+                                                        {b.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Explicit RBI Consent Checkbox */}
@@ -639,7 +561,7 @@ const CreditReportPage = () => {
                                         />
                                         <span className="cr-checkbox-custom" />
                                         <span className="cr-consent-text">
-                                            I hereby provide my unconditional consent under RBI guidelines to <strong>BeeFund Financial Services</strong> to fetch my credit bureau report and score from authorized credit information companies (CIBIL / Experian / CRIF High Mark) to evaluate my financial standing and facilitate customized credit solutions.
+                                            I hereby provide my explicit consent under RBI regulations to <strong>BeeFund Financial Services</strong> to fetch my credit bureau report and score from authorized credit information companies (CIBIL / Experian / Equifax / CRIF High Mark) to evaluate my financial standing and generate my loan obligation chart.
                                         </span>
                                     </label>
                                     {fieldErrors.consent && <span className="cr-error-text">⚠️ {fieldErrors.consent}</span>}
@@ -655,11 +577,11 @@ const CreditReportPage = () => {
                                     {isSubmitting ? (
                                         <>
                                             <span className="cr-spinner" />
-                                            <span>Connecting to Bureau Engine...</span>
+                                            <span>Validating Information...</span>
                                         </>
                                     ) : (
                                         <>
-                                            <span>Get My Free Credit Report</span>
+                                            <span>Request OTP & Fetch Bureau Report</span>
                                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                                 <polyline points="12 5 19 12 12 19"></polyline>
@@ -681,14 +603,14 @@ const CreditReportPage = () => {
                                             <circle cx="12" cy="12" r="10" />
                                             <polyline points="12 6 12 12 14 14" />
                                         </svg>
-                                        <span>Soft Pull • Zero Score Drop</span>
+                                        <span>Soft Pull • Zero Score Impact</span>
                                     </div>
                                     <div className="cr-trust-item">
                                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#3b82f6" strokeWidth="2">
                                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                                             <polyline points="22 4 12 14.01 9 11.01" />
                                         </svg>
-                                        <span>100% Free Lifetime Refresh</span>
+                                        <span>Official Obligation Schedule</span>
                                     </div>
                                 </div>
                             </form>
@@ -706,7 +628,7 @@ const CreditReportPage = () => {
                             </div>
                             <h2>Verify Your Mobile Number</h2>
                             <p className="otp-subtitle">
-                                We have dispatched a 6-digit verification code to <strong>+91 {formData.mobile}</strong>.
+                                Enter the 6-digit verification code sent to <strong>+91 {formData.mobile}</strong>.
                             </p>
 
                             <form onSubmit={handleVerifyOtp} className="otp-form">
@@ -759,11 +681,11 @@ const CreditReportPage = () => {
                                     {isVerifyingOtp ? (
                                         <>
                                             <span className="cr-spinner" />
-                                            <span>Fetching Bureau Report...</span>
+                                            <span>Connecting to Decentro Bureau Engine...</span>
                                         </>
                                     ) : (
                                         <>
-                                            <span>Verify & Access Report</span>
+                                            <span>Verify & Retrieve Bureau Report</span>
                                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
@@ -772,35 +694,65 @@ const CreditReportPage = () => {
                                 </button>
 
                                 <div className="otp-sandbox-hint">
-                                    <span>💡 Demo Notice: Enter any 6-digit code (e.g., <strong>123456</strong>) to simulate bureau retrieval.</span>
+                                    <span>💡 Safe Mode: Enter any 6 digits (e.g. <strong>123456</strong>) to simulate retrieval with zero ₹400 hit cost.</span>
                                 </div>
                             </form>
                         </div>
                     )}
 
-                    {/* STEP 3: Full Credit Score Dashboard */}
+                    {/* STEP 3: Full Credit Score & Obligation Chart Dashboard */}
                     {step === 3 && reportData && (
                         <div className="credit-report-dashboard">
+                            {/* Cache / Protection Banner */}
+                            {wasFromCache && (
+                                <div className="cache-badge-banner">
+                                    <span>🛡️ Served from Active Session Cache — Saved duplicate ₹400 API charge!</span>
+                                </div>
+                            )}
+
                             {/* Dashboard Header Bar */}
                             <div className="dashboard-top-bar">
                                 <div className="report-user-meta">
-                                    <span className="report-tag">BUREAU VERIFIED</span>
-                                    <h2>{reportData.fullName}</h2>
+                                    <span className="report-tag">OFFICIAL BUREAU DOSSIER</span>
+                                    <h2>{reportData.personal?.fullName}</h2>
                                     <div className="meta-chips">
-                                        <span>PAN: <strong>{reportData.panMasked}</strong></span>
-                                        <span>Mobile: <strong>{reportData.mobileMasked}</strong></span>
-                                        <span>Date: <strong>{reportData.reportDate}</strong></span>
+                                        <span>PAN: <strong>{reportData.personal?.pan}</strong></span>
+                                        <span>Mobile: <strong>{reportData.personal?.mobile}</strong></span>
+                                        <span>Report Date: <strong>{reportData.reportDate}</strong></span>
+                                        <span>Model: <strong>{reportData.bureauModel}</strong></span>
                                     </div>
                                 </div>
                                 <div className="report-actions">
-                                    <button onClick={handleDownloadPdf} className="btn-download-pdf">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    {/* EXCEL EXPORT BUTTON */}
+                                    <button
+                                        onClick={() => exportObligationChartToExcel(reportData)}
+                                        className="btn-export-excel"
+                                        title="Export complete loan obligation chart with account numbers, EMIs, and balances to Excel"
+                                    >
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="8" y1="13" x2="16" y2="13"></line>
+                                            <line x1="8" y1="17" x2="16" y2="17"></line>
+                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                        <span>Export Obligations (Excel)</span>
+                                    </button>
+
+                                    {/* PDF DOWNLOAD BUTTON */}
+                                    <button
+                                        onClick={() => downloadBureauReportPdf(reportData)}
+                                        className="btn-download-pdf"
+                                        title="Download official comprehensive CIBIL / Bureau PDF report"
+                                    >
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                             <polyline points="7 10 12 15 17 10"></polyline>
                                             <line x1="12" y1="15" x2="12" y2="3"></line>
                                         </svg>
-                                        <span>Download PDF Report</span>
+                                        <span>Download CIBIL PDF</span>
                                     </button>
+
                                     <button onClick={() => setStep(1)} className="btn-refresh-score">
                                         <span>Check Another</span>
                                     </button>
@@ -811,7 +763,6 @@ const CreditReportPage = () => {
                             <div className="gauge-hero-card">
                                 <div className="gauge-dial-container">
                                     <svg className="gauge-svg" viewBox="0 0 200 120">
-                                        {/* Background Track Arc */}
                                         <path
                                             d="M 20 110 A 80 80 0 0 1 180 110"
                                             fill="none"
@@ -819,7 +770,6 @@ const CreditReportPage = () => {
                                             strokeWidth="16"
                                             strokeLinecap="round"
                                         />
-                                        {/* Colored Progress Arc */}
                                         <path
                                             d="M 20 110 A 80 80 0 0 1 180 110"
                                             fill="none"
@@ -858,103 +808,162 @@ const CreditReportPage = () => {
 
                                 <div className="gauge-summary-content">
                                     <div className="gauge-headline">
-                                        <h3>Your Financial Health is in the <span style={{ color: currentTier.color }}>{currentTier.label}</span> Range!</h3>
+                                        <h3>Your Bureau Rating is in the <span style={{ color: currentTier.color }}>{currentTier.label}</span> Band!</h3>
                                         <p>{currentTier.desc}</p>
                                     </div>
                                     <div className="gauge-perks-grid">
                                         <div className="perk-pill">
-                                            <span className="perk-icon">⚡</span>
-                                            <span>Instant Sanction Odds: <strong>96%</strong></span>
+                                            <span className="perk-icon">💳</span>
+                                            <span>Total Monthly EMI: <strong>{formatINR(reportData.summary.totalMonthlyEMI)}</strong></span>
                                         </div>
                                         <div className="perk-pill">
                                             <span className="perk-icon">📉</span>
-                                            <span>Eligible for Lowest ROI: <strong>From 8.50%</strong></span>
+                                            <span>Eligible for Lowest ROI: <strong>From 8.50% p.a.</strong></span>
                                         </div>
                                         <div className="perk-pill">
-                                            <span className="perk-icon">🎁</span>
-                                            <span>Zero Processing Fee Offers</span>
+                                            <span className="perk-icon">⚡</span>
+                                            <span>Loan Approval Odds: <strong>96% (High)</strong></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* 5 Factor Breakdown Cards */}
-                            <div className="factors-section">
-                                <div className="section-title-wrap">
-                                    <h3>5 Pillars of Your Credit Health</h3>
-                                    <p>Credit bureaus compute your score based on these 5 parameters:</p>
+                            {/* =========================================================
+                                FULL LOAN OBLIGATION CHART & FINANCIAL EXPOSURE
+                                ========================================================= */}
+                            <div className="obligation-section">
+                                <div className="section-title-wrap obligation-header-wrap">
+                                    <div>
+                                        <span className="section-kicker">📊 Bureau Retail Accounts</span>
+                                        <h3>Complete Loan Obligation Chart</h3>
+                                        <p>Comprehensive schedule of all active and closed loan facilities, monthly EMIs, and balances:</p>
+                                    </div>
+                                    <div className="obligation-filter-tabs">
+                                        <button
+                                            className={`tab-btn ${obligationFilter === 'all' ? 'active' : ''}`}
+                                            onClick={() => setObligationFilter('all')}
+                                        >
+                                            All Facilities ({reportData.obligations.length})
+                                        </button>
+                                        <button
+                                            className={`tab-btn ${obligationFilter === 'active' ? 'active' : ''}`}
+                                            onClick={() => setObligationFilter('active')}
+                                        >
+                                            Active Only ({reportData.summary.activeAccounts})
+                                        </button>
+                                        <button
+                                            className={`tab-btn ${obligationFilter === 'closed' ? 'active' : ''}`}
+                                            onClick={() => setObligationFilter('closed')}
+                                        >
+                                            Closed ({reportData.summary.closedAccounts})
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div className="factors-grid">
-                                    {/* 1. Payment History */}
-                                    <div className="factor-card">
-                                        <div className="factor-card-top">
-                                            <div className="factor-icon-badge high-impact">
-                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                            </div>
-                                            <span className="impact-pill high">High Impact (35%)</span>
-                                        </div>
-                                        <h4>Payment History</h4>
-                                        <div className="factor-metric">{reportData.factors.paymentHistory.label}</div>
-                                        <p>{reportData.factors.paymentHistory.desc}</p>
-                                        <div className="factor-bar"><div className="factor-progress" style={{ width: '100%', background: '#10b981' }} /></div>
+                                {/* KPI Metrics Row */}
+                                <div className="obligation-kpis-grid">
+                                    <div className="kpi-card">
+                                        <span className="kpi-label">Total Monthly EMI Obligation</span>
+                                        <span className="kpi-val emi-highlight">{formatINR(reportData.summary.totalMonthlyEMI)}</span>
+                                        <span className="kpi-sub">Across all active facilities</span>
                                     </div>
+                                    <div className="kpi-card">
+                                        <span className="kpi-label">Total Outstanding Balance</span>
+                                        <span className="kpi-val">{formatINR(reportData.summary.totalOutstanding)}</span>
+                                        <span className="kpi-sub">Current debt principal</span>
+                                    </div>
+                                    <div className="kpi-card">
+                                        <span className="kpi-label">Total Sanctioned Facility</span>
+                                        <span className="kpi-val">{formatINR(reportData.summary.totalSanctioned)}</span>
+                                        <span className="kpi-sub">Combined borrowing limits</span>
+                                    </div>
+                                    <div className="kpi-card">
+                                        <span className="kpi-label">Overdue / Past Due</span>
+                                        <span className={`kpi-val ${reportData.summary.totalPastDue > 0 ? 'text-danger' : 'text-success'}`}>
+                                            {formatINR(reportData.summary.totalPastDue)}
+                                        </span>
+                                        <span className="kpi-sub">{reportData.summary.totalPastDue > 0 ? 'Action Required' : 'Zero Defaults (Clean)'}</span>
+                                    </div>
+                                </div>
 
-                                    {/* 2. Credit Utilization */}
-                                    <div className="factor-card">
-                                        <div className="factor-card-top">
-                                            <div className="factor-icon-badge high-impact">
-                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-                                            </div>
-                                            <span className="impact-pill high">High Impact (30%)</span>
-                                        </div>
-                                        <h4>Credit Utilization</h4>
-                                        <div className="factor-metric">{reportData.factors.creditUtilization.label}</div>
-                                        <p>{reportData.factors.creditUtilization.desc}</p>
-                                        <div className="factor-bar"><div className="factor-progress" style={{ width: '18%', background: '#10b981' }} /></div>
-                                    </div>
+                                {/* Obligation Schedule Table */}
+                                <div className="obligation-table-wrap">
+                                    <table className="obligation-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Lending Institution</th>
+                                                <th>Facility Type</th>
+                                                <th>Account No.</th>
+                                                <th>Sanction Limit</th>
+                                                <th>Current Balance</th>
+                                                <th>Monthly EMI</th>
+                                                <th>ROI (%)</th>
+                                                <th>Tenure</th>
+                                                <th>Past Due</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filteredObligations.length > 0 ? (
+                                                filteredObligations.map((acc, idx) => (
+                                                    <tr key={acc.id || idx}>
+                                                        <td><strong>{idx + 1}</strong></td>
+                                                        <td><strong>{acc.institution}</strong></td>
+                                                        <td>{acc.accountType}</td>
+                                                        <td><code>{acc.accountNumber}</code></td>
+                                                        <td>{formatINR(acc.sanctionAmount)}</td>
+                                                        <td className="fw-bold">{formatINR(acc.balance)}</td>
+                                                        <td className="fw-bold text-amber">{formatINR(acc.installmentAmount)}</td>
+                                                        <td>{acc.interestRate !== 'N/A' ? `${acc.interestRate}%` : '—'}</td>
+                                                        <td>{acc.repaymentTenure}</td>
+                                                        <td className={acc.pastDueAmount > 0 ? 'text-danger fw-bold' : ''}>
+                                                            {formatINR(acc.pastDueAmount)}
+                                                        </td>
+                                                        <td>
+                                                            <span className={`ob-status-badge ${acc.open ? 'status-active' : 'status-closed'}`}>
+                                                                {acc.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="11" className="text-center py-4">
+                                                        No accounts matching the selected filter.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr className="obligation-total-row">
+                                                <td colSpan="4"><strong>TOTAL ACTIVE OBLIGATIONS</strong></td>
+                                                <td><strong>{formatINR(reportData.summary.totalSanctioned)}</strong></td>
+                                                <td><strong>{formatINR(reportData.summary.totalOutstanding)}</strong></td>
+                                                <td className="text-amber"><strong>{formatINR(reportData.summary.totalMonthlyEMI)} / mo</strong></td>
+                                                <td>—</td>
+                                                <td>—</td>
+                                                <td><strong>{formatINR(reportData.summary.totalPastDue)}</strong></td>
+                                                <td><strong>{reportData.summary.activeAccounts} Active</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
 
-                                    {/* 3. Credit Age */}
-                                    <div className="factor-card">
-                                        <div className="factor-card-top">
-                                            <div className="factor-icon-badge med-impact">
-                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                            </div>
-                                            <span className="impact-pill med">Medium Impact (15%)</span>
-                                        </div>
-                                        <h4>Credit Age & Vintage</h4>
-                                        <div className="factor-metric">{reportData.factors.creditAge.label}</div>
-                                        <p>{reportData.factors.creditAge.desc}</p>
-                                        <div className="factor-bar"><div className="factor-progress" style={{ width: '85%', background: '#f59e0b' }} /></div>
-                                    </div>
-
-                                    {/* 4. Credit Mix */}
-                                    <div className="factor-card">
-                                        <div className="factor-card-top">
-                                            <div className="factor-icon-badge low-impact">
-                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                                            </div>
-                                            <span className="impact-pill low">Low Impact (10%)</span>
-                                        </div>
-                                        <h4>Total Accounts & Mix</h4>
-                                        <div className="factor-metric">{reportData.factors.creditMix.label}</div>
-                                        <p>{reportData.factors.creditMix.desc}</p>
-                                        <div className="factor-bar"><div className="factor-progress" style={{ width: '80%', background: '#3b82f6' }} /></div>
-                                    </div>
-
-                                    {/* 5. Recent Inquiries */}
-                                    <div className="factor-card">
-                                        <div className="factor-card-top">
-                                            <div className="factor-icon-badge low-impact">
-                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                            </div>
-                                            <span className="impact-pill low">Low Impact (10%)</span>
-                                        </div>
-                                        <h4>Recent Inquiries</h4>
-                                        <div className="factor-metric">{reportData.factors.recentEnquiries.label}</div>
-                                        <p>{reportData.factors.recentEnquiries.desc}</p>
-                                        <div className="factor-bar"><div className="factor-progress" style={{ width: '95%', background: '#10b981' }} /></div>
-                                    </div>
+                                {/* Table Export Actions */}
+                                <div className="table-actions-row">
+                                    <button
+                                        onClick={() => exportObligationChartToExcel(reportData)}
+                                        className="btn-table-export excel"
+                                    >
+                                        <span>📥 Export Obligation Schedule to Excel (.xlsx/.csv)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => downloadBureauReportPdf(reportData)}
+                                        className="btn-table-export pdf"
+                                    >
+                                        <span>📄 Download Complete Bureau PDF Report</span>
+                                    </button>
                                 </div>
                             </div>
 
@@ -985,12 +994,12 @@ const CreditReportPage = () => {
                                         onClick={() => setSimulatedAdjustment(simulatedAdjustment === 35 ? 0 : 35)}
                                     >
                                         <span className="sim-gain">+35 Pts</span>
-                                        <span className="sim-text">Consolidate 3 high-interest personal loans into 1 LAP</span>
+                                        <span className="sim-text">Consolidate multiple high-interest loans into 1 LAP</span>
                                     </button>
                                 </div>
                                 {simulatedAdjustment > 0 && (
                                     <div className="sim-result-banner">
-                                        <span>🎉 Projected New Score: <strong>{clampedScore}</strong> (+{simulatedAdjustment} points). Your loan approval odds jump to 99%!</span>
+                                        <span>🎉 Projected New Score: <strong>{clampedScore}</strong> (+{simulatedAdjustment} points). Your loan sanction chances increase to 99%!</span>
                                     </div>
                                 )}
                             </div>
@@ -998,13 +1007,17 @@ const CreditReportPage = () => {
                             {/* Pre-Approved Matching Loan Offers */}
                             <div className="offers-section">
                                 <div className="section-title-wrap">
-                                    <span className="offers-badge">🐝 Tailored For Your Score</span>
+                                    <span className="offers-badge">🐝 Tailored For Your Rating</span>
                                     <h3>Pre-Approved Loan Offers from BeeFund Partner Banks</h3>
-                                    <p>Based on your {clampedScore} credit rating, you qualify for instant concession rates:</p>
+                                    <p>Based on your {clampedScore} credit score, you qualify for instant concession rates:</p>
                                 </div>
 
                                 <div className="offers-grid">
-                                    {reportData.matchedOffers.map((offer, idx) => (
+                                    {[
+                                        { title: 'Prime Business Loan', rate: 'From 9.99% p.a.', amount: 'Up to ₹75 Lakhs', tenure: '12 - 60 Months', badge: 'High Approval Odds', type: 'BL' },
+                                        { title: 'Working Capital (OD / CC)', rate: 'From 9.25% p.a.', amount: 'Up to ₹2 Crores', tenure: 'Annual Renewal', badge: 'Turnover Based', type: 'Working Capital' },
+                                        { title: 'Loan Against Property (LAP)', rate: 'From 8.50% p.a.', amount: 'Up to ₹10 Crores', tenure: 'Up to 15 Years', badge: 'Lowest EMI', type: 'LAP' }
+                                    ].map((offer, idx) => (
                                         <div key={idx} className="offer-card">
                                             <div className="offer-badge">{offer.badge}</div>
                                             <h4>{offer.title}</h4>
@@ -1050,10 +1063,10 @@ const CreditReportPage = () => {
                     <section className="guide-section">
                         <h2>What is a Credit Score and Why Does it Matter in India?</h2>
                         <p>
-                            A <strong>credit score</strong> is a three-digit numerical summary ranging between <strong>300 and 900</strong> that reflects your creditworthiness and repayment track record. In India, four licensed credit bureaus calculate this metric: <strong>TransUnion CIBIL, Experian, CRIF High Mark, and Equifax</strong>, operating strictly under the supervision of the <strong>Reserve Bank of India (RBI)</strong>.
+                            A <strong>credit score</strong> is a three-digit numerical summary ranging between <strong>300 and 900</strong> that reflects your creditworthiness and repayment track record. In India, four licensed credit bureaus calculate this metric: <strong>TransUnion CIBIL, Experian, CRIF High Mark, and Equifax</strong>, operating strictly under the regulatory supervision of the <strong>Reserve Bank of India (RBI)</strong>.
                         </p>
                         <p>
-                            Whenever you apply for a Business Loan (BL), Working Capital facility (OD/CC), Home Loan (HL), or Loan Against Property (LAP), lenders inspect your credit bureau dossier before anything else. A score of <strong>750 or above</strong> represents a stellar credit profile, guaranteeing immediate processing, reduced processing fees, and interest concessions of up to <strong>150 to 200 basis points</strong> compared to standard sanction rates.
+                            Whenever you apply for a Business Loan (BL), Working Capital facility (OD/CC), Home Loan (HL), or Loan Against Property (LAP), lenders inspect your credit bureau dossier before anything else. A score of <strong>750 or above</strong> represents a stellar credit profile, guaranteeing immediate sanctioning, minimal processing fees, and interest concessions of up to <strong>150 to 200 basis points</strong> compared to standard rates.
                         </p>
                     </section>
 
