@@ -247,6 +247,39 @@
     to { transform: rotate(360deg); }
 }
 
+.apply-input-has-error,
+.apply-phone-wrap.apply-input-has-error {
+    border-color: #ef4444 !important;
+    background-color: #fff1f2 !important;
+    animation: applyShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+[data-theme="dark"] .apply-input-has-error,
+[data-theme="dark"] .apply-phone-wrap.apply-input-has-error {
+    background-color: rgba(239, 68, 68, 0.12) !important;
+    border-color: #ef4444 !important;
+}
+
+.apply-field-error {
+    display: block;
+    color: #dc2626;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 0.35rem;
+    line-height: 1.2;
+}
+
+[data-theme="dark"] .apply-field-error {
+    color: #f87171;
+}
+
+@keyframes applyShake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+    40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
 .apply-error-message {
     color: #dc2626;
     background: #fee2e2;

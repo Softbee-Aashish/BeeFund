@@ -223,6 +223,17 @@ const Header = () => {
                             </div>
                         </li>
 
+                        {/* CREDIT REPORT CHECK (NEW PRODUCT) */}
+                        <li>
+                            <Link
+                                to="/credit-report"
+                                className={`nav-link nav-link-credit ${location.pathname.startsWith('/credit-report') || location.pathname.startsWith('/credit-score') ? 'active' : ''}`}
+                            >
+                                <span>Credit Report</span>
+                                <span className="nav-free-badge">FREE</span>
+                            </Link>
+                        </li>
+
                         <li>
                             <Link
                                 to="/about"

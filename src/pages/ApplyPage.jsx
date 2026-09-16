@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HexagonBackground from '../components/HexagonBackground';
+import { validateIndianMobile, cleanMobileInput, validateEmail, validateAge } from '../utils/validation';
 import './ApplyPage.css';
 
 // Google Apps Script Web App URL
@@ -55,6 +56,7 @@ const ApplyPage = () => {
         comments: ''
     });
 
+    const [fieldErrors, setFieldErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
@@ -71,19 +73,63 @@ const ApplyPage = () => {
     }, [location.search]);
 
     const handleChange = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        let val = value;
+        if (name === 'mobile') {
+            val = cleanMobileInput(value);
+        }
+        setFormData(prev => ({ ...prev, [name]: val }));
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const handleBlur = (field) => {
+        if (field === 'mobile') {
+            const res = validateIndianMobile(formData.mobile);
+            if (!res.isValid) setFieldErrors(prev => ({ ...prev, mobile: res.message }));
+        } else if (field === 'email') {
+            const res = validateEmail(formData.email);
+            if (!res.isValid) setFieldErrors(prev => ({ ...prev, email: res.message }));
+        } else if (field === 'name') {
+            if (!formData.name.trim() || formData.name.trim().length < 2) {
+                setFieldErrors(prev => ({ ...prev, name: 'Please enter your full name.' }));
+            }
+        } else if (field === 'age') {
+            const res = validateAge(formData.age);
+            if (!res.isValid) setFieldErrors(prev => ({ ...prev, age: res.message }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
         setSubmitError('');
 
+        // Strict validation
+        const mobileCheck = validateIndianMobile(formData.mobile);
+        const emailCheck = validateEmail(formData.email);
+        const ageCheck = validateAge(formData.age);
+        const nameValid = formData.name && formData.name.trim().length >= 2;
+
+        const newErrors = {};
+        if (!nameValid) newErrors.name = 'Please enter your full name.';
+        if (!ageCheck.isValid) newErrors.age = ageCheck.message;
+        if (!mobileCheck.isValid) newErrors.mobile = mobileCheck.message;
+        if (!emailCheck.isValid) newErrors.email = emailCheck.message;
+
+        if (Object.keys(newErrors).length > 0) {
+            setFieldErrors(newErrors);
+            setSubmitError('Please correct the highlighted fields with genuine contact details.');
+            return;
+        }
+
+        setIsSubmitting(true);
+
         const payload = {
-            fullName: formData.name,
+            fullName: formData.name.trim(),
             age: formData.age,
-            mobileNumber: formData.mobile,
-            emailAddress: formData.email,
+            mobileNumber: mobileCheck.cleaned,
+            emailAddress: emailCheck.cleaned,
             interestedLoanType: formData.loanType,
             desiredLoanAmount: formData.amount,
             comments: formData.comments,
@@ -143,8 +189,11 @@ const ApplyPage = () => {
                                     placeholder="e.g. John Doe"
                                     value={formData.name}
                                     onChange={handleChange}
+                                    onBlur={() => handleBlur('name')}
+                                    className={fieldErrors.name ? 'apply-input-has-error' : ''}
                                     required
                                 />
+                                {fieldErrors.name && <span className="apply-field-error">⚠️ {fieldErrors.name}</span>}
                             </div>
                             <div className="apply-input-group">
                                 <label htmlFor="age">Age *</label>
@@ -157,28 +206,32 @@ const ApplyPage = () => {
                                     max="100"
                                     value={formData.age}
                                     onChange={handleChange}
+                                    onBlur={() => handleBlur('age')}
+                                    className={fieldErrors.age ? 'apply-input-has-error' : ''}
                                     required
                                 />
+                                {fieldErrors.age && <span className="apply-field-error">⚠️ {fieldErrors.age}</span>}
                             </div>
                         </div>
 
                         <div className="apply-row">
                             <div className="apply-input-group">
                                 <label htmlFor="mobile">Mobile Number *</label>
-                                <div className="apply-phone-wrap">
+                                <div className={`apply-phone-wrap ${fieldErrors.mobile ? 'apply-input-has-error' : ''}`}>
                                     <span className="apply-phone-prefix">+91</span>
                                     <input
                                         type="tel"
                                         id="mobile"
                                         name="mobile"
                                         placeholder="98765 43210"
-                                        pattern="[0-9]{10}"
-                                        title="Please enter a valid 10-digit mobile number"
+                                        maxLength="10"
                                         value={formData.mobile}
                                         onChange={handleChange}
+                                        onBlur={() => handleBlur('mobile')}
                                         required
                                     />
                                 </div>
+                                {fieldErrors.mobile && <span className="apply-field-error">⚠️ {fieldErrors.mobile}</span>}
                             </div>
                             <div className="apply-input-group">
                                 <label htmlFor="email">Email Address *</label>
@@ -189,8 +242,11 @@ const ApplyPage = () => {
                                     placeholder="john@example.com"
                                     value={formData.email}
                                     onChange={handleChange}
+                                    onBlur={() => handleBlur('email')}
+                                    className={fieldErrors.email ? 'apply-input-has-error' : ''}
                                     required
                                 />
+                                {fieldErrors.email && <span className="apply-field-error">⚠️ {fieldErrors.email}</span>}
                             </div>
                         </div>
 

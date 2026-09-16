@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import HexagonBackground from '../components/HexagonBackground';
+import { validateIndianMobile, cleanMobileInput, validateEmail, validateAge } from '../utils/validation';
 import './ContactPage.css';
 
 // 🔥 PASTE YOUR WEB APP URL HERE 🔥
@@ -16,32 +17,77 @@ const ContactPage = () => {
         comments: ''
     });
 
+    const [fieldErrors, setFieldErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
 
     const handleChange = (e) => {
-        setFormData({
+        const { name, value } = e.target;
+        let val = value;
+        if (name === 'mobile') {
+            val = cleanMobileInput(value);
+        }
+        setFormData(prev => ({
             ...formData,
-            [e.target.name]: e.target.value
-        });
+            [name]: val
+        }));
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const handleBlur = (field) => {
+        if (field === 'mobile') {
+            const res = validateIndianMobile(formData.mobile);
+            if (!res.isValid) setFieldErrors(prev => ({ ...prev, mobile: res.message }));
+        } else if (field === 'email') {
+            const res = validateEmail(formData.email);
+            if (!res.isValid) setFieldErrors(prev => ({ ...prev, email: res.message }));
+        } else if (field === 'name') {
+            if (!formData.name.trim() || formData.name.trim().length < 2) {
+                setFieldErrors(prev => ({ ...prev, name: 'Please enter your full name.' }));
+            }
+        } else if (field === 'age') {
+            const res = validateAge(formData.age);
+            if (!res.isValid) setFieldErrors(prev => ({ ...prev, age: res.message }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitError('');
+
+        // Strict validation
+        const mobileCheck = validateIndianMobile(formData.mobile);
+        const emailCheck = validateEmail(formData.email);
+        const ageCheck = validateAge(formData.age);
+        const nameValid = formData.name && formData.name.trim().length >= 2;
+
+        const newErrors = {};
+        if (!nameValid) newErrors.name = 'Please enter your full name.';
+        if (!ageCheck.isValid) newErrors.age = ageCheck.message;
+        if (!mobileCheck.isValid) newErrors.mobile = mobileCheck.message;
+        if (!emailCheck.isValid) newErrors.email = emailCheck.message;
+
+        if (Object.keys(newErrors).length > 0) {
+            setFieldErrors(newErrors);
+            setSubmitError('Please correct the highlighted fields with genuine contact details.');
+            return;
+        }
 
         setIsSubmitting(true);
-        setSubmitError('');
 
         // Map form data to the keys expected by the Google Apps Script
         const payload = {
-            fullName: formData.name,
+            fullName: formData.name.trim(),
             age: formData.age,
-            mobileNumber: formData.mobile,
-            emailAddress: formData.email,
+            mobileNumber: mobileCheck.cleaned,
+            emailAddress: emailCheck.cleaned,
             interestedLoanType: formData.loanType,
             desiredLoanAmount: formData.amount,
-            comments: formData.comments
+            comments: formData.comments,
+            source: 'Contact Us Page'
         };
 
         try {
@@ -139,22 +185,71 @@ const ContactPage = () => {
                             <div className="form-row">
                                 <div className="input-group">
                                     <label htmlFor="name">Full Name *</label>
-                                    <input type="text" id="name" name="name" placeholder="John Doe" value={formData.name} onChange={handleChange} required />
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        placeholder="John Doe"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        onBlur={() => handleBlur('name')}
+                                        className={fieldErrors.name ? 'input-has-error' : ''}
+                                        required
+                                    />
+                                    {fieldErrors.name && <span className="field-error-text">⚠️ {fieldErrors.name}</span>}
                                 </div>
                                 <div className="input-group">
                                     <label htmlFor="age">Age *</label>
-                                    <input type="number" id="age" name="age" placeholder="25" min="18" max="100" value={formData.age} onChange={handleChange} required />
+                                    <input
+                                        type="number"
+                                        id="age"
+                                        name="age"
+                                        placeholder="25"
+                                        min="18"
+                                        max="100"
+                                        value={formData.age}
+                                        onChange={handleChange}
+                                        onBlur={() => handleBlur('age')}
+                                        className={fieldErrors.age ? 'input-has-error' : ''}
+                                        required
+                                    />
+                                    {fieldErrors.age && <span className="field-error-text">⚠️ {fieldErrors.age}</span>}
                                 </div>
                             </div>
 
                             <div className="form-row">
                                 <div className="input-group">
                                     <label htmlFor="mobile">Mobile Number *</label>
-                                    <input type="tel" id="mobile" name="mobile" placeholder="+91 XXXXX XXXXX" pattern="[0-9+\s-]+" value={formData.mobile} onChange={handleChange} required />
+                                    <div className={`contact-phone-wrap ${fieldErrors.mobile ? 'input-has-error' : ''}`}>
+                                        <span className="contact-phone-prefix">+91</span>
+                                        <input
+                                            type="tel"
+                                            id="mobile"
+                                            name="mobile"
+                                            placeholder="98765 43210"
+                                            maxLength="10"
+                                            value={formData.mobile}
+                                            onChange={handleChange}
+                                            onBlur={() => handleBlur('mobile')}
+                                            required
+                                        />
+                                    </div>
+                                    {fieldErrors.mobile && <span className="field-error-text">⚠️ {fieldErrors.mobile}</span>}
                                 </div>
                                 <div className="input-group">
                                     <label htmlFor="email">Email Address *</label>
-                                    <input type="email" id="email" name="email" placeholder="john@example.com" value={formData.email} onChange={handleChange} required />
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        placeholder="john@example.com"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        onBlur={() => handleBlur('email')}
+                                        className={fieldErrors.email ? 'input-has-error' : ''}
+                                        required
+                                    />
+                                    {fieldErrors.email && <span className="field-error-text">⚠️ {fieldErrors.email}</span>}
                                 </div>
                             </div>
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useEnquiryModal } from '../context/EnquireModalContext';
+import { validateIndianMobile, validateEmail, cleanMobileInput, validateAge } from '../utils/validation';
 import './PamphletModal.css';
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjEOhV9L2B-ff3faIZ_WZNm-6kVNxQ6N24PVw3w8MKXO0y41TJVJ3exYFIwjjppM87gA/exec';
@@ -78,6 +79,7 @@ const PamphletModal = () => {
         comments: ''
     });
 
+    const [fieldErrors, setFieldErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
     const [showSuccess, setShowSuccess] = useState(false);
@@ -92,6 +94,7 @@ const PamphletModal = () => {
             }));
             setShowSuccess(false);
             setSubmitError('');
+            setFieldErrors({});
         }
     }, [isOpen, modalData]);
 
@@ -121,19 +124,73 @@ const PamphletModal = () => {
     if (!isOpen) return null;
 
     const handleChange = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        if (name === 'mobile') {
+            const cleaned = cleanMobileInput(value);
+            setFormData(prev => ({ ...prev, mobile: cleaned }));
+            if (fieldErrors.mobile) {
+                setFieldErrors(prev => ({ ...prev, mobile: '' }));
+            }
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+            if (fieldErrors[name]) {
+                setFieldErrors(prev => ({ ...prev, [name]: '' }));
+            }
+        }
+    };
+
+    const handleBlur = (field) => {
+        if (field === 'mobile') {
+            const res = validateIndianMobile(formData.mobile);
+            if (!res.isValid) {
+                setFieldErrors(prev => ({ ...prev, mobile: res.message }));
+            }
+        } else if (field === 'email') {
+            const res = validateEmail(formData.email);
+            if (!res.isValid) {
+                setFieldErrors(prev => ({ ...prev, email: res.message }));
+            }
+        } else if (field === 'name') {
+            if (!formData.name.trim() || formData.name.trim().length < 2) {
+                setFieldErrors(prev => ({ ...prev, name: 'Please enter your full name.' }));
+            }
+        } else if (field === 'age') {
+            const res = validateAge(formData.age);
+            if (!res.isValid) {
+                setFieldErrors(prev => ({ ...prev, age: res.message }));
+            }
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
         setSubmitError('');
 
+        // Strict Validation Checks
+        const mobileCheck = validateIndianMobile(formData.mobile);
+        const emailCheck = validateEmail(formData.email);
+        const ageCheck = validateAge(formData.age);
+        const nameValid = formData.name && formData.name.trim().length >= 2;
+
+        const newErrors = {};
+        if (!nameValid) newErrors.name = 'Please enter your full name.';
+        if (!ageCheck.isValid) newErrors.age = ageCheck.message;
+        if (!mobileCheck.isValid) newErrors.mobile = mobileCheck.message;
+        if (!emailCheck.isValid) newErrors.email = emailCheck.message;
+
+        if (Object.keys(newErrors).length > 0) {
+            setFieldErrors(newErrors);
+            setSubmitError('Please correct the highlighted fields with genuine contact details.');
+            return;
+        }
+
+        setIsSubmitting(true);
+
         const payload = {
-            fullName: formData.name,
+            fullName: formData.name.trim(),
             age: formData.age,
-            mobileNumber: formData.mobile,
-            emailAddress: formData.email,
+            mobileNumber: mobileCheck.cleaned,
+            emailAddress: emailCheck.cleaned,
             interestedLoanType: formData.loanType,
             desiredLoanAmount: formData.amount,
             comments: formData.comments,
@@ -225,8 +282,11 @@ const PamphletModal = () => {
                                             placeholder="e.g. Rahul Sharma"
                                             value={formData.name}
                                             onChange={handleChange}
+                                            onBlur={() => handleBlur('name')}
+                                            className={fieldErrors.name ? 'input-has-error' : ''}
                                             required
                                         />
+                                        {fieldErrors.name && <span className="p-field-error">⚠️ {fieldErrors.name}</span>}
                                     </div>
                                     <div className="p-input-group">
                                         <label htmlFor="p-age">Age *</label>
@@ -239,28 +299,32 @@ const PamphletModal = () => {
                                             max="100"
                                             value={formData.age}
                                             onChange={handleChange}
+                                            onBlur={() => handleBlur('age')}
+                                            className={fieldErrors.age ? 'input-has-error' : ''}
                                             required
                                         />
+                                        {fieldErrors.age && <span className="p-field-error">⚠️ {fieldErrors.age}</span>}
                                     </div>
                                 </div>
 
                                 <div className="form-grid-2">
                                     <div className="p-input-group">
                                         <label htmlFor="p-mobile">Mobile Number *</label>
-                                        <div className="phone-input-wrap">
+                                        <div className={`phone-input-wrap ${fieldErrors.mobile ? 'input-has-error' : ''}`}>
                                             <span className="phone-prefix">+91</span>
                                             <input
                                                 type="tel"
                                                 id="p-mobile"
                                                 name="mobile"
                                                 placeholder="98765 43210"
-                                                pattern="[0-9]{10}"
-                                                title="Please enter a valid 10-digit mobile number"
+                                                maxLength="10"
                                                 value={formData.mobile}
                                                 onChange={handleChange}
+                                                onBlur={() => handleBlur('mobile')}
                                                 required
                                             />
                                         </div>
+                                        {fieldErrors.mobile && <span className="p-field-error">⚠️ {fieldErrors.mobile}</span>}
                                     </div>
                                     <div className="p-input-group">
                                         <label htmlFor="p-email">Email Address *</label>
@@ -271,8 +335,11 @@ const PamphletModal = () => {
                                             placeholder="rahul@example.com"
                                             value={formData.email}
                                             onChange={handleChange}
+                                            onBlur={() => handleBlur('email')}
+                                            className={fieldErrors.email ? 'input-has-error' : ''}
                                             required
                                         />
+                                        {fieldErrors.email && <span className="p-field-error">⚠️ {fieldErrors.email}</span>}
                                     </div>
                                 </div>
 

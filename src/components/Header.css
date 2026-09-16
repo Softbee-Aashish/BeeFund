@@ -96,6 +96,36 @@
     width: 100%;
 }
 
+.nav-link-credit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.nav-free-badge {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.18rem 0.48rem;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+    animation: freePulse 2.2s infinite;
+}
+
+@keyframes freePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+[data-theme="dark"] .nav-free-badge {
+    background: linear-gradient(135deg, #34d399, #059669);
+    color: #0f172a;
+}
+
 /* ========================================================
    DROPDOWN MENUS (LOANS & TOOLS)
    ======================================================== */

@@ -18,6 +18,7 @@ const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const ApplyPage = React.lazy(() => import('./pages/ApplyPage'));
 const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const ThankYouPage = React.lazy(() => import('./pages/ThankYouPage'));
+const CreditReportPage = React.lazy(() => import('./pages/CreditReportPage'));
 
 // Tools
 const ToolsHome = React.lazy(() => import('./pages/tools/ToolsHome'));
@@ -68,6 +69,8 @@ function App() {
                   <Route path="/blog/:slug" element={<BlogPostPage />} />
                   <Route path="/contact" element={<ContactPage />} />
                   <Route path="/apply" element={<ApplyPage />} />
+                  <Route path="/credit-report" element={<CreditReportPage />} />
+                  <Route path="/credit-score" element={<CreditReportPage />} />
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/thank-you" element={<ThankYouPage />} />
                 </Routes>

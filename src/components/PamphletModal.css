@@ -426,7 +426,7 @@
     min-height: 75px;
 }
 
-/* Error Banner */
+/* Error Banner & Field Errors */
 .p-error-banner {
     background: #fef2f2;
     border: 1px solid #fecaca;
@@ -435,6 +435,40 @@
     border-radius: 10px;
     font-size: 0.82rem;
     text-align: center;
+    font-weight: 600;
+}
+
+.p-field-error {
+    font-size: 0.73rem;
+    color: #ef4444;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    animation: pErrShake 0.3s ease;
+}
+
+@keyframes pErrShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+.input-has-error input,
+.phone-input-wrap.input-has-error,
+.p-input-group.input-has-error input {
+    border-color: #ef4444 !important;
+}
+
+[data-theme="dark"] .p-error-banner {
+    background: rgba(220, 38, 38, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .p-field-error {
+    color: #f87171;
 }
 
 /* Footer & Submit */
