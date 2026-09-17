@@ -112,6 +112,9 @@ const Header = () => {
     const [scrolled, setScrolled] = useState(false);
     const [loansOpen, setLoansOpen] = useState(false);
     const [toolsOpen, setToolsOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [mobileLoansOpen, setMobileLoansOpen] = useState(false);
+    const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
     const location = useLocation();
 
     useEffect(() => {
@@ -122,16 +125,33 @@ const Header = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Close dropdowns on route change
+    // Close dropdowns and mobile drawer on route change
     useEffect(() => {
         setLoansOpen(false);
         setToolsOpen(false);
+        setMobileMenuOpen(false);
     }, [location.pathname]);
+
+    // Prevent body scrolling when mobile drawer is open
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [mobileMenuOpen]);
+
+    const closeMobileMenu = () => {
+        setMobileMenuOpen(false);
+    };
 
     return (
         <header className={`header ${scrolled ? 'header-scrolled' : ''}`}>
             <div className="container header-container">
-                <Link to="/" className="logo-link">
+                <Link to="/" className="logo-link" onClick={closeMobileMenu}>
                     <img src="/logo.png" alt="BEEFUND Logo" className="logo" />
                 </Link>
 
@@ -261,16 +281,184 @@ const Header = () => {
                     </ul>
                 </nav>
 
-                <div className="header-cta">
+                <div className="header-actions">
+                    <div className="header-cta">
+                        <button
+                            type="button"
+                            onClick={() => openEnquiryModal({ source: 'Header CTA' })}
+                            className="btn btn-primary btn-sm"
+                        >
+                            Enquire Now
+                        </button>
+                    </div>
+
+                    {/* Mobile Menu Hamburger Button */}
                     <button
                         type="button"
-                        onClick={() => openEnquiryModal({ source: 'Header CTA' })}
-                        className="btn btn-primary btn-sm"
+                        className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label={mobileMenuOpen ? 'Close Menu' : 'Open Navigation Menu'}
+                        aria-expanded={mobileMenuOpen}
                     >
-                        Enquire Now
+                        <span className="hamburger-bar"></span>
+                        <span className="hamburger-bar"></span>
+                        <span className="hamburger-bar"></span>
                     </button>
                 </div>
             </div>
+
+            {/* Mobile Navigation Drawer Backdrop */}
+            <div
+                className={`mobile-drawer-backdrop ${mobileMenuOpen ? 'open' : ''}`}
+                onClick={closeMobileMenu}
+                aria-hidden="true"
+            />
+
+            {/* Mobile Navigation Drawer */}
+            <aside className={`mobile-nav-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+                <div className="mobile-drawer-header">
+                    <Link to="/" onClick={closeMobileMenu} className="mobile-drawer-logo">
+                        <img src="/logo.png" alt="BEEFUND" className="logo" />
+                    </Link>
+                    <button
+                        type="button"
+                        className="mobile-drawer-close"
+                        onClick={closeMobileMenu}
+                        aria-label="Close Menu"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                <div className="mobile-drawer-body">
+                    <ul className="mobile-nav-list">
+                        <li>
+                            <Link to="/" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+                                <span>🏠 Home</span>
+                            </Link>
+                        </li>
+
+                        {/* FREE CREDIT SCORE LINK */}
+                        <li>
+                            <Link
+                                to="/credit-report"
+                                onClick={closeMobileMenu}
+                                className={`mobile-nav-link mobile-nav-highlight ${location.pathname.startsWith('/credit-report') || location.pathname.startsWith('/credit-score') ? 'active' : ''}`}
+                            >
+                                <div className="mobile-nav-link-content">
+                                    <span>📊 Free Credit Report</span>
+                                    <span className="nav-free-badge">FREE</span>
+                                </div>
+                            </Link>
+                        </li>
+
+                        {/* LOANS ACCORDION */}
+                        <li className="mobile-accordion-item">
+                            <button
+                                type="button"
+                                className={`mobile-accordion-btn ${mobileLoansOpen ? 'expanded' : ''}`}
+                                onClick={() => setMobileLoansOpen(!mobileLoansOpen)}
+                            >
+                                <span>💰 Loan Products</span>
+                                <span className="accordion-arrow">{mobileLoansOpen ? '▲' : '▼'}</span>
+                            </button>
+
+                            {mobileLoansOpen && (
+                                <div className="mobile-accordion-panel">
+                                    {LOAN_MENU_ITEMS.map((cat, i) => (
+                                        <div key={i} className="mobile-cat-group">
+                                            <div className="mobile-cat-title">{cat.category}</div>
+                                            {cat.items.map((item, j) => (
+                                                <Link
+                                                    key={j}
+                                                    to={item.path}
+                                                    onClick={closeMobileMenu}
+                                                    className="mobile-sub-link"
+                                                >
+                                                    <span className="sub-icon">{item.icon}</span>
+                                                    <span className="sub-name">{item.name}</span>
+                                                    <span className="sub-badge">{item.badge}</span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    ))}
+                                    <Link to="/loans" onClick={closeMobileMenu} className="mobile-view-all-link">
+                                        View All Loan Products →
+                                    </Link>
+                                </div>
+                            )}
+                        </li>
+
+                        {/* TOOLS & CALCULATORS ACCORDION */}
+                        <li className="mobile-accordion-item">
+                            <button
+                                type="button"
+                                className={`mobile-accordion-btn ${mobileToolsOpen ? 'expanded' : ''}`}
+                                onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
+                            >
+                                <span>🧮 Financial Calculators & Tools</span>
+                                <span className="accordion-arrow">{mobileToolsOpen ? '▲' : '▼'}</span>
+                            </button>
+
+                            {mobileToolsOpen && (
+                                <div className="mobile-accordion-panel">
+                                    {TOOL_MENU_ITEMS.map((tool) => (
+                                        <Link
+                                            key={tool.id}
+                                            to={tool.path}
+                                            onClick={closeMobileMenu}
+                                            className="mobile-sub-link"
+                                        >
+                                            <span className="sub-icon">{tool.icon}</span>
+                                            <div className="sub-text">
+                                                <span className="sub-name">{tool.name}</span>
+                                                <span className="sub-desc">{tool.desc}</span>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                    <Link to="/tools" onClick={closeMobileMenu} className="mobile-view-all-link">
+                                        Explore All Financial Tools →
+                                    </Link>
+                                </div>
+                            )}
+                        </li>
+
+                        <li>
+                            <Link to="/about" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/about' ? 'active' : ''}`}>
+                                <span>🏢 About BeeFund</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/blog" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname.startsWith('/blog') ? 'active' : ''}`}>
+                                <span>📝 Financial Insights & Blog</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/contact" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/contact' ? 'active' : ''}`}>
+                                <span>📞 Contact Us</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/terms" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/terms' ? 'active' : ''}`}>
+                                <span>📜 Terms & Privacy</span>
+                            </Link>
+                        </li>
+                    </ul>
+
+                    <div className="mobile-drawer-cta">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                closeMobileMenu();
+                                openEnquiryModal({ source: 'Mobile Drawer CTA' });
+                            }}
+                            className="btn btn-primary w-full"
+                        >
+                            ⚡ Instant Loan Enquiry
+                        </button>
+                    </div>
+                </div>
+            </aside>
         </header>
     );
 };

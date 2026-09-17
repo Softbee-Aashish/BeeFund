@@ -181,6 +181,33 @@
     box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12);
 }
 
+.btn-cibil-hero {
+    background: #ffffff;
+    border-color: #d97706;
+    color: #1e1b4b;
+    position: relative;
+    font-weight: 700;
+}
+
+.btn-cibil-hero:hover {
+    border-color: #b45309;
+    color: #b45309;
+    background: #fffbeb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(217, 119, 6, 0.18);
+}
+
+.hero-btn-badge {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    margin-left: 2px;
+}
+
 /* ---- PRODUCTS SECTION ---- */
 .products-section {
     padding: 5rem 0 4rem;

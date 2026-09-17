@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import HexagonBackground from '../../components/HexagonBackground';
 import { exportToExcel, formatINR, formatNumberINR } from '../../utils/excelExport';
+import { generateODStatementPDF } from '../../utils/loanPdfExport';
 import './ODCCCalculator.css';
 import './ToolShared.css';
 
@@ -217,48 +216,12 @@ const ODCCCalculator = () => {
     };
 
     const handleExportPdfOD = () => {
-        const doc = new jsPDF();
-
-        // BeeFund Header
-        doc.setFillColor(245, 158, 11);
-        doc.rect(0, 0, 210, 20, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('BEEFUND - Overdraft (OD) Interest Statement', 14, 13);
-
-        doc.setTextColor(31, 41, 55);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 14, 28);
-        doc.text(`Total Calculation Days: ${variableSummary.totalDays} days`, 14, 34);
-        doc.text(`Average Daily Utilized Balance: ${formatINR(variableSummary.avgDailyBalance)}`, 14, 40);
-        doc.text(`Total Accrued Interest: ${formatINR(variableSummary.totalInterest)}`, 14, 46);
-
-        const tableHeaders = [['#', 'From', 'To', 'Days', 'Balance', 'Rate', 'Daily Int.', 'Total Interest']];
-        const tableRows = variableSummary.entries.map((row, idx) => [
-            String(idx + 1),
-            row.fromDate || '-',
-            row.toDate || '-',
-            String(row.days),
-            formatINR(row.balance),
-            `${row.rate}%`,
-            formatINR(row.dailyInterest),
-            formatINR(row.periodInterest)
-        ]);
-
-        autoTable(doc, {
-            head: tableHeaders,
-            body: tableRows,
-            startY: 52,
-            styles: { fontSize: 8, cellPadding: 2.5 },
-            headStyles: { fillColor: [245, 158, 11], textColor: [255, 255, 255] },
-            alternateRowStyles: { fillColor: [255, 251, 235] },
-            foot: [['Total', '', '', `${variableSummary.totalDays} Days`, `Avg: ${formatINR(variableSummary.avgDailyBalance)}`, '', '', formatINR(variableSummary.totalInterest)]],
-            footStyles: { fillColor: [31, 41, 55], textColor: [255, 255, 255], fontStyle: 'bold' }
+        generateODStatementPDF({
+            accountTitle: 'Commercial Overdraft (OD) Facility',
+            summary: variableSummary,
+            entries: variableSummary.entries,
+            fileName: 'BeeFund_OD_Interest_Statement.pdf'
         });
-
-        doc.save('BeeFund_OD_Interest_Statement.pdf');
     };
 
     return (

@@ -1,0 +1,21 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Priority Core Routes
+Allow: /credit-report
+Allow: /credit-score
+Allow: /tools/emi-calculator
+Allow: /tools/repayment-schedule
+Allow: /tools/od-cc-calculator
+Allow: /loans
+Allow: /tools
+Allow: /terms
+Allow: /privacy
+Allow: /blog
+Allow: /about
+Allow: /contact
+
+# Sitemaps
+Sitemap: https://beefund.pages.dev/sitemap.xml
+Sitemap: https://beefund.in/sitemap.xml

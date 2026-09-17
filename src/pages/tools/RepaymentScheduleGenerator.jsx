@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import HexagonBackground from '../../components/HexagonBackground';
 import { exportToExcel, formatINR, formatNumberINR } from '../../utils/excelExport';
+import { generateLoanSchedulePDF } from '../../utils/loanPdfExport';
 import './RepaymentScheduleGenerator.css';
 import './ToolShared.css';
 
@@ -291,56 +290,23 @@ const RepaymentScheduleGenerator = () => {
     };
 
     const handleExportPdf = () => {
-        const doc = new jsPDF();
-
-        // BeeFund Header
-        doc.setFillColor(245, 158, 11);
-        doc.rect(0, 0, 210, 24, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(15);
-        doc.setFont('helvetica', 'bold');
-        doc.text('BEEFUND - Loan Repayment Schedule', 14, 15);
-
-        // Sanction Summary
-        doc.setTextColor(31, 41, 55);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-
-        const col1X = 14;
-        const col2X = 110;
-
-        doc.text(`Loan Product: ${loanName}`, col1X, 32);
-        doc.text(`Sanctioned Amount: ${formatINR(scheduleData.principal)}`, col1X, 38);
-        doc.text(`Interest Rate: ${annualRate}% p.a. (${rateStructure})`, col1X, 44);
-        doc.text(`Tenure: ${totalMonths} Months`, col1X, 50);
-
-        doc.text(`Monthly EMI: ${formatINR(scheduleData.effectiveEmi)}`, col2X, 32);
-        doc.text(`Total Interest: ${formatINR(scheduleData.totalInterestPayable)}`, col2X, 38);
-        doc.text(`Total Payable: ${formatINR(scheduleData.totalAmountPayable)}`, col2X, 44);
-        doc.text(`First EMI Date: ${scheduleData.startDateLabel}`, col2X, 50);
-        doc.text(`Final Maturity: ${scheduleData.endDateLabel}`, col2X, 56);
-
-        const tableHeaders = [['Mo #', 'Date', 'Opening POS', 'EMI', 'Principal', 'Interest', 'Closing POS']];
-        const tableRows = scheduleData.rows.map(r => [
-            String(r.month),
-            r.dateLabel,
-            formatINR(r.openingPos),
-            formatINR(r.emi),
-            formatINR(r.principal),
-            formatINR(r.interest),
-            formatINR(r.closingPos)
-        ]);
-
-        autoTable(doc, {
-            head: tableHeaders,
-            body: tableRows,
-            startY: 62,
-            styles: { fontSize: 7, cellPadding: 2 },
-            headStyles: { fillColor: [245, 158, 11], textColor: [255, 255, 255] },
-            alternateRowStyles: { fillColor: [255, 251, 235] }
+        generateLoanSchedulePDF({
+            loanTitle: 'Official Sanction Repayment Schedule',
+            loanName: loanName,
+            principal: scheduleData.principal,
+            annualRate: annualRate,
+            rateStructure: rateStructure === 'fixed' ? 'Fixed Rate' : 'Floating Rate',
+            tenureMonths: totalMonths,
+            effectiveEmi: scheduleData.effectiveEmi,
+            totalInterest: scheduleData.totalInterestPayable,
+            totalPayment: scheduleData.totalAmountPayable,
+            startDateLabel: scheduleData.startDateLabel,
+            endDateLabel: scheduleData.endDateLabel,
+            moratoriumMonths: moratoriumMonths,
+            processingFee: scheduleData.processingFeeAmount,
+            scheduleRows: scheduleData.rows,
+            fileName: `BeeFund_Repayment_Schedule_${loanName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
         });
-
-        doc.save(`BeeFund_Repayment_Schedule_${loanName.replace(/\s+/g, '_')}.pdf`);
     };
 
     return (

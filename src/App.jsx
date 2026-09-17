@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
 import BeeSwarm from './components/BeeSwarm';
 import WhatsAppWidget from './components/WhatsAppWidget';
@@ -19,6 +20,7 @@ const ApplyPage = React.lazy(() => import('./pages/ApplyPage'));
 const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const ThankYouPage = React.lazy(() => import('./pages/ThankYouPage'));
 const CreditReportPage = React.lazy(() => import('./pages/CreditReportPage'));
+const TermsPage = React.lazy(() => import('./pages/TermsPage'));
 
 // Tools
 const ToolsHome = React.lazy(() => import('./pages/tools/ToolsHome'));
@@ -72,10 +74,13 @@ function App() {
                   <Route path="/credit-report" element={<CreditReportPage />} />
                   <Route path="/credit-score" element={<CreditReportPage />} />
                   <Route path="/about" element={<AboutPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/privacy" element={<TermsPage />} />
                   <Route path="/thank-you" element={<ThankYouPage />} />
                 </Routes>
               </React.Suspense>
             </main>
+            <Footer />
             <WhatsAppWidget />
             <DarkModeToggle />
             <BottomNav />

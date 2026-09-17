@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { exportToExcel, formatINR, formatNumberINR } from '../utils/excelExport';
+import { generateLoanSchedulePDF } from '../utils/loanPdfExport';
 import './CalculatorPage.css';
 import '../pages/tools/ToolShared.css';
 
@@ -175,48 +174,34 @@ const CalculatorPage = () => {
         });
     };
 
-    // PDF Export
+    // PDF Export (Bank-Grade Amortization Dossier with Dark Blue Violet & Amber Gold Theme)
     const exportPDF = () => {
-        const doc = new jsPDF();
-        doc.setFillColor(245, 158, 11);
-        doc.rect(0, 0, 210, 24, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(15);
-        doc.setFont('helvetica', 'bold');
-        doc.text('BEEFUND - Loan Repayment Schedule', 14, 15);
+        const firstMonth = results.schedule[0]?.monthLabel || '';
+        const lastMonth = results.schedule[results.schedule.length - 1]?.monthLabel || '';
 
-        doc.setFontSize(9);
-        doc.setTextColor(50);
-        doc.setFont('helvetica', 'normal');
-
-        const col1X = 14;
-        const col2X = 110;
-
-        doc.text(`Loan Amount: ${formatCurrencyPDF(results.amount)}`, col1X, 32);
-        doc.text(`Interest Rate: ${results.rate.toFixed(2)}% p.a.`, col1X, 38);
-        doc.text(`Tenure: ${results.tenure} months (${(results.tenure / 12).toFixed(1)} years)`, col1X, 44);
-
-        doc.text(`Monthly EMI: ${formatCurrencyPDF(results.emi)}`, col2X, 32);
-        doc.text(`Total Interest: ${formatCurrencyPDF(results.totalInterest)}`, col2X, 38);
-        doc.text(`Total Payment: ${formatCurrencyPDF(results.totalPayment)}`, col2X, 44);
-
-        autoTable(doc, {
-            startY: 52,
-            head: [['Month', 'Date', 'EMI', 'Principal', 'Interest', 'Balance Outstanding']],
-            body: results.schedule.map(r => [
-                r.month,
-                r.monthLabel,
-                formatCurrencyPDF(r.emi),
-                formatCurrencyPDF(r.principal),
-                formatCurrencyPDF(r.interest),
-                formatCurrencyPDF(r.balance),
-            ]),
-            styles: { fontSize: 8, cellPadding: 2.5, font: 'helvetica' },
-            headStyles: { fillColor: [245, 158, 11], textColor: [255, 255, 255] },
-            alternateRowStyles: { fillColor: [255, 251, 235] },
+        generateLoanSchedulePDF({
+            loanTitle: 'Official Loan Amortization Schedule',
+            loanName: 'Standard Term Loan Facility',
+            principal: results.amount,
+            annualRate: results.rate,
+            rateStructure: 'Reducing Balance',
+            tenureMonths: results.tenure,
+            effectiveEmi: results.emi,
+            totalInterest: results.totalInterest,
+            totalPayment: results.totalPayment,
+            startDateLabel: firstMonth,
+            endDateLabel: lastMonth,
+            scheduleRows: results.schedule.map(r => ({
+                month: r.month,
+                dateLabel: r.monthLabel,
+                openingPos: r.balance + r.principal,
+                emi: r.emi,
+                principal: r.principal,
+                interest: r.interest,
+                closingPos: r.balance
+            })),
+            fileName: 'BeeFund_Loan_Amortization_Schedule.pdf'
         });
-
-        doc.save('BEEFUND_Loan_Schedule.pdf');
     };
 
     // Excel Export

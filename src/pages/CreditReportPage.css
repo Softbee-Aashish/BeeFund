@@ -310,12 +310,13 @@
 
 /* RBI Consent */
 .cr-consent-wrap {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
+    background: #fffdf5;
+    border: 1.5px solid #fde68a;
     border-radius: 12px;
-    padding: 1rem 1.15rem;
-    margin-bottom: 1.75rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.4rem;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.05);
 }
 
 .cr-consent-wrap.cr-consent-error {
@@ -343,7 +344,7 @@
     border-radius: 5px;
     background: #ffffff;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 3px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -365,12 +366,34 @@
 }
 
 .cr-consent-text {
-    font-size: 0.82rem;
+    flex: 1;
+    font-size: 0.8rem;
     color: #78350f;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 
-.cr-consent-text strong {
+.cr-consent-declaration {
+    font-size: 0.82rem;
+    color: #78350f;
+    background: rgba(245, 158, 11, 0.12);
+    border-left: 3.5px solid #d97706;
+    padding: 0.45rem 0.65rem;
+    border-radius: 6px;
+    margin-bottom: 0.45rem;
+    line-height: 1.45;
+}
+
+.cr-consent-declaration strong {
+    color: #451a03;
+}
+
+.cr-consent-sub {
+    font-size: 0.75rem;
+    color: #92400e;
+    line-height: 1.4;
+}
+
+.cr-consent-sub strong {
     color: #451a03;
 }
 
@@ -1788,15 +1811,25 @@
 
 [data-theme="dark"] .cr-consent-wrap {
     background: rgba(245, 158, 11, 0.08);
-    border-color: rgba(245, 158, 11, 0.25);
+    border-color: rgba(245, 158, 11, 0.3);
 }
 
-[data-theme="dark"] .cr-consent-text {
-    color: #fde68a;
+[data-theme="dark"] .cr-consent-declaration {
+    background: rgba(245, 158, 11, 0.15);
+    border-left-color: #f59e0b;
+    color: #fef3c7;
 }
 
-[data-theme="dark"] .cr-consent-text strong {
+[data-theme="dark"] .cr-consent-declaration strong {
     color: #fbbf24;
+}
+
+[data-theme="dark"] .cr-consent-sub {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .cr-consent-sub strong {
+    color: #fde68a;
 }
 
 [data-theme="dark"] .cr-trust-item {
@@ -1959,3 +1992,286 @@
         font-size: 1.4rem;
     }
 }
+
+/* =========================================================================
+   LEGAL CONSENT DRAWER ("HIDE METHOD UNDER HYPERLINK WORD")
+   ========================================================================= */
+.cr-consent-link {
+    color: #b45309;
+    text-decoration: underline;
+    font-weight: 700;
+    transition: color 0.2s ease;
+}
+
+.cr-consent-link:hover {
+    color: #78350f;
+}
+
+.cr-consent-drawer-wrap {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #fde68a;
+}
+
+.cr-consent-drawer-btn {
+    background: transparent;
+    border: none;
+    color: #b45309;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.cr-consent-drawer-btn:hover {
+    color: #78350f;
+    text-decoration: underline;
+}
+
+.cr-consent-drawer-body {
+    margin-top: 0.5rem;
+    background: #ffffff;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font-size: 0.76rem;
+    line-height: 1.55;
+    color: #475569;
+}
+
+.cr-consent-drawer-body h5 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+}
+
+.cr-consent-drawer-body p {
+    margin-bottom: 0.45rem;
+}
+
+.cr-consent-drawer-body p:last-child {
+    margin-bottom: 0;
+}
+
+.cr-consent-drawer-body a {
+    color: #d97706;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* =========================================================================
+   SEO SNIPPET & REAL-WORLD CASE STUDY STYLING
+   ========================================================= */
+.snippet-answer-box {
+    background: #f0fdf4;
+    border-left: 4px solid #10b981;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.lead-answer {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #064e3b;
+    margin: 0;
+}
+
+.lead-answer strong {
+    color: #065f46;
+}
+
+.case-study-section {
+    margin: 2.5rem 0;
+}
+
+.case-study-card {
+    background: linear-gradient(135deg, #1e1b4b 0%, #2e2a72 100%);
+    color: #ffffff;
+    border-radius: 1rem;
+    padding: 2.5rem 2.25rem;
+    box-shadow: 0 12px 32px rgba(30, 27, 75, 0.25);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.case-study-badge {
+    display: inline-block;
+    background: #d97706;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    margin-bottom: 1rem;
+}
+
+.case-study-card h3 {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 0.75rem;
+    line-height: 1.35;
+}
+
+.case-study-intro {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    line-height: 1.6;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.case-study-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.cs-step {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+}
+
+.cs-month {
+    flex-shrink: 0;
+    background: #f59e0b;
+    color: #1e1b4b;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cs-step h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 0.3rem;
+}
+
+.cs-step p {
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* =========================================================================
+   E-E-A-T AUTHOR & EDITORIAL CREDENTIALS CARD
+   ========================================================================= */
+.eeat-section {
+    margin-top: 3rem;
+}
+
+.eeat-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+}
+
+.eeat-avatar {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #d97706;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.eeat-info h4 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+}
+
+.eeat-credentials {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 0.4rem;
+}
+
+.eeat-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.76rem;
+    color: #64748b;
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .eeat-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.25rem;
+    }
+    .cs-step {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Dark Mode Overrides for Legal Drawer & Guide */
+[data-theme="dark"] .cr-consent-drawer-body {
+    background: #0f172a;
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .cr-consent-drawer-body h5 {
+    color: #fde68a;
+}
+
+[data-theme="dark"] .snippet-answer-box {
+    background: rgba(16, 185, 129, 0.1);
+    border-left-color: #10b981;
+}
+
+[data-theme="dark"] .lead-answer {
+    color: #a7f3d0;
+}
+
+[data-theme="dark"] .lead-answer strong {
+    color: #34d399;
+}
+
+[data-theme="dark"] .eeat-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .eeat-info h4 {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .eeat-credentials {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .eeat-avatar {
+    background: #0f172a;
+    border-color: #f59e0b;
+}
+
+
