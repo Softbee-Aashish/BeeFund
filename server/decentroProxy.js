@@ -89,7 +89,18 @@ app.post('/api/decentro/credit-report', async (req, res) => {
                       age: { age: '35' }
                     }
                   },
-                  scoreDetails: [{ value: '785', type: 'ERS', name: 'ERS4.0' }],
+                  scoreDetails: [
+                    {
+                      value: '785',
+                      type: 'ERS',
+                      name: 'ERS4.0',
+                      scoringElements: [
+                        { seq: '1', code: '703', description: 'Total Utilization' },
+                        { seq: '2', code: '702', description: 'Total Credit Exposure' },
+                        { seq: '3', code: '704', description: 'Credit Card Utilization' }
+                      ]
+                    }
+                  ],
                   retailAccountsSummary: {
                     noOfAccounts: '4',
                     noOfActiveAccounts: '3',
@@ -123,12 +134,25 @@ app.post('/api/decentro/credit-report', async (req, res) => {
                       open: 'Yes',
                       pastDueAmount: '0'
                     }
-                  ]
+                  ],
+                  otherKeyInd: {
+                    ageOfOldestTrade: '158',
+                    numberOfOpenTrades: '3',
+                    allLinesEVERWritten: '0.00'
+                  },
+                  recentActivities: {
+                    accountsDeliquent: '0',
+                    accountsOpened: '0',
+                    totalInquiries: '0',
+                    accountsUpdated: '1'
+                  }
                 }
               }
             ]
-          }
-        }
+          },
+          reportOrderNumber: '8923745612'
+        },
+        responseKey: 'success_credit_report'
       });
     }
 

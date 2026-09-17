@@ -173,12 +173,27 @@ function decentroCreditProxyPlugin(env) {
                           past30Days: '0',
                           past12Months: '1',
                           recent: '2025-11-14'
+                        },
+                        otherKeyInd: {
+                          ageOfOldestTrade: '158',
+                          numberOfOpenTrades: '3',
+                          allLinesEVERWritten: '0.00',
+                          allLinesEVERWrittenIn9Months: '0',
+                          allLinesEVERWrittenIn6Months: '0'
+                        },
+                        recentActivities: {
+                          accountsDeliquent: '0',
+                          accountsOpened: '0',
+                          totalInquiries: '0',
+                          accountsUpdated: '1'
                         }
                       }
                     }
                   ]
-                }
-              }
+                },
+                reportOrderNumber: '8923745612'
+              },
+              responseKey: 'success_credit_report'
             });
 
             // Safe Mock Mode: If mockMode is enabled or keys missing

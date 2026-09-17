@@ -829,6 +829,94 @@ const CreditReportPage = () => {
                             </div>
 
                             {/* =========================================================
+                                KEY BUREAU SCORING FACTORS (Decentro Drivers)
+                                ========================================================= */}
+                            <div className="factors-section">
+                                <div className="section-title-wrap">
+                                    <span className="section-kicker">🎯 Bureau Scoring Drivers</span>
+                                    <h3>Key Credit Factors Influencing Your Bureau Score</h3>
+                                    <p>Your credit rating is derived by bureau algorithms assessing five critical financial pillars:</p>
+                                </div>
+                                <div className="factors-grid">
+                                    {/* 1. Payment History */}
+                                    <div className="factor-card">
+                                        <div className="factor-card-top">
+                                            <div className="factor-icon-badge high-impact">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                            </div>
+                                            <span className="impact-pill high">High Impact (35%)</span>
+                                        </div>
+                                        <h4>Payment History</h4>
+                                        <div className="factor-metric">{reportData.summary.totalPastDue === 0 ? '100% On-Time' : 'Overdue Detected'}</div>
+                                        <p>{reportData.summary.totalPastDue === 0 ? 'Flawless track record with zero late payments or defaults across all accounts.' : `Currently ₹${reportData.summary.totalPastDue.toLocaleString('en-IN')} in overdue balances requiring immediate clearance.`}</p>
+                                        <div className="factor-bar">
+                                            <div className="factor-progress" style={{ width: reportData.summary.totalPastDue === 0 ? '100%' : '60%', background: reportData.summary.totalPastDue === 0 ? '#10b981' : '#ef4444' }}></div>
+                                        </div>
+                                    </div>
+
+                                    {/* 2. Credit Utilization */}
+                                    <div className="factor-card">
+                                        <div className="factor-card-top">
+                                            <div className="factor-icon-badge high-impact">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            </div>
+                                            <span className="impact-pill high">High Impact (30%)</span>
+                                        </div>
+                                        <h4>Credit Utilization</h4>
+                                        <div className="factor-metric">
+                                            {reportData.summary.totalSanctioned > 0 
+                                                ? `${Math.round((reportData.summary.totalOutstanding / reportData.summary.totalSanctioned) * 100)}% Used`
+                                                : 'Healthy (< 30%)'}
+                                        </div>
+                                        <p>Low utilization under 30% signals disciplined debt management to prospective lenders.</p>
+                                        <div className="factor-bar">
+                                            <div className="factor-progress" style={{ width: '28%', background: '#10b981' }}></div>
+                                        </div>
+                                    </div>
+
+                                    {/* 3. Credit Age */}
+                                    <div className="factor-card">
+                                        <div className="factor-card-top">
+                                            <div className="factor-icon-badge med-impact">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                            </div>
+                                            <span className="impact-pill med">Medium Impact (15%)</span>
+                                        </div>
+                                        <h4>Credit Age & History</h4>
+                                        <div className="factor-metric">{reportData.otherKeyInd?.ageOfOldestTrade || 'Established'}</div>
+                                        <p>A long credit vintage demonstrates reliable repayment performance over economic cycles.</p>
+                                        <div className="factor-bar">
+                                            <div className="factor-progress" style={{ width: '85%', background: '#f59e0b' }}></div>
+                                        </div>
+                                    </div>
+
+                                    {/* 4. Bureau Algorithm Driver */}
+                                    <div className="factor-card">
+                                        <div className="factor-card-top">
+                                            <div className="factor-icon-badge low-impact">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                            </div>
+                                            <span className="impact-pill low">Bureau Algorithm Driver</span>
+                                        </div>
+                                        <h4>Primary Score Influencer</h4>
+                                        <div className="factor-metric">
+                                            {reportData.scoringFactors && reportData.scoringFactors[0]?.description
+                                                ? reportData.scoringFactors[0].description
+                                                : 'Total Utilization'}
+                                        </div>
+                                        <p>
+                                            {reportData.scoringFactors && reportData.scoringFactors.length > 1
+                                                ? `Additional drivers: ${reportData.scoringFactors.slice(1).map(s => s.description).join(', ')}`
+                                                : 'Active credit lines and exposure balance reported by Decentro.'}
+                                        </p>
+                                        <div className="factor-bar">
+                                            <div className="factor-progress" style={{ width: '75%', background: '#3b82f6' }}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* =========================================================
                                 FULL LOAN OBLIGATION CHART & FINANCIAL EXPOSURE
                                 ========================================================= */}
                             <div className="obligation-section">

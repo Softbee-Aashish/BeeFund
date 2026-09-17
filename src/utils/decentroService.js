@@ -14,6 +14,22 @@ import { exportToExcel } from './excelExport';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
+/**
+ * Official Decentro Credit Bureau API Endpoints Specification:
+ * - Staging Base: https://in.staging.decentro.tech
+ * - Production Base: https://in.decentro.tech
+ */
+export const DECENTRO_ENDPOINTS = {
+    // 1. Credit Report Summary API (Detailed CIR data, loan obligations, score factors, base64 PDF)
+    CREDIT_REPORT_SUMMARY: '/v2/financial_services/credit_bureau/credit_report/summary',
+    // 2. Standard Credit Report API
+    CREDIT_REPORT: '/v2/financial_services/credit_bureau/credit_report',
+    // 3. Quick Credit Score API (Lightweight score check with just mobile & name)
+    QUICK_CREDIT_SCORE: '/v2/bytes/credit-score',
+    // 4. Customer Data Pull API (Fetch KYC, linked PAN, email, phone, addresses)
+    CUSTOMER_DATA_PULL: '/v2/financial_services/data/pull'
+};
+
 // In-memory cache to ensure zero duplicate hits within the active browser session
 const sessionReportCache = new Map();
 
@@ -250,6 +266,23 @@ export const parseDecentroResponse = (apiResult, originalInput = {}) => {
             total: parseInt(enquirySummary.total, 10) || enquiries.length,
             past30Days: parseInt(enquirySummary.past30Days, 10) || 0,
             past12Months: parseInt(enquirySummary.past12Months, 10) || 0
+        },
+        scoringFactors: ((scoreDetails && scoreDetails[0]?.scoringElements) || rawData?.scoringElements || []).map((el) => ({
+            type: el.type || 'RES',
+            seq: el.seq || '1',
+            code: el.code || '',
+            description: el.description || 'Credit factor'
+        })),
+        otherKeyInd: {
+            ageOfOldestTrade: cirReport?.otherKeyInd?.ageOfOldestTrade ? `${cirReport.otherKeyInd.ageOfOldestTrade} Months` : 'N/A',
+            numberOfOpenTrades: cirReport?.otherKeyInd?.numberOfOpenTrades || 'N/A',
+            allLinesEVERWritten: cirReport?.otherKeyInd?.allLinesEVERWritten || '0.00'
+        },
+        recentActivities: {
+            accountsDelinquent: cirReport?.recentActivities?.accountsDeliquent || '0',
+            accountsOpened: cirReport?.recentActivities?.accountsOpened || '0',
+            totalInquiries: cirReport?.recentActivities?.totalInquiries || '0',
+            accountsUpdated: cirReport?.recentActivities?.accountsUpdated || '0'
         }
     };
 };
