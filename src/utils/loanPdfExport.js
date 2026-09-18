@@ -17,6 +17,7 @@
 
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { BEEFUND_LOGO_BASE64, BEEFUND_LOGO_WHITE_BASE64 } from '../assets/logoBase64.js';
 
 /**
  * Universal autoTable runner across ESM, CommonJS, and bundled environments
@@ -110,28 +111,31 @@ export const generateLoanSchedulePDF = ({
     doc.setFillColor(COLOR_GOLD_AMBER[0], COLOR_GOLD_AMBER[1], COLOR_GOLD_AMBER[2]);
     doc.rect(0, 26, pageWidth, 2.5, 'F');
 
-    // Honeycomb Brand Emblem Tag
-    doc.setFillColor(COLOR_YELLOW_BROWN[0], COLOR_YELLOW_BROWN[1], COLOR_YELLOW_BROWN[2]);
-    doc.roundedRect(margin, 5.5, 9, 9, 1.8, 1.8, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('B', margin + 2.8, 12);
-
-    // Brand Name: BEEFUND
-    doc.setFontSize(16);
-    doc.text('BEEFUND', margin + 12, 11.5);
+    // Official BeeFund Brand Logo
+    try {
+        doc.addImage(BEEFUND_LOGO_WHITE_BASE64, 'PNG', margin, 4.5, 36, 11.7);
+    } catch (e) {
+        // Fallback badge
+        doc.setFillColor(COLOR_YELLOW_BROWN[0], COLOR_YELLOW_BROWN[1], COLOR_YELLOW_BROWN[2]);
+        doc.roundedRect(margin, 5.5, 9, 9, 1.8, 1.8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('B', margin + 2.8, 12);
+        doc.setFontSize(16);
+        doc.text('BEEFUND', margin + 12, 11.5);
+    }
 
     // Tagline / Subtitle
     doc.setTextColor(COLOR_GOLD_LIGHT[0], COLOR_GOLD_LIGHT[1], COLOR_GOLD_LIGHT[2]);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'bold');
-    doc.text('FINANCIAL SERVICES & LOAN ADVISORY', margin + 12, 16.5);
+    doc.text('FINANCIAL SERVICES & LOAN ADVISORY', margin + 39, 11);
 
     doc.setTextColor(226, 232, 240);
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
-    doc.text('Bank-Grade Capital Structuring  |  Amortization Intelligence', margin + 12, 21);
+    doc.text('Bank-Grade Capital Structuring  |  Amortization Intelligence', margin + 39, 16);
 
     // Right Header Information
     doc.setTextColor(255, 255, 255);
@@ -389,10 +393,14 @@ export const generateLoanSchedulePDF = ({
                 doc.setFillColor(COLOR_GOLD_AMBER[0], COLOR_GOLD_AMBER[1], COLOR_GOLD_AMBER[2]);
                 doc.rect(0, 11, pageWidth, 1.2, 'F');
 
+                try {
+                    doc.addImage(BEEFUND_LOGO_WHITE_BASE64, 'PNG', margin, 1.8, 20, 6.5);
+                } catch (e) {}
+
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(7.5);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`BEEFUND FINANCIAL SERVICES  •  ${loanName} Repayment Schedule (Contd.)`, margin, 7.5);
+                doc.text(`BEEFUND FINANCIAL SERVICES  •  ${loanName} Repayment Schedule (Contd.)`, margin + 23, 7.5);
 
                 doc.setTextColor(COLOR_GOLD_LIGHT[0], COLOR_GOLD_LIGHT[1], COLOR_GOLD_LIGHT[2]);
                 doc.setFontSize(6.5);
@@ -405,10 +413,14 @@ export const generateLoanSchedulePDF = ({
             doc.setLineWidth(0.3);
             doc.line(margin, footerY - 2.5, pageWidth - margin, footerY - 2.5);
 
+            try {
+                doc.addImage(BEEFUND_LOGO_BASE64, 'PNG', margin, footerY - 1.8, 12, 3.9);
+            } catch (e) {}
+
             doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
             doc.setFontSize(6);
             doc.setFont('helvetica', 'normal');
-            doc.text('BEEFUND FINANCIAL SERVICES  |  Official Loan Repayment Schedule  |  Confidential', margin, footerY + 1);
+            doc.text('BEEFUND FINANCIAL SERVICES  |  Official Loan Repayment Schedule  |  Confidential', margin + 14, footerY + 1);
 
             doc.setTextColor(COLOR_TEXT_DARK[0], COLOR_TEXT_DARK[1], COLOR_TEXT_DARK[2]);
             doc.setFont('helvetica', 'bold');
@@ -460,26 +472,28 @@ export const generateODStatementPDF = ({
     doc.setFillColor(COLOR_GOLD_AMBER[0], COLOR_GOLD_AMBER[1], COLOR_GOLD_AMBER[2]);
     doc.rect(0, 26, pageWidth, 2.5, 'F');
 
-    // Logo Crest
-    doc.setFillColor(COLOR_YELLOW_BROWN[0], COLOR_YELLOW_BROWN[1], COLOR_YELLOW_BROWN[2]);
-    doc.roundedRect(margin, 5.5, 9, 9, 1.8, 1.8, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text('B', margin + 2.8, 12);
-
-    // Brand Name: BEEFUND
-    doc.setFontSize(16);
-    doc.text('BEEFUND', margin + 12, 11.5);
+    // Official BeeFund Brand Logo
+    try {
+        doc.addImage(BEEFUND_LOGO_WHITE_BASE64, 'PNG', margin, 4.5, 36, 11.7);
+    } catch (e) {
+        doc.setFillColor(COLOR_YELLOW_BROWN[0], COLOR_YELLOW_BROWN[1], COLOR_YELLOW_BROWN[2]);
+        doc.roundedRect(margin, 5.5, 9, 9, 1.8, 1.8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('B', margin + 2.8, 12);
+        doc.setFontSize(16);
+        doc.text('BEEFUND', margin + 12, 11.5);
+    }
 
     doc.setTextColor(COLOR_GOLD_LIGHT[0], COLOR_GOLD_LIGHT[1], COLOR_GOLD_LIGHT[2]);
     doc.setFontSize(7);
-    doc.text('FINANCIAL SERVICES & WORKING CAPITAL INTELLIGENCE', margin + 12, 16.5);
+    doc.text('FINANCIAL SERVICES & WORKING CAPITAL INTELLIGENCE', margin + 39, 11);
 
     doc.setTextColor(226, 232, 240);
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
-    doc.text('Overdraft & Cash Credit Daily Balance Audit Dossier', margin + 12, 21);
+    doc.text('Overdraft & Cash Credit Daily Balance Audit Dossier', margin + 39, 16);
 
     // Right Header Information
     doc.setTextColor(255, 255, 255);
@@ -631,10 +645,15 @@ export const generateODStatementPDF = ({
                 doc.rect(0, 0, pageWidth, 11, 'F');
                 doc.setFillColor(COLOR_GOLD_AMBER[0], COLOR_GOLD_AMBER[1], COLOR_GOLD_AMBER[2]);
                 doc.rect(0, 11, pageWidth, 1.2, 'F');
+
+                try {
+                    doc.addImage(BEEFUND_LOGO_WHITE_BASE64, 'PNG', margin, 1.8, 20, 6.5);
+                } catch (e) {}
+
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(7.5);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`BEEFUND FINANCIAL SERVICES  •  ${accountTitle} Statement (Contd.)`, margin, 7.5);
+                doc.text(`BEEFUND FINANCIAL SERVICES  •  ${accountTitle} Statement (Contd.)`, margin + 23, 7.5);
             }
 
             const footerY = pageHeight - 9;
@@ -642,9 +661,13 @@ export const generateODStatementPDF = ({
             doc.setLineWidth(0.3);
             doc.line(margin, footerY - 2.5, pageWidth - margin, footerY - 2.5);
 
+            try {
+                doc.addImage(BEEFUND_LOGO_BASE64, 'PNG', margin, footerY - 1.8, 12, 3.9);
+            } catch (e) {}
+
             doc.setTextColor(COLOR_TEXT_MUTED[0], COLOR_TEXT_MUTED[1], COLOR_TEXT_MUTED[2]);
             doc.setFontSize(6);
-            doc.text('BEEFUND FINANCIAL SERVICES  |  Official Overdraft Interest Statement  |  Confidential', margin, footerY + 1);
+            doc.text('BEEFUND FINANCIAL SERVICES  |  Official Overdraft Interest Statement  |  Confidential', margin + 14, footerY + 1);
 
             doc.setTextColor(COLOR_TEXT_DARK[0], COLOR_TEXT_DARK[1], COLOR_TEXT_DARK[2]);
             doc.setFont('helvetica', 'bold');

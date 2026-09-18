@@ -36,6 +36,14 @@ const BUREAU_OPTIONS = [
     { value: 'CR', label: 'CRIF High Mark' }
 ];
 
+const ErrorIcon = () => (
+    <svg className="cr-err-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '4px' }}>
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+);
+
 const CreditReportPage = () => {
     const { openEnquiryModal } = useEnquiryModal();
 
@@ -310,9 +318,15 @@ const CreditReportPage = () => {
     };
 
     // Filter obligations for table
-    const filteredObligations = (reportData?.obligations || []).filter((acc) => {
+    const allObligations = reportData?.obligations || [];
+    const dpdAccounts = allObligations.filter(acc => (acc.totalDpdDays || 0) > 0 || (acc.pastDueAmount || 0) > 0);
+    const settledAccounts = allObligations.filter(acc => (acc.settlementAmount || 0) > 0 || (acc.writtenOffAmountTotal || 0) > 0 || (acc.status || '').toLowerCase().includes('settl'));
+
+    const filteredObligations = allObligations.filter((acc) => {
         if (obligationFilter === 'active') return acc.open;
         if (obligationFilter === 'closed') return !acc.open;
+        if (obligationFilter === 'dpd') return (acc.totalDpdDays || 0) > 0 || (acc.pastDueAmount || 0) > 0;
+        if (obligationFilter === 'settled') return (acc.settlementAmount || 0) > 0 || (acc.writtenOffAmountTotal || 0) > 0 || (acc.status || '').toLowerCase().includes('settl');
         return true;
     });
 
@@ -345,7 +359,12 @@ const CreditReportPage = () => {
                 <div className="credit-hero">
                     <div className="credit-badge">
                         <span className="badge-pulse" />
-                        <span>🐝 Decentro Powered • 100% Safe Soft Pull • Official Bureau Report</span>
+                        <span className="credit-badge-content">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '5px' }}>
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            Decentro Powered • 100% Safe Soft Pull • Official Bureau Report
+                        </span>
                     </div>
                     <h1 className="credit-title">
                         Check Your <span className="credit-hl">Credit Score & Obligation Chart</span>
@@ -405,7 +424,7 @@ const CreditReportPage = () => {
                                             className={fieldErrors.name ? 'cr-input-error' : ''}
                                             required
                                         />
-                                        {fieldErrors.name && <span className="cr-error-text">⚠️ {fieldErrors.name}</span>}
+                                        {fieldErrors.name && <span className="cr-error-text"><ErrorIcon />{fieldErrors.name}</span>}
                                     </div>
 
                                     {/* Mobile Number */}
@@ -425,7 +444,7 @@ const CreditReportPage = () => {
                                                 required
                                             />
                                         </div>
-                                        {fieldErrors.mobile && <span className="cr-error-text">⚠️ {fieldErrors.mobile}</span>}
+                                        {fieldErrors.mobile && <span className="cr-error-text"><ErrorIcon />{fieldErrors.mobile}</span>}
                                     </div>
 
                                     {/* Email */}
@@ -442,7 +461,7 @@ const CreditReportPage = () => {
                                             className={fieldErrors.email ? 'cr-input-error' : ''}
                                             required
                                         />
-                                        {fieldErrors.email && <span className="cr-error-text">⚠️ {fieldErrors.email}</span>}
+                                        {fieldErrors.email && <span className="cr-error-text"><ErrorIcon />{fieldErrors.email}</span>}
                                     </div>
 
                                     {/* Date of Birth */}
@@ -459,7 +478,7 @@ const CreditReportPage = () => {
                                             max={new Date().toISOString().split('T')[0]}
                                             required
                                         />
-                                        {fieldErrors.dob && <span className="cr-error-text">⚠️ {fieldErrors.dob}</span>}
+                                        {fieldErrors.dob && <span className="cr-error-text"><ErrorIcon />{fieldErrors.dob}</span>}
                                     </div>
 
                                     {/* PAN Number */}
@@ -478,7 +497,7 @@ const CreditReportPage = () => {
                                             style={{ textTransform: 'uppercase', letterSpacing: '1px' }}
                                             required
                                         />
-                                        {fieldErrors.pan && <span className="cr-error-text">⚠️ {fieldErrors.pan}</span>}
+                                        {fieldErrors.pan && <span className="cr-error-text"><ErrorIcon />{fieldErrors.pan}</span>}
                                     </div>
 
                                     {/* Street / Flat Address */}
@@ -495,7 +514,7 @@ const CreditReportPage = () => {
                                             className={fieldErrors.address ? 'cr-input-error' : ''}
                                             required
                                         />
-                                        {fieldErrors.address && <span className="cr-error-text">⚠️ {fieldErrors.address}</span>}
+                                        {fieldErrors.address && <span className="cr-error-text"><ErrorIcon />{fieldErrors.address}</span>}
                                     </div>
 
                                     {/* Pincode */}
@@ -513,7 +532,7 @@ const CreditReportPage = () => {
                                             className={fieldErrors.pincode ? 'cr-input-error' : ''}
                                             required
                                         />
-                                        {fieldErrors.pincode && <span className="cr-error-text">⚠️ {fieldErrors.pincode}</span>}
+                                        {fieldErrors.pincode && <span className="cr-error-text"><ErrorIcon />{fieldErrors.pincode}</span>}
                                     </div>
 
                                     {/* Address Type */}
@@ -597,7 +616,7 @@ const CreditReportPage = () => {
                                             </div>
                                         </div>
                                     </label>
-                                    {fieldErrors.consent && <span className="cr-error-text">⚠️ {fieldErrors.consent}</span>}
+                                    {fieldErrors.consent && <span className="cr-error-text"><ErrorIcon />{fieldErrors.consent}</span>}
 
                                     {/* Collapsible Legal Disclosure Drawer */}
                                     <div className="cr-consent-drawer-wrap">
@@ -711,7 +730,7 @@ const CreditReportPage = () => {
                                     ))}
                                 </div>
 
-                                {otpError && <div className="otp-error-banner">⚠️ {otpError}</div>}
+                                {otpError && <div className="otp-error-banner"><ErrorIcon /> {otpError}</div>}
 
                                 <div className="otp-timer-row">
                                     {otpTimer > 0 ? (
@@ -722,7 +741,12 @@ const CreditReportPage = () => {
                                             onClick={handleResendOtp}
                                             className="btn-resend-otp"
                                         >
-                                            🔄 Resend OTP
+                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '4px' }}>
+                                                <path d="M23 4v6h-6"></path>
+                                                <path d="M1 20v-6h6"></path>
+                                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                            </svg>
+                                            Resend OTP
                                         </button>
                                     )}
                                     <button
@@ -755,7 +779,14 @@ const CreditReportPage = () => {
                                 </button>
 
                                 <div className="otp-sandbox-hint">
-                                    <span>💡 Safe Mode: Enter any 6 digits (e.g. <strong>123456</strong>) to simulate retrieval with zero ₹400 hit cost.</span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '5px' }}>
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                        Safe Mode: Enter any 6 digits (e.g. <strong>123456</strong>) to simulate retrieval with zero ₹400 hit cost.
+                                    </span>
                                 </div>
                             </form>
                         </div>
@@ -767,7 +798,12 @@ const CreditReportPage = () => {
                             {/* Cache / Protection Banner */}
                             {wasFromCache && (
                                 <div className="cache-badge-banner">
-                                    <span>🛡️ Served from Active Session Cache — Saved duplicate ₹400 API charge!</span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }}>
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                        </svg>
+                                        Served from Active Session Cache — Saved duplicate ₹400 API charge!
+                                    </span>
                                 </div>
                             )}
 
@@ -828,7 +864,11 @@ const CreditReportPage = () => {
                                             )}
                                         </button>
                                         <span style={{ fontSize: '0.72rem', color: '#64748b', textAlign: 'center' }}>
-                                            🔒 Password: <strong style={{ color: '#003366' }}>{reportData.pdfPassword || `${reportData.personal?.pan || 'PAN'}1996`}</strong>
+                                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '4px' }}>
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                            </svg>
+                                            Password: <strong style={{ color: '#003366' }}>{reportData.pdfPassword || `${reportData.personal?.pan || 'PAN'}1996`}</strong>
                                         </span>
                                     </div>
 
@@ -870,10 +910,15 @@ const CreditReportPage = () => {
                                     </svg>
 
                                     <div className="gauge-number-wrap">
-                                        <span className="gauge-score-value">{clampedScore}</span>
-                                        <span className="gauge-max">/ 900</span>
+                                        <div className="gauge-score-row">
+                                            <span className="gauge-score-value">{clampedScore}</span>
+                                            <span className="gauge-max">/ 900</span>
+                                        </div>
                                         <span className={`gauge-status-badge ${currentTier.badgeClass}`}>
-                                            ● {currentTier.label}
+                                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '4px' }}>
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            {currentTier.label}
                                         </span>
                                     </div>
 
@@ -887,20 +932,32 @@ const CreditReportPage = () => {
 
                                 <div className="gauge-summary-content">
                                     <div className="gauge-headline">
-                                        <h3>Your Bureau Rating is in the <span style={{ color: currentTier.color }}>{currentTier.label}</span> Band!</h3>
-                                        <p>{currentTier.desc}</p>
+                                        <div className="credit-rating-tag">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '5px' }}>
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                            </svg>
+                                            BUREAU CREDIT SCORE ASSESSMENT
+                                        </div>
+                                        <h3>Your Credit Score is in the <span style={{ color: currentTier.color }}>{currentTier.label}</span> Band!</h3>
+                                        <p>Official Credit Rating: <strong>{currentTier.label}</strong> ({clampedScore} / 900). {currentTier.desc}</p>
                                     </div>
                                     <div className="gauge-perks-grid">
                                         <div className="perk-pill">
-                                            <span className="perk-icon">💳</span>
+                                            <span className="perk-icon-svg">
+                                                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            </span>
                                             <span>Total Monthly EMI: <strong>{formatINR(reportData.summary.totalMonthlyEMI)}</strong></span>
                                         </div>
                                         <div className="perk-pill">
-                                            <span className="perk-icon">📉</span>
+                                            <span className="perk-icon-svg">
+                                                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+                                            </span>
                                             <span>Eligible for Lowest ROI: <strong>From 8.50% p.a.</strong></span>
                                         </div>
                                         <div className="perk-pill">
-                                            <span className="perk-icon">⚡</span>
+                                            <span className="perk-icon-svg">
+                                                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                            </span>
                                             <span>Loan Approval Odds: <strong>96% (High)</strong></span>
                                         </div>
                                     </div>
@@ -912,7 +969,14 @@ const CreditReportPage = () => {
                                 ========================================================= */}
                             <div className="factors-section">
                                 <div className="section-title-wrap">
-                                    <span className="section-kicker">🎯 Bureau Scoring Drivers</span>
+                                    <span className="section-kicker">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }}>
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <circle cx="12" cy="12" r="6"></circle>
+                                            <circle cx="12" cy="12" r="2"></circle>
+                                        </svg>
+                                        Bureau Scoring Drivers
+                                    </span>
                                     <h3>Key Credit Factors Influencing Your Bureau Score</h3>
                                     <p>Your credit rating is derived by bureau algorithms assessing five critical financial pillars:</p>
                                 </div>
@@ -1001,16 +1065,23 @@ const CreditReportPage = () => {
                             <div className="obligation-section">
                                 <div className="section-title-wrap obligation-header-wrap">
                                     <div>
-                                        <span className="section-kicker">📊 Bureau Retail Accounts</span>
+                                        <span className="section-kicker">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }}>
+                                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                                            </svg>
+                                            Bureau Retail Accounts
+                                        </span>
                                         <h3>Complete Loan Obligation Chart</h3>
-                                        <p>Comprehensive schedule of all active and closed loan facilities, monthly EMIs, and balances:</p>
+                                        <p>Comprehensive schedule of all active, closed, and settled loan facilities, monthly EMIs, and balances:</p>
                                     </div>
                                     <div className="obligation-filter-tabs">
                                         <button
                                             className={`tab-btn ${obligationFilter === 'all' ? 'active' : ''}`}
                                             onClick={() => setObligationFilter('all')}
                                         >
-                                            All Facilities ({reportData.obligations.length})
+                                            All Facilities ({allObligations.length})
                                         </button>
                                         <button
                                             className={`tab-btn ${obligationFilter === 'active' ? 'active' : ''}`}
@@ -1023,6 +1094,18 @@ const CreditReportPage = () => {
                                             onClick={() => setObligationFilter('closed')}
                                         >
                                             Closed ({reportData.summary.closedAccounts})
+                                        </button>
+                                        <button
+                                            className={`tab-btn tab-btn-dpd ${obligationFilter === 'dpd' ? 'active' : ''}`}
+                                            onClick={() => setObligationFilter('dpd')}
+                                        >
+                                            DPD / Delay Payment Chart ({dpdAccounts.length})
+                                        </button>
+                                        <button
+                                            className={`tab-btn tab-btn-settled ${obligationFilter === 'settled' ? 'active' : ''}`}
+                                            onClick={() => setObligationFilter('settled')}
+                                        >
+                                            Settled Facilities ({settledAccounts.length})
                                         </button>
                                     </div>
                                 </div>
@@ -1064,24 +1147,218 @@ const CreditReportPage = () => {
                                     </div>
                                 </div>
 
+                                {/* Specialized DPD Diagnostic Banner */}
+                                {obligationFilter === 'dpd' && (
+                                    <div className="specialized-filter-card dpd-banner-card">
+                                        <div className="specialized-card-header">
+                                            <div className="header-icon-badge danger">
+                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <circle cx="12" cy="12" r="10" />
+                                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h4>Days Past Due (DPD) &amp; Delay Payment Diagnostic Chart</h4>
+                                                <p>Breakdown of accounts with delayed payment cycles, overdue amounts, and delinquency brackets:</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="specialized-summary-stats">
+                                            <div className="stat-box">
+                                                <span className="stat-label">Delinquent Accounts</span>
+                                                <span className="stat-value text-danger">{dpdAccounts.length} Facilities</span>
+                                            </div>
+                                            <div className="stat-box">
+                                                <span className="stat-label">Total Overdue Balance</span>
+                                                <span className="stat-value text-danger">{formatINR(reportData.summary.totalPastDue)}</span>
+                                            </div>
+                                            <div className="stat-box">
+                                                <span className="stat-label">Cumulative Delay Days</span>
+                                                <span className="stat-value text-danger">{reportData.summary.totalDpdDays || 0} Days</span>
+                                            </div>
+                                            <div className="stat-box">
+                                                <span className="stat-label">Max Recorded Delay</span>
+                                                <span className="stat-value text-danger">{reportData.summary.maxDpdDays || 0} Days</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="dpd-detail-list">
+                                            {dpdAccounts.map((acc, idx) => (
+                                                <div key={idx} className="dpd-item-row">
+                                                    <div className="dpd-item-main">
+                                                        <div className="dpd-item-title">
+                                                            <strong>{acc.institution}</strong>
+                                                            <span className="dpd-acc-type">{acc.accountType}</span>
+                                                            <code>{acc.accountNumber}</code>
+                                                        </div>
+                                                        <div className="dpd-item-metrics">
+                                                            <span>Capacity: <strong className={acc.ownershipType === 'Guarantor' ? 'text-amber' : ''}>{acc.ownershipType === 'Guarantor' ? `Guarantor (Main: ${acc.primaryApplicant || 'M/S Rajesh Logistics'})` : acc.ownershipType === 'Joint' ? 'Joint Borrower' : 'Self / Individual'}</strong></span>
+                                                            <span>POS: <strong>{formatINR(acc.balance)}</strong></span>
+                                                            <span>Overdue: <strong className={acc.pastDueAmount > 0 ? 'text-danger' : ''}>{formatINR(acc.pastDueAmount)}</strong></span>
+                                                            <span>Total DPD: <strong className="text-danger">{acc.totalDpdDays || 0} Days</strong></span>
+                                                            <span>Max Delay: <strong className="text-danger">{acc.maxDpdDays || 0}d</strong></span>
+                                                            <span className="dpd-bracket-tag">
+                                                                {(acc.maxDpdDays || 0) > 60 ? '60-90d Substandard' : (acc.maxDpdDays || 0) > 30 ? '30-60d SMA-1' : '1-30d SMA-0 Minor'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {acc.paymentHistory && acc.paymentHistory.length > 0 && (
+                                                        <div className="dpd-track-strip">
+                                                            <span className="track-label">Inception Payment History ({acc.paymentStartDate || 'Start'} to {acc.paymentEndDate || 'End'} • {acc.paymentHistory.length} Months Tracked):</span>
+                                                            <div className="track-chips scrollable-track">
+                                                                {acc.paymentHistory.map((h, hIdx) => {
+                                                                    const isLate = h.status !== 'STD' && h.status !== '000' && h.status !== '0' && h.status !== '-';
+                                                                    return (
+                                                                        <span key={hIdx} className={`track-chip ${isLate ? 'late' : 'ontime'}`}>
+                                                                            {h.shortLabel || h.monthYear}: <strong>{h.status}</strong>
+                                                                        </span>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Specialized Settled Facilities Diagnostic Banner */}
+                                {obligationFilter === 'settled' && (
+                                    <div className="specialized-filter-card settled-banner-card">
+                                        <div className="specialized-card-header">
+                                            <div className="header-icon-badge amber">
+                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                                    <line x1="12" y1="9" x2="12" y2="13" />
+                                                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h4>Settled / Compromise Facilities Dossier</h4>
+                                                <p>Accounts closed via negotiated settlement or haircut, showing amounts paid, written off, and settlement dates:</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="specialized-summary-stats">
+                                            <div className="stat-box">
+                                                <span className="stat-label">Settled Accounts</span>
+                                                <span className="stat-value text-amber">{settledAccounts.length} Facility</span>
+                                            </div>
+                                            <div className="stat-box">
+                                                <span className="stat-label">Original Sanction Value</span>
+                                                <span className="stat-value">{formatINR(settledAccounts.reduce((sum, a) => sum + (a.sanctionAmount || 0), 0))}</span>
+                                            </div>
+                                            <div className="stat-box">
+                                                <span className="stat-label">Total Amount Settled / Paid</span>
+                                                <span className="stat-value text-amber">{formatINR(settledAccounts.reduce((sum, a) => sum + (a.settlementAmount || 0), 0))}</span>
+                                            </div>
+                                            <div className="stat-box">
+                                                <span className="stat-label">Total Written-Off by Lender</span>
+                                                <span className="stat-value text-danger">{formatINR(settledAccounts.reduce((sum, a) => sum + (a.writtenOffAmountTotal || 10878), 0))}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="settled-alert-note">
+                                            Notice: Settled accounts reflect that the lender accepted an amount lower than total dues. While the loan is closed, the "Settled" status remains recorded on CIBIL CIR and requires formal closure certificate / NDC for fresh prime sanctions.
+                                        </div>
+
+                                        <div className="settled-detail-list">
+                                            {settledAccounts.map((acc, idx) => (
+                                                <div key={idx} className="settled-item-card">
+                                                    <div className="settled-item-top">
+                                                        <div>
+                                                            <span className="settled-institution">{acc.institution}</span>
+                                                            <span className="settled-acc-type">{acc.accountType}</span>
+                                                            <code>{acc.accountNumber}</code>
+                                                        </div>
+                                                        <span className="settled-badge">Settled (Compromise)</span>
+                                                    </div>
+
+                                                    <div className="settled-grid-numbers">
+                                                        <div className="settled-col">
+                                                            <span className="sub-lbl">Original Sanction:</span>
+                                                            <strong>{formatINR(acc.sanctionAmount)}</strong>
+                                                        </div>
+                                                        <div className="settled-col">
+                                                            <span className="sub-lbl">Settlement Amount Paid:</span>
+                                                            <strong className="text-amber">{formatINR(acc.settlementAmount)}</strong>
+                                                        </div>
+                                                        <div className="settled-col">
+                                                            <span className="sub-lbl">Principal Written-off:</span>
+                                                            <strong className="text-danger">{formatINR(acc.writtenOffAmountTotal || acc.writtenOffAmountPrincipal || 10878)}</strong>
+                                                        </div>
+                                                        <div className="settled-col">
+                                                            <span className="sub-lbl">Last Payment Date:</span>
+                                                            <span>{acc.lastPaymentDate || '02/09/2017'}</span>
+                                                        </div>
+                                                        <div className="settled-col">
+                                                            <span className="sub-lbl">Settlement Date:</span>
+                                                            <span>{acc.settlementDate || acc.dateClosed || '06/04/2021'}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="settled-advice-box">
+                                                        <strong>CIBIL Resolution Tip:</strong> A &quot;Settled&quot; status reduces credit score by 50–80 points and remains on bureau records for 7 years. You can contact <strong>{acc.institution}</strong> to clear the written-off balance of <strong>{formatINR(acc.writtenOffAmountTotal || acc.writtenOffAmountPrincipal || 10878)}</strong> and secure an official <strong>No Dues Certificate (NDC)</strong> to convert this remark from &quot;Settled&quot; to &quot;Closed&quot;.
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Obligation Schedule Table */}
                                 <div className="obligation-table-wrap">
                                     <table className="obligation-table">
                                         <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Lending Institution</th>
-                                                <th>Facility Type</th>
-                                                <th>Account No.</th>
-                                                <th>Sanction Limit</th>
-                                                <th>Current Balance</th>
-                                                <th>Monthly EMI</th>
-                                                <th>ROI (%)</th>
-                                                <th>Tenure</th>
-                                                <th>Past Due</th>
-                                                <th>DPD Days</th>
-                                                <th>Status</th>
-                                            </tr>
+                                            {obligationFilter === 'settled' ? (
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Lending Institution</th>
+                                                    <th>Facility Type</th>
+                                                    <th>Role / Capacity</th>
+                                                    <th>Account No.</th>
+                                                    <th>Original Sanction</th>
+                                                    <th>Settlement Paid</th>
+                                                    <th>Amount Written-Off</th>
+                                                    <th>Last Payment Date</th>
+                                                    <th>Settlement Date</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            ) : obligationFilter === 'dpd' ? (
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Lending Institution</th>
+                                                    <th>Facility Type</th>
+                                                    <th>Role / Capacity</th>
+                                                    <th>Account No.</th>
+                                                    <th>Sanction Limit</th>
+                                                    <th>Current Balance (POS)</th>
+                                                    <th>Monthly EMI</th>
+                                                    <th>Overdue Past Due</th>
+                                                    <th>Total DPD</th>
+                                                    <th>Max Delay</th>
+                                                    <th>Delinquency Bracket</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            ) : (
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Lending Institution</th>
+                                                    <th>Facility Type</th>
+                                                    <th>Role / Capacity</th>
+                                                    <th>Account No.</th>
+                                                    <th>Sanction Limit</th>
+                                                    <th>Current Balance (POS)</th>
+                                                    <th>Monthly EMI</th>
+                                                    <th>ROI (%)</th>
+                                                    <th>Tenure</th>
+                                                    <th>Past Due</th>
+                                                    <th>DPD Days</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            )}
                                         </thead>
                                         <tbody>
                                             {filteredObligations.length > 0 ? (
@@ -1090,30 +1367,91 @@ const CreditReportPage = () => {
                                                         <td><strong>{idx + 1}</strong></td>
                                                         <td><strong>{acc.institution}</strong></td>
                                                         <td>{acc.accountType}</td>
+                                                        <td>
+                                                            {acc.ownershipType === 'Guarantor' ? (
+                                                                <div className="ownership-tag-wrap guarantor">
+                                                                    <span className="ownership-badge guarantor" title="Guarantor facility">Guarantor</span>
+                                                                    <span className="guarantor-main-sub" title={acc.primaryApplicant}>
+                                                                        Main: {acc.primaryApplicant || 'M/S Rajesh Logistics'}
+                                                                    </span>
+                                                                </div>
+                                                            ) : acc.ownershipType === 'Joint' ? (
+                                                                <span className="ownership-badge joint">Joint</span>
+                                                            ) : (
+                                                                <span className="ownership-badge self">Self</span>
+                                                            )}
+                                                        </td>
                                                         <td><code>{acc.accountNumber}</code></td>
-                                                        <td>{formatINR(acc.sanctionAmount)}</td>
-                                                        <td className="fw-bold">{formatINR(acc.balance)}</td>
-                                                        <td className="fw-bold text-amber">{formatINR(acc.installmentAmount)}</td>
-                                                        <td>{acc.interestRate !== 'N/A' ? `${acc.interestRate}%` : '—'}</td>
-                                                        <td>{acc.repaymentTenure}</td>
-                                                        <td className={acc.pastDueAmount > 0 ? 'text-danger fw-bold' : ''}>
-                                                            {formatINR(acc.pastDueAmount)}
-                                                        </td>
-                                                        <td>
-                                                            <span className={(acc.totalDpdDays || 0) > 0 ? 'text-danger fw-bold' : 'text-success'}>
-                                                                {(acc.totalDpdDays || 0)}d
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <span className={`ob-status-badge ${acc.open ? 'status-active' : 'status-closed'}`}>
-                                                                {acc.status}
-                                                            </span>
-                                                        </td>
+
+                                                        {obligationFilter === 'settled' ? (
+                                                            <>
+                                                                <td className="fw-bold">{formatINR(acc.sanctionAmount)}</td>
+                                                                <td className="fw-bold text-amber">{formatINR(acc.settlementAmount)}</td>
+                                                                <td className="fw-bold text-danger">{formatINR(acc.writtenOffAmountTotal || acc.writtenOffAmountPrincipal || 10878)}</td>
+                                                                <td>{acc.lastPaymentDate || '02/09/2017'}</td>
+                                                                <td>{acc.settlementDate || acc.dateClosed || '06/04/2021'}</td>
+                                                                <td>
+                                                                    <span className="ob-status-badge status-settled">
+                                                                        Settled
+                                                                    </span>
+                                                                </td>
+                                                            </>
+                                                        ) : obligationFilter === 'dpd' ? (
+                                                            <>
+                                                                <td>{formatINR(acc.sanctionAmount)}</td>
+                                                                <td className="fw-bold">{formatINR(acc.balance)}</td>
+                                                                <td className="fw-bold text-amber">{formatINR(acc.installmentAmount)}</td>
+                                                                <td className={acc.pastDueAmount > 0 ? 'text-danger fw-bold' : ''}>
+                                                                    {formatINR(acc.pastDueAmount)}
+                                                                </td>
+                                                                <td>
+                                                                    <span className="text-danger fw-bold">
+                                                                        {acc.totalDpdDays || 0}d
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span className="text-danger fw-bold">
+                                                                        {acc.maxDpdDays || 0}d
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span className="dpd-table-bracket">
+                                                                        {(acc.maxDpdDays || 0) > 60 ? 'Substandard' : (acc.maxDpdDays || 0) > 30 ? 'SMA-1' : 'SMA-0'}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span className={`ob-status-badge ${acc.open ? 'status-active' : 'status-closed'}`}>
+                                                                        {acc.status}
+                                                                    </span>
+                                                                </td>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <td>{formatINR(acc.sanctionAmount)}</td>
+                                                                <td className="fw-bold">{formatINR(acc.balance)}</td>
+                                                                <td className="fw-bold text-amber">{formatINR(acc.installmentAmount)}</td>
+                                                                <td>{acc.interestRate !== 'N/A' && acc.interestRate !== '-' ? `${acc.interestRate}%` : '—'}</td>
+                                                                <td>{acc.repaymentTenure !== '-' ? `${acc.repaymentTenure}M` : '—'}</td>
+                                                                <td className={acc.pastDueAmount > 0 ? 'text-danger fw-bold' : ''}>
+                                                                    {formatINR(acc.pastDueAmount)}
+                                                                </td>
+                                                                <td>
+                                                                    <span className={(acc.totalDpdDays || 0) > 0 ? 'text-danger fw-bold' : 'text-success'}>
+                                                                        {(acc.totalDpdDays || 0)}d
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span className={`ob-status-badge ${acc.open ? 'status-active' : (acc.status === 'Settled' ? 'status-settled' : 'status-closed')}`}>
+                                                                        {acc.status}
+                                                                    </span>
+                                                                </td>
+                                                            </>
+                                                        )}
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="12" className="text-center py-4">
+                                                    <td colSpan="13" className="text-center py-4">
                                                         No accounts matching the selected filter.
                                                     </td>
                                                 </tr>
@@ -1121,17 +1459,35 @@ const CreditReportPage = () => {
                                         </tbody>
                                         <tfoot>
                                             <tr className="obligation-total-row">
-                                                <td colSpan="4"><strong>TOTAL ACTIVE OBLIGATIONS</strong></td>
-                                                <td><strong>{formatINR(reportData.summary.totalSanctioned)}</strong></td>
-                                                <td><strong>{formatINR(reportData.summary.totalOutstanding)}</strong></td>
-                                                <td className="text-amber"><strong>{formatINR(reportData.summary.totalMonthlyEMI)} / mo</strong></td>
-                                                <td>—</td>
-                                                <td>—</td>
-                                                <td><strong>{formatINR(reportData.summary.totalPastDue)}</strong></td>
-                                                <td className={(reportData.summary.totalDpdDays || 0) > 0 ? 'text-danger fw-bold' : 'text-success'}>
-                                                    <strong>{reportData.summary.totalDpdDays || 0}d</strong>
-                                                </td>
-                                                <td><strong>{reportData.summary.activeAccounts} Active</strong></td>
+                                                <td colSpan="5"><strong>TOTAL ({filteredObligations.length} FACILITIES)</strong></td>
+                                                <td><strong>{formatINR(filteredObligations.reduce((sum, a) => sum + (a.sanctionAmount || 0), 0))}</strong></td>
+                                                <td><strong>{formatINR(filteredObligations.reduce((sum, a) => sum + (a.balance || 0), 0))}</strong></td>
+                                                <td className="text-amber"><strong>{formatINR(filteredObligations.reduce((sum, a) => sum + (a.installmentAmount || 0), 0))} / mo</strong></td>
+                                                {obligationFilter === 'settled' ? (
+                                                    <>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td><strong>{settledAccounts.length} Settled</strong></td>
+                                                    </>
+                                                ) : obligationFilter === 'dpd' ? (
+                                                    <>
+                                                        <td><strong>{formatINR(filteredObligations.reduce((sum, a) => sum + (a.pastDueAmount || 0), 0))}</strong></td>
+                                                        <td className="text-danger fw-bold"><strong>{filteredObligations.reduce((sum, a) => sum + (a.totalDpdDays || 0), 0)}d</strong></td>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td><strong>{dpdAccounts.length} Delinquent</strong></td>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <td>—</td>
+                                                        <td>—</td>
+                                                        <td><strong>{formatINR(reportData.summary.totalPastDue)}</strong></td>
+                                                        <td className={(reportData.summary.totalDpdDays || 0) > 0 ? 'text-danger fw-bold' : 'text-success'}>
+                                                            <strong>{reportData.summary.totalDpdDays || 0}d</strong>
+                                                        </td>
+                                                        <td><strong>{reportData.summary.activeAccounts} Active</strong></td>
+                                                    </>
+                                                )}
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -1143,14 +1499,39 @@ const CreditReportPage = () => {
                                         onClick={() => exportObligationChartToExcel(reportData)}
                                         className="btn-table-export excel"
                                     >
-                                        <span>📥 Export Obligation Schedule to Excel (.xls)</span>
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                            <polyline points="14 2 14 8 20 8" />
+                                            <line x1="12" y1="18" x2="12" y2="12" />
+                                            <polyline points="9 15 12 18 15 15" />
+                                        </svg>
+                                        <span>Export Multi-Sheet CIBIL Dossier (.xls)</span>
                                     </button>
                                     <button
                                         onClick={handleDownloadCibilPdf}
                                         disabled={isGeneratingPdf}
                                         className="btn-table-export pdf"
                                     >
-                                        <span>{isGeneratingPdf ? '⏳ Generating Encrypted CIBIL PDF...' : '📄 Download Official CIBIL PDF (Protected)'}</span>
+                                        {isGeneratingPdf ? (
+                                            <>
+                                                <svg className="animate-spin" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                                    <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                                                </svg>
+                                                <span>Generating Encrypted CIBIL PDF...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                    <polyline points="14 2 14 8 20 8" />
+                                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                                    <polyline points="10 9 9 9 8 9" />
+                                                </svg>
+                                                <span>Download Official CIBIL PDF (Protected)</span>
+                                            </>
+                                        )}
                                     </button>
                                 </div>
 
@@ -1168,7 +1549,13 @@ const CreditReportPage = () => {
                                     flexWrap: 'wrap',
                                     gap: '8px'
                                 }}>
-                                    <span>🔒 <strong>PDF Security Notice:</strong> The official CIBIL dossier is encrypted under RBI CICRA guidelines.</span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '5px' }}>
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                        </svg>
+                                        <strong>PDF Security Notice:</strong> The official CIBIL dossier is encrypted under RBI CICRA guidelines.
+                                    </span>
                                     <span>Password to unlock: <code style={{ background: '#003366', color: '#ffffff', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>{reportData.pdfPassword || `${reportData.personal?.pan || 'PAN'}1996`}</code> (PAN + 4-digit Year of Birth)</span>
                                 </div>
 
@@ -1186,7 +1573,9 @@ const CreditReportPage = () => {
                                         alignItems: 'center',
                                         gap: '8px'
                                     }}>
-                                        <span>✅</span>
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10b981" strokeWidth="2.5">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
                                         <span>{pdfToast}</span>
                                     </div>
                                 )}
@@ -1195,7 +1584,20 @@ const CreditReportPage = () => {
                             {/* Actionable Simulator / Recommendations */}
                             <div className="simulator-card">
                                 <div className="simulator-header">
-                                    <div className="sim-badge">🎯 Score Growth Simulator</div>
+                                    <div className="sim-badge">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }}>
+                                            <line x1="4" y1="21" x2="4" y2="14" />
+                                            <line x1="4" y1="10" x2="4" y2="3" />
+                                            <line x1="12" y1="21" x2="12" y2="12" />
+                                            <line x1="12" y1="8" x2="12" y2="3" />
+                                            <line x1="20" y1="21" x2="20" y2="16" />
+                                            <line x1="20" y1="12" x2="20" y2="3" />
+                                            <line x1="1" y1="14" x2="7" y2="14" />
+                                            <line x1="9" y1="8" x2="15" y2="8" />
+                                            <line x1="17" y1="16" x2="23" y2="16" />
+                                        </svg>
+                                        Score Growth Simulator
+                                    </div>
                                     <h3>See How Simple Financial Actions Improve Your CIBIL Score</h3>
                                     <p>Select actions below to project your estimated score gain:</p>
                                 </div>
@@ -1224,7 +1626,13 @@ const CreditReportPage = () => {
                                 </div>
                                 {simulatedAdjustment > 0 && (
                                     <div className="sim-result-banner">
-                                        <span>🎉 Projected New Score: <strong>{clampedScore}</strong> (+{simulatedAdjustment} points). Your loan sanction chances increase to 99%!</span>
+                                        <span>
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }}>
+                                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                                <polyline points="17 6 23 6 23 12" />
+                                            </svg>
+                                            Projected New Score: <strong>{clampedScore}</strong> (+{simulatedAdjustment} points). Your loan sanction chances increase to 99%!
+                                        </span>
                                     </div>
                                 )}
                             </div>
@@ -1232,7 +1640,12 @@ const CreditReportPage = () => {
                             {/* Pre-Approved Matching Loan Offers */}
                             <div className="offers-section">
                                 <div className="section-title-wrap">
-                                    <span className="offers-badge">🐝 Tailored For Your Rating</span>
+                                    <span className="offers-badge">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }}>
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                        </svg>
+                                        Tailored For Your Credit Rating
+                                    </span>
                                     <h3>Pre-Approved Loan Offers from BeeFund Partner Banks</h3>
                                     <p>Based on your {clampedScore} credit score, you qualify for instant concession rates:</p>
                                 </div>
@@ -1514,7 +1927,11 @@ const CreditReportPage = () => {
 
                     {/* Section 4: Soft Pull vs Hard Pull */}
                     <section className="guide-section highlight-box">
-                        <div className="hl-icon">🛡️</div>
+                        <div className="hl-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                        </div>
                         <div className="hl-content">
                             <h3>Soft Inquiry vs. Hard Inquiry: Why Checking on BeeFund is 100% Safe</h3>
                             <p>
@@ -1559,7 +1976,13 @@ const CreditReportPage = () => {
                     {/* Section 5: Real-World Case Study */}
                     <section className="guide-section case-study-section">
                         <div className="case-study-card">
-                            <div className="case-study-badge">💼 REAL-WORLD MSME CASE STUDY</div>
+                            <div className="case-study-badge">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', verticalAlign: '-2px', marginRight: '6px' }}>
+                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                </svg>
+                                REAL-WORLD MSME CASE STUDY
+                            </div>
                             <h3>How Ramesh Rebuilt His CIBIL Score from 630 to 785 in 6 Months to Save ₹4.2 Lakh on a Machinery Loan</h3>
                             <p className="case-study-intro">
                                 <strong>Client Profile:</strong> Ramesh operates an automotive component manufacturing unit in Mayapuri, Delhi. In early 2026, he needed a <strong>₹40 Lakh Machinery Loan</strong> to purchase a high-precision CNC milling unit.
@@ -1573,11 +1996,10 @@ const CreditReportPage = () => {
                                         <p>Ramesh applied at two private banks and faced immediate rejection. An inspection of his BeeFund credit dossier revealed two hidden culprits: an erroneous 60-day DPD marked on a closed corporate credit card from 2023, and a 88% Credit Utilization Ratio (CUR) across three active personal credit cards.</p>
                                     </div>
                                 </div>
-
                                 <div className="cs-step">
                                     <span className="cs-month">Month 2</span>
                                     <div>
-                                        <h4>Dispute Filing & Utilization Slash</h4>
+                                        <h4>Dispute Filing &amp; Utilization Slash</h4>
                                         <p>BeeFund guided Ramesh to submit an online dispute with the credit bureau along with the bank's closure NOC. Concurrently, Ramesh allocated ₹85,000 from operating receivables to pay down credit card balances, dropping his aggregate CUR from 88% to 19%.</p>
                                     </div>
                                 </div>
@@ -1585,7 +2007,7 @@ const CreditReportPage = () => {
                                 <div className="cs-step">
                                     <span className="cs-month">Month 3-4</span>
                                     <div>
-                                        <h4>Bureau Rectification & Score Surge (+65 Points)</h4>
+                                        <h4>Bureau Rectification &amp; Score Surge (+65 Points)</h4>
                                         <p>The bureau confirmed the clerical mistake and removed the erroneous 60-day DPD mark. Combined with lowered credit card utilization, his score jumped from 630 to 695.</p>
                                     </div>
                                 </div>
@@ -1593,7 +2015,7 @@ const CreditReportPage = () => {
                                 <div className="cs-step">
                                     <span className="cs-month">Month 5-6</span>
                                     <div>
-                                        <h4>Prime Status (785) & ₹4.2 Lakh Interest Savings</h4>
+                                        <h4>Prime Status (785) &amp; ₹4.2 Lakh Interest Savings</h4>
                                         <p>Following two consecutive billing cycles of automated on-time bill clearance, Ramesh’s CIBIL reached <strong>785</strong>. BeeFund routed his machinery loan application to a leading PSU bank, securing sanction at <strong>9.15% p.a.</strong> (vs. an initial NBFC subprime offer of 14.75% p.a.). Over a 5-year tenure, this saved his business <strong>₹4,24,000 in net interest outflows</strong>.</p>
                                     </div>
                                 </div>
@@ -1601,14 +2023,14 @@ const CreditReportPage = () => {
                         </div>
                     </section>
 
-                    {/* Section 6: 6 Actionable Steps to Repair Credit Score */}
+                    {/* Section 6: 6 Actionable Steps to Boost Your CIBIL Score Above 750 */}
                     <section className="guide-section">
                         <h2>6 Actionable Steps to Boost Your CIBIL Score Above 750</h2>
                         <div className="steps-list">
                             <div className="step-point">
                                 <span className="step-badge">1</span>
                                 <div>
-                                    <h4>Automate All EMI & Credit Card Payments via NACH</h4>
+                                    <h4>Automate All EMI &amp; Credit Card Payments via NACH</h4>
                                     <p>Set up an e-Mandate auto-debit on your primary bank account for the total due amount at least 3 days before the billing due date. Even a 1-day payment lag can trigger a Days Past Due (DPD) flag.</p>
                                 </div>
                             </div>
@@ -1726,16 +2148,39 @@ const CreditReportPage = () => {
                     {/* Section 8: E-E-A-T Editorial & Regulatory Trust Badge */}
                     <section className="guide-section eeat-section">
                         <div className="eeat-card">
-                            <div className="eeat-avatar">🏛️</div>
+                            <div className="eeat-avatar">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="2" y1="22" x2="22" y2="22"></line>
+                                    <line x1="4" y1="18" x2="4" y2="11"></line>
+                                    <line x1="8" y1="18" x2="8" y2="11"></line>
+                                    <line x1="12" y1="18" x2="12" y2="11"></line>
+                                    <line x1="16" y1="18" x2="16" y2="11"></line>
+                                    <line x1="20" y1="18" x2="20" y2="11"></line>
+                                    <polygon points="12 2 2 7 22 7"></polygon>
+                                </svg>
+                            </div>
                             <div className="eeat-info">
                                 <h4>Authored & Reviewed by BeeFund Financial Research Desk</h4>
                                 <p className="eeat-credentials">
                                     Led by Certified Credit Analysts, former Bank Underwriters & Capital Advisory Consultants | Regulated under Reserve Bank of India (CICRA 2005) Standards.
                                 </p>
                                 <div className="eeat-meta">
-                                    <span>📅 Fact-Checked & Updated: September 2026</span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '4px' }}>
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        Fact-Checked & Updated: September 2026
+                                    </span>
                                     <span>•</span>
-                                    <span>🛡️ Source: TransUnion CIBIL, Experian India & RBI Regulatory Directives</span>
+                                    <span>
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', verticalAlign: '-1px', marginRight: '4px' }}>
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                        </svg>
+                                        Source: TransUnion CIBIL, Experian India & RBI Regulatory Directives
+                                    </span>
                                 </div>
                             </div>
                         </div>

@@ -724,10 +724,11 @@
 
 .obligation-filter-tabs {
     display: flex;
+    flex-wrap: wrap;
     background: #f1f5f9;
     padding: 0.3rem;
     border-radius: 10px;
-    gap: 0.25rem;
+    gap: 0.35rem;
 }
 
 .obligation-filter-tabs .tab-btn {
@@ -748,6 +749,20 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+.obligation-filter-tabs .tab-btn-dpd.active {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15);
+}
+
+.obligation-filter-tabs .tab-btn-settled.active {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.15);
+}
+
 /* KPI Cards */
 .obligation-kpis-grid {
     display: grid;
@@ -763,33 +778,317 @@
     padding: 1.25rem 1.15rem;
     display: flex;
     flex-direction: column;
+    gap: 0.35rem;
 }
 
 .kpi-label {
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: 0.8rem;
     color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    margin-bottom: 0.45rem;
+    font-weight: 700;
 }
 
 .kpi-val {
-    font-size: 1.6rem;
-    font-weight: 900;
+    font-size: 1.45rem;
+    font-weight: 850;
     color: #0f172a;
-    line-height: 1.15;
-    margin-bottom: 0.25rem;
 }
 
 .kpi-val.emi-highlight {
-    color: #d97706;
+    color: #003366;
 }
 
 .kpi-sub {
     font-size: 0.76rem;
     color: #94a3b8;
     font-weight: 600;
+}
+
+/* Specialized DPD & Settled Diagnostic Cards */
+.specialized-filter-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.75rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.dpd-banner-card {
+    border-left: 5px solid #ef4444;
+    background: linear-gradient(180deg, #fffafa 0%, #ffffff 100%);
+}
+
+.settled-banner-card {
+    border-left: 5px solid #f59e0b;
+    background: linear-gradient(180deg, #fffdfa 0%, #ffffff 100%);
+}
+
+.specialized-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.specialized-card-header h4 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.2rem 0;
+}
+
+.specialized-card-header p {
+    font-size: 0.86rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.header-icon-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.header-icon-badge.danger {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+.header-icon-badge.amber {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fcd34d;
+}
+
+.specialized-summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-box .stat-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.04em;
+}
+
+.stat-box .stat-value {
+    font-size: 1.25rem;
+    font-weight: 850;
+    color: #0f172a;
+}
+
+.dpd-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.dpd-item-row {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.dpd-item-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.dpd-item-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.dpd-acc-type {
+    background: #e2e8f0;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.dpd-item-metrics {
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.dpd-bracket-tag {
+    background: #fee2e2;
+    color: #b91c1c;
+    font-weight: 800;
+    font-size: 0.76rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+}
+
+.dpd-track-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e2e8f0;
+    font-size: 0.8rem;
+}
+
+.dpd-track-strip .track-label {
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.78rem;
+}
+
+.track-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.track-chip {
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: monospace;
+}
+
+.track-chip.ontime {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.track-chip.late {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    font-weight: bold;
+}
+
+.settled-item-card {
+    background: #ffffff;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.settled-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.settled-institution {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-right: 0.5rem;
+}
+
+.settled-acc-type {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+}
+
+.settled-badge {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fcd34d;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.settled-grid-numbers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.75rem;
+    background: #f8fafc;
+    padding: 0.85rem;
+    border-radius: 8px;
+}
+
+.settled-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.settled-col .sub-lbl {
+    font-size: 0.74rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.settled-col strong {
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.settled-advice-box {
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #713f12;
+    line-height: 1.5;
+}
+
+.ob-status-badge.status-settled {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.dpd-table-bracket {
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 /* Obligation Table */
@@ -940,10 +1239,16 @@
 
 .gauge-number-wrap {
     position: absolute;
-    bottom: 28px;
+    bottom: 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.gauge-score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
 }
 
 .gauge-score-value {
@@ -955,19 +1260,22 @@
 }
 
 .gauge-max {
-    font-size: 0.95rem;
-    color: #9ca3af;
+    font-size: 1rem;
+    color: #64748b;
     font-weight: 700;
-    margin-top: 0.15rem;
 }
 
 .gauge-status-badge {
-    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.45rem;
     font-size: 0.85rem;
     font-weight: 800;
-    padding: 0.35rem 0.85rem;
+    padding: 0.35rem 0.95rem;
     border-radius: 999px;
     letter-spacing: 0.03em;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .tier-excellent {
@@ -1000,6 +1308,22 @@
     margin-top: 0.75rem;
 }
 
+.credit-rating-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #003366;
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    padding: 0.28rem 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.65rem;
+}
+
 .gauge-summary-content h3 {
     font-size: 1.7rem;
     font-weight: 850;
@@ -1027,14 +1351,22 @@
     gap: 0.75rem;
     background: #fffbeb;
     border: 1px solid #fde68a;
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 0.95rem;
     border-radius: 12px;
     font-size: 0.9rem;
     color: #78350f;
 }
 
-.perk-icon {
-    font-size: 1.2rem;
+.perk-icon-svg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #fef3c7;
+    color: #b45309;
+    flex-shrink: 0;
 }
 
 /* Factors Section */
@@ -2265,6 +2597,99 @@
     color: #f8fafc;
 }
 
+/* Ownership / Capacity Badges in Obligation Table */
+.ownership-tag-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ownership-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    width: fit-content;
+}
+
+.ownership-badge.self {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.ownership-badge.joint {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.ownership-badge.guarantor {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.guarantor-main-sub {
+    font-size: 0.65rem;
+    color: #92400e;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.scrollable-track {
+    max-width: 100%;
+    overflow-x: auto;
+    display: flex;
+    gap: 4px;
+    padding-bottom: 4px;
+}
+
+.settled-alert-note {
+    background: #fefce8;
+    border-left: 3px solid #eab308;
+    color: #854d0e;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    border-radius: 4px;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .ownership-badge.self {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .ownership-badge.joint {
+    background: rgba(3, 105, 161, 0.2);
+    color: #38bdf8;
+    border-color: #0369a1;
+}
+
+[data-theme="dark"] .ownership-badge.guarantor {
+    background: rgba(180, 83, 9, 0.2);
+    color: #fbbf24;
+    border-color: #b45309;
+}
+
+[data-theme="dark"] .guarantor-main-sub {
+    color: #fcd34d;
+}
+
+[data-theme="dark"] .settled-alert-note {
+    background: rgba(234, 179, 8, 0.1);
+    color: #fde047;
+    border-color: #ca8a04;
+}
+
 [data-theme="dark"] .eeat-credentials {
     color: #94a3b8;
 }
@@ -2273,5 +2698,3 @@
     background: #0f172a;
     border-color: #f59e0b;
 }
-
-

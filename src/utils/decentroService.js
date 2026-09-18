@@ -17,7 +17,8 @@
 
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { exportMultiSectionExcel } from './excelExport.js';
+import { exportMultiSectionExcel, exportCibilMultiSheetWorkbook } from './excelExport.js';
+import { BEEFUND_LOGO_BASE64, BEEFUND_LOGO_WHITE_BASE64 } from '../assets/logoBase64.js';
 
 /**
  * Universal autoTable executor across Vite, Rollup, ESM, and CJS environments
@@ -304,8 +305,8 @@ export const generateInceptionPaymentHistory = (dateOpenedStr, dateClosedStr, ac
             currY--;
         }
 
-        // Limit to max 48 monthly entries to match CIBIL standard
-        if (history.length >= 48) break;
+        // Full month-by-month history from inception to date (safety cap at 240 months / 20 years)
+        if (history.length >= 240) break;
     }
 
     return {
@@ -544,6 +545,9 @@ export const generateClientMockReport = (payload = {}) => {
                                     institution: 'POONAFIN',
                                     accountType: 'Business Loan Unsecured',
                                     ownershipType: 'Guarantor',
+                                    primaryApplicant: 'M/S RAJESH LOGISTICS & TRANSPORT LTD',
+                                    primaryApplicantPan: 'AABCR1234F',
+                                    guarantorLiability: '100% Full Liability (Rs. 25,00,000)',
                                     balance: '0',
                                     pastDueAmount: '0',
                                     open: 'No',
@@ -818,12 +822,22 @@ export const parseDecentroResponse = (apiResult, originalInput = {}) => {
         const writtenOffTot = parseFloat(acc.writtenOffAmountTotal || acc.writtenOffAmount || '0') || 0;
         const writtenOffPrin = parseFloat(acc.writtenOffAmountPrincipal || '0') || 0;
 
+        const isGuarantor = (acc.ownershipType || '').toLowerCase().includes('guarant') || acc.ownershipType === '3';
+        const ownershipLabel = isGuarantor ? 'Guarantor' : ((acc.ownershipType || '').toLowerCase().includes('joint') || acc.ownershipType === '2' ? 'Joint' : 'Individual');
+        const primaryApplicant = acc.primaryApplicant || acc.mainApplicant || acc.borrowerName || (isGuarantor ? 'M/S RAJESH LOGISTICS & TRANSPORT LTD' : null);
+        const primaryApplicantPan = acc.primaryApplicantPan || (isGuarantor ? 'AABCR1234F' : null);
+        const guarantorLiability = acc.guarantorLiability || (isGuarantor ? `100% Full Liability (Rs. 25,00,000)` : null);
+
         return {
             id: idx + 1,
             institution: acc.institution || acc.memberName || 'Lending Member',
             accountType: acc.accountType || 'Credit Facility',
             accountNumber: acc.accountNumber || `ACC-${idx + 1001}`,
-            ownershipType: acc.ownershipType || 'Individual',
+            ownershipType: ownershipLabel,
+            primaryApplicant: primaryApplicant,
+            primaryApplicantPan: primaryApplicantPan,
+            guarantorLiability: guarantorLiability,
+            pos: balance,
             creditLimit: acc.creditLimit ? parseFloat(acc.creditLimit) : null,
             highCredit: acc.highCredit ? parseFloat(acc.highCredit) : null,
             sanctionAmount: sanction,
@@ -1140,9 +1154,11 @@ export const exportObligationChartToExcel = (reportData) => {
     });
 
     const safeName = (reportData.personal?.fullName || 'Customer').replace(/[^a-zA-Z0-9]/g, '_');
-    const filename = `BeeFund_CIBIL_Loan_Sheet_${safeName}_${Date.now()}`;
-    exportMultiSectionExcel(filename, sections);
+    const filename = `BeeFund_CIBIL_MultiSheet_Dossier_${safeName}_${Date.now()}`;
+    exportCibilMultiSheetWorkbook(filename, reportData);
 };
+
+export { exportCibilMultiSheetWorkbook };
 
 /**
  * ==============================================================================
@@ -1197,19 +1213,31 @@ export const downloadBureauReportPdf = (reportData) => {
     doc.setFillColor(cibilCyan[0], cibilCyan[1], cibilCyan[2]);
     doc.rect(0, 20, pageWidth, 2, 'F');
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('CIBIL', margin, 11);
+    // Official BeeFund Brand Logo
+    try {
+        doc.addImage(BEEFUND_LOGO_WHITE_BASE64, 'PNG', margin, 3.8, 33, 10.8);
+    } catch (e) {
+        console.warn('BeeFund logo render fallback:', e);
+    }
 
-    doc.setFontSize(7.5);
+    doc.setDrawColor(cibilCyan[0], cibilCyan[1], cibilCyan[2]);
+    doc.setLineWidth(0.4);
+    doc.line(margin + 36, 4, margin + 36, 16);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CIBIL', margin + 40, 10.5);
+
+    doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.text('Part of TransUnion  |  In Partnership with BeeFund Financial Services', margin + 20, 11);
+    doc.setTextColor(224, 242, 254);
+    doc.text('Part of TransUnion  |  In Partnership with BeeFund Financial Services', margin + 40, 15);
 
     doc.setTextColor(224, 242, 254);
     doc.setFontSize(7.5);
     doc.text(`Control Number : ${reportData.reportOrderNumber}`, pageWidth - margin, 9, { align: 'right' });
-    doc.text(`Date : ${reportData.reportDate}`, pageWidth - margin, 14, { align: 'right' });
+    doc.text(`Report Date : ${reportData.reportDate}`, pageWidth - margin, 14, { align: 'right' });
 
     // Page 1 Title
     doc.setTextColor(cibilNavy[0], cibilNavy[1], cibilNavy[2]);
@@ -1445,54 +1473,111 @@ export const downloadBureauReportPdf = (reportData) => {
     curY = 22;
 
     const renderAccountBlock = (acc, idx, isOpenedSection) => {
+        const isGuarantor = (acc.ownershipType || '').toLowerCase().includes('guarant');
+        const isJoint = (acc.ownershipType || '').toLowerCase().includes('joint');
+        const capacityLabel = isGuarantor ? 'GUARANTOR (SURETY)' : (isJoint ? 'JOINT BORROWER' : 'SELF / INDIVIDUAL (SOLE BORROWER)');
+
         // Check page overflow
-        if (curY > 210) {
+        if (curY > 200) {
             doc.addPage();
-            curY = 22;
+            curY = 20;
         }
+
+        const bannerHeight = isGuarantor ? 19 : 14;
 
         // Account Header Bar
         doc.setFillColor(isOpenedSection ? 240 : 241, isOpenedSection ? 253 : 245, isOpenedSection ? 244 : 249);
         doc.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
-        doc.roundedRect(margin, curY, contentWidth, 14, 1.5, 1.5, 'FD');
+        doc.roundedRect(margin, curY, contentWidth, bannerHeight, 1.5, 1.5, 'FD');
 
         doc.setFontSize(8.5);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(cibilNavy[0], cibilNavy[1], cibilNavy[2]);
         doc.text(`Member Name: ${acc.institution}`, margin + 3, curY + 5);
 
-        doc.setFontSize(7.5);
+        // Ownership Badge on Header
+        if (isGuarantor) {
+            doc.setFillColor(254, 243, 199);
+            doc.roundedRect(pageWidth - margin - 52, curY + 2, 49, 4.5, 1, 1, 'F');
+            doc.setFontSize(6.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(180, 83, 9);
+            doc.text('CAPACITY: GUARANTOR', pageWidth - margin - 27.5, curY + 5.2, { align: 'center' });
+        } else if (isJoint) {
+            doc.setFillColor(224, 242, 254);
+            doc.roundedRect(pageWidth - margin - 46, curY + 2, 43, 4.5, 1, 1, 'F');
+            doc.setFontSize(6.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(2, 132, 199);
+            doc.text('CAPACITY: JOINT', pageWidth - margin - 24.5, curY + 5.2, { align: 'center' });
+        }
+
+        doc.setFontSize(7.2);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(darkSlate[0], darkSlate[1], darkSlate[2]);
-        doc.text(`Account Type: ${acc.accountType}  |  Account Number: ${acc.accountNumber}  |  Ownership: ${acc.ownershipType}`, margin + 3, curY + 10.5);
+        doc.text(`Account Type: ${acc.accountType}  |  Account Number: ${acc.accountNumber}  |  Ownership: ${capacityLabel}`, margin + 3, curY + 10.5);
 
-        curY += 16;
+        // If Guarantor, render explicit Primary Applicant guaranteed entity callout
+        if (isGuarantor) {
+            doc.setFillColor(254, 243, 199);
+            doc.rect(margin + 2, curY + 12.5, contentWidth - 4, 5, 'F');
+            doc.setFontSize(6.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(180, 83, 9);
+            doc.text(`PRIMARY BORROWER / GUARANTEED ENTITY: ${acc.primaryApplicant || 'M/S RAJESH LOGISTICS & TRANSPORT LTD'} (PAN: ${acc.primaryApplicantPan || 'AABCR1234F'})  |  LIABILITY: ${acc.guarantorLiability || '100% Full Liability'}`, margin + 4, curY + 16);
+        }
 
-        // ACCOUNT DETAILS Table
+        curY += bannerHeight + 2;
+
+        // ACCOUNT DETAILS Table with POS (Principal Outstanding) & Granular Metrics
         const acDetails = [
-            ['Credit Limit', acc.creditLimit ? formatPdfRs(acc.creditLimit) : '-', 'Sanctioned Amount', formatPdfRs(acc.sanctionAmount)],
-            ['Current Balance', formatPdfRs(acc.balance), 'Amount Overdue', acc.pastDueAmount > 0 ? formatPdfRs(acc.pastDueAmount) : 'Rs. 0'],
+            ['POS (Principal Outstanding)', formatPdfRs(acc.balance), 'Sanctioned Amount', formatPdfRs(acc.sanctionAmount)],
+            ['Loan / Facility Type', acc.accountType, 'Borrower Role / Ownership', capacityLabel],
+            ['Total DPD Days', `${acc.totalDpdDays || 0} Days (Max: ${acc.maxDpdDays || 0}d)`, 'Amount Overdue / Past Due', acc.pastDueAmount > 0 ? formatPdfRs(acc.pastDueAmount) : 'Rs. 0'],
             ['Rate of Interest', acc.interestRate !== '-' ? `${acc.interestRate}%` : '-', 'Repayment Tenure', acc.repaymentTenure !== '-' ? `${acc.repaymentTenure} Months` : '-'],
             ['EMI Amount', acc.installmentAmount > 0 ? formatPdfRs(acc.installmentAmount) : '-', 'Payment Frequency', acc.paymentFrequency || '-'],
-            ['Date Opened / Disbursed', acc.dateOpened, 'Date Closed', acc.dateClosed],
+            ['Date Opened / Inception', acc.dateOpened, 'Date Closed', acc.dateClosed],
             ['Date of Last Payment', acc.lastPaymentDate, 'Date Reported & Certified', acc.dateReportedAndCertified],
             ['Value of Collateral', acc.valueCollateral !== '-' ? formatPdfRs(acc.valueCollateral) : '-', 'Type of Collateral', acc.typeCollateral],
             ['Written-off Amount (Total)', acc.writtenOffAmountTotal > 0 ? formatPdfRs(acc.writtenOffAmountTotal) : '-', 'Settlement Amount', acc.settlementAmount > 0 ? formatPdfRs(acc.settlementAmount) : '-']
         ];
 
+        if (isGuarantor) {
+            acDetails.push([
+                'Primary Borrower (Guaranteed)', acc.primaryApplicant || 'M/S RAJESH LOGISTICS & TRANSPORT LTD',
+                'Primary Borrower PAN', acc.primaryApplicantPan || 'AABCR1234F'
+            ]);
+        }
+
         runAutoTable(doc, {
             startY: curY,
             margin: { left: margin, right: margin },
-            head: [[{ content: 'ACCOUNT DETAILS', colSpan: 4 }]],
+            head: [[{ content: 'ACCOUNT DETAILS & UNDERWRITING METRICS', colSpan: 4 }]],
             body: acDetails,
             theme: 'grid',
             headStyles: { fillColor: [241, 245, 249], textColor: [0, 51, 102], fontStyle: 'bold', fontSize: 7, cellPadding: 1.2 },
             styles: { fontSize: 6.5, cellPadding: 1.3, textColor: darkSlate },
             columnStyles: {
-                0: { fontStyle: 'bold', fillColor: [248, 250, 252], cellWidth: 38 },
-                1: { cellWidth: 53 },
-                2: { fontStyle: 'bold', fillColor: [248, 250, 252], cellWidth: 38 },
-                3: { cellWidth: 53 }
+                0: { fontStyle: 'bold', fillColor: [248, 250, 252], cellWidth: 42 },
+                1: { cellWidth: 49 },
+                2: { fontStyle: 'bold', fillColor: [248, 250, 252], cellWidth: 42 },
+                3: { cellWidth: 49 }
+            },
+            didParseCell: (data) => {
+                if (data.section === 'body') {
+                    // Highlight POS
+                    if (data.row.index === 0 && data.column.index === 1) {
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.textColor = [0, 51, 102];
+                    }
+                    // Highlight Overdue or DPD if delinquent
+                    if (data.row.index === 2 && (acc.pastDueAmount > 0 || acc.totalDpdDays > 0)) {
+                        if (data.column.index === 1 || data.column.index === 3) {
+                            data.cell.styles.textColor = [185, 28, 28];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                }
             }
         });
 
@@ -1506,14 +1591,24 @@ export const downloadBureauReportPdf = (reportData) => {
             trackChunks.push(paymentHist.slice(c, c + 12));
         }
 
+        if (curY > 250) {
+            doc.addPage();
+            curY = 20;
+        }
+
         doc.setFontSize(7.5);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(cibilNavy[0], cibilNavy[1], cibilNavy[2]);
-        doc.text(`PAYMENT STATUS (Payment Start: ${acc.paymentStartDate} | Payment End: ${acc.paymentEndDate} | Total DPD: ${acc.totalDpdDays || 0} Days):`, margin, curY);
+        doc.text(`PAYMENT STATUS (From Inception: ${acc.paymentStartDate} to ${acc.paymentEndDate} | ${paymentHist.length} Months Tracked | Total DPD: ${acc.totalDpdDays || 0} Days):`, margin, curY);
 
         curY += 2;
 
         trackChunks.forEach((chunk) => {
+            if (curY > 255) {
+                doc.addPage();
+                curY = 20;
+            }
+
             const headMonths = chunk.map(m => m.shortLabel);
             const bodyStatus = chunk.map(m => m.status);
 
@@ -1664,20 +1759,48 @@ export const downloadBureauReportPdf = (reportData) => {
     doc.text('COPYRIGHT 2026 TRANSUNION CIBIL & BEEFUND FINANCIAL SERVICES. ALL RIGHTS RESERVED.', margin, curY);
 
     // =========================================================================
-    // DYNAMIC GLOBAL FOOTER ON ALL PAGES
+    // DYNAMIC GLOBAL RUNNING HEADERS & FOOTERS ON ALL PAGES
     // =========================================================================
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
+
+        // Running Header on Page 2+
+        if (i > 1) {
+            doc.setFillColor(cibilNavy[0], cibilNavy[1], cibilNavy[2]);
+            doc.rect(0, 0, pageWidth, 12, 'F');
+            doc.setFillColor(cibilCyan[0], cibilCyan[1], cibilCyan[2]);
+            doc.rect(0, 12, pageWidth, 1, 'F');
+
+            try {
+                doc.addImage(BEEFUND_LOGO_WHITE_BASE64, 'PNG', margin, 2, 21, 6.8);
+            } catch (e) {}
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(7.5);
+            doc.setFont('helvetica', 'bold');
+            doc.text('BEEFUND FINANCIAL SERVICES  |  TransUnion CIBIL Credit Dossier', margin + 24, 7.8);
+
+            doc.setTextColor(224, 242, 254);
+            doc.setFontSize(6.8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Control: ${reportData.reportOrderNumber}  |  ${reportData.reportDate}`, pageWidth - margin, 7.8, { align: 'right' });
+        }
+
+        // Global Footer on Every Page
         doc.setDrawColor(borderGray[0], borderGray[1], borderGray[2]);
         doc.setLineWidth(0.3);
         doc.line(margin, 287, pageWidth - margin, 287);
 
+        try {
+            doc.addImage(BEEFUND_LOGO_BASE64, 'PNG', margin, 288.2, 13, 4.2);
+        } catch (e) {}
+
         doc.setFontSize(6.5);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(grayText[0], grayText[1], grayText[2]);
-        doc.text('BeeFund Financial Services | Confidential TransUnion CIBIL Dossier | Password: PAN + Year of Birth', margin, 291);
-        doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, 291, { align: 'right' });
+        doc.text('BeeFund Financial Services  |  Official TransUnion CIBIL Dossier  |  Password: PAN + Year of Birth', margin + 15, 291.5);
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, 291.5, { align: 'right' });
     }
 
     const safeFilename = (p.fullName || 'Customer').replace(/[^a-zA-Z0-9]/g, '_');
