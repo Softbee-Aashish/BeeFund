@@ -9,27 +9,903 @@
  * ==============================================================================
  */
 
-export const exportToExcel = (filename, headers, rows) => {
-    const BOM = '\uFEFF';
-
-    const escapeField = (val) => {
-        if (val === null || val === undefined) return '""';
-        let str = String(val);
-        if (str.includes('"') || str.includes(',') || str.includes('\n') || str.includes('\r')) {
-            return `"${str.replace(/"/g, '""')}"`;
-        }
-        return `"${str}"`;
+/**
+ * Export Styled Loan Amortization Schedule to Microsoft Excel (.xls)
+ * High-fidelity bank-grade spreadsheet with official BeeFund branding,
+ * structured loan parameter KPI card, column width spacing, color coding,
+ * and double-underlined summary totals.
+ */
+export const exportLoanScheduleToExcel = ({
+    loanTitle = 'OFFICIAL LOAN AMORTIZATION SCHEDULE',
+    loanName = 'Term Loan',
+    principal = 500000,
+    annualRate = 10,
+    rateStructure = 'Reducing Balance',
+    tenureMonths = 24,
+    effectiveEmi = 23072,
+    totalInterest = 53739,
+    totalPayment = 553739,
+    startDateLabel = '',
+    endDateLabel = '',
+    scheduleRows = [],
+    fileName = 'BeeFund_Loan_Repayment_Schedule.xls'
+}) => {
+    const esc = (v) => {
+        if (v === null || v === undefined) return '';
+        return String(v)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
     };
 
-    const headerLine = headers.map(escapeField).join(',');
-    const dataLines = rows.map(row => row.map(escapeField).join(','));
-    const csvContent = BOM + [headerLine, ...dataLines].join('\r\n');
+    const refId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const currentDateStr = new Date().toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const fmtNum = (val) => {
+        const n = Math.round(Number(val) || 0);
+        return n;
+    };
+
+    const fmtRs = (val) => {
+        const n = Math.round(Number(val) || 0);
+        return 'Rs. ' + n.toLocaleString('en-IN');
+    };
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>BeeFund Financial Services</Author>
+  <Company>BeeFund Capital Advisory</Company>
+  <Created>${new Date().toISOString()}</Created>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#0F172A"/>
+  </Style>
+  <Style ss:ID="BrandBanner">
+   <Font ss:FontName="Segoe UI" ss:Size="14" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1E1B4B" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="BrandRibbon">
+   <Font ss:FontName="Segoe UI" ss:Size="8.5" ss:Color="#FEF3C7" ss:Bold="1"/>
+   <Interior ss:Color="#B45309" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="CardTitle">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1E1B4B" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="CardLbl">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569" ss:Bold="1"/>
+   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CardVal">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#0F172A" ss:Bold="1"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CardValAmber">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#B45309" ss:Bold="1"/>
+   <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TableTh">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1E1B4B" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellMonth">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellMonthAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellDate">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A" ss:Bold="1"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellDateAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellNum">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellNumAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellEmi">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#B45309" ss:Bold="1"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellEmiAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#B45309" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellPrincipal">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#15803D" ss:Bold="1"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellPrincipalAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#15803D" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellInterest">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#B45309"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellInterestAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#B45309"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellClosing">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#1E1B4B" ss:Bold="1"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellClosingAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#1E1B4B" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TotalRow">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#78350F" ss:Bold="1"/>
+   <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#F59E0B"/>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#F59E0B"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TotalRowText">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#78350F" ss:Bold="1"/>
+   <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#F59E0B"/>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#F59E0B"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="Disclaimer">
+   <Font ss:FontName="Segoe UI" ss:Size="8" ss:Color="#64748B" ss:Italic="1"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Amortization Schedule">
+  <Table ss:DefaultRowHeight="19">
+   <Column ss:Width="65"/>
+   <Column ss:Width="105"/>
+   <Column ss:Width="125"/>
+   <Column ss:Width="115"/>
+   <Column ss:Width="125"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="130"/>
+   <Row ss:Height="28">
+    <Cell ss:MergeAcross="6" ss:StyleID="BrandBanner"><Data ss:Type="String">BEEFUND FINANCIAL SERVICES  •  ${esc(loanTitle)}</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="6" ss:StyleID="BrandRibbon"><Data ss:Type="String">Bank-Grade Capital Structuring  |  Amortization Intelligence  |  Facility: ${esc(loanName)}  |  Ref: BF-LN-${refId}  |  Date: ${currentDateStr}</Data></Cell>
+   </Row>
+   <Row ss:Height="8"/>
+   <Row ss:Height="20">
+    <Cell ss:MergeAcross="6" ss:StyleID="CardTitle"><Data ss:Type="String">LOAN SANCTION &amp; REPAYMENT FACILITY PARAMETERS</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Loan Facility</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="CardVal"><Data ss:Type="String">${esc(loanName)}</Data></Cell>
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Sanctioned Principal</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="CardVal"><Data ss:Type="String">${fmtRs(principal)}</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Annual Interest Rate</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="CardVal"><Data ss:Type="String">${Number(annualRate).toFixed(2)}% p.a. (${esc(rateStructure)})</Data></Cell>
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Monthly EMI</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="CardValAmber"><Data ss:Type="String">${fmtRs(effectiveEmi)} / Month</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Repayment Tenure</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="CardVal"><Data ss:Type="String">${tenureMonths} Months (${(tenureMonths / 12).toFixed(1)} Years)</Data></Cell>
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Total Repayment (P + I)</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="CardVal"><Data ss:Type="String">${fmtRs(totalPayment || (principal + totalInterest))}</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Total Accrued Interest</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="CardValAmber"><Data ss:Type="String">${fmtRs(totalInterest)}</Data></Cell>
+    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">Schedule Span</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="CardVal"><Data ss:Type="String">${esc(startDateLabel || 'Inception')} to ${esc(endDateLabel || 'Maturity')}</Data></Cell>
+   </Row>
+   <Row ss:Height="10"/>
+   <Row ss:Height="24">
+    <Cell ss:StyleID="TableTh"><Data ss:Type="String">Month #</Data></Cell>
+    <Cell ss:StyleID="TableTh"><Data ss:Type="String">Payment Date</Data></Cell>
+    <Cell ss:StyleID="TableTh"><Data ss:Type="String">Opening POS (INR)</Data></Cell>
+    <Cell ss:StyleID="TableTh"><Data ss:Type="String">Monthly EMI (INR)</Data></Cell>
+    <Cell ss:StyleID="TableTh"><Data ss:Type="String">Principal Paid (INR)</Data></Cell>
+    <Cell ss:StyleID="TableTh"><Data ss:Type="String">Interest Paid (INR)</Data></Cell>
+    <Cell ss:StyleID="TableTh"><Data ss:Type="String">Closing Balance (INR)</Data></Cell>
+   </Row>
+`;
+
+    let totalPrincipalSum = 0;
+    let totalInterestSum = 0;
+    let totalEmiSum = 0;
+
+    scheduleRows.forEach((r, idx) => {
+        const isAlt = idx % 2 === 1;
+        const cMonth = isAlt ? 'CellMonthAlt' : 'CellMonth';
+        const cDate = isAlt ? 'CellDateAlt' : 'CellDate';
+        const cNum = isAlt ? 'CellNumAlt' : 'CellNum';
+        const cEmi = isAlt ? 'CellEmiAlt' : 'CellEmi';
+        const cPrin = isAlt ? 'CellPrincipalAlt' : 'CellPrincipal';
+        const cInt = isAlt ? 'CellInterestAlt' : 'CellInterest';
+        const cClose = isAlt ? 'CellClosingAlt' : 'CellClosing';
+
+        const opening = fmtNum(r.openingPos ?? (r.balance + r.principal));
+        const emi = fmtNum(r.emi);
+        const principalAmt = fmtNum(r.principal);
+        const interestAmt = fmtNum(r.interest);
+        const closing = fmtNum(r.closingPos ?? r.balance);
+
+        totalPrincipalSum += principalAmt;
+        totalInterestSum += interestAmt;
+        totalEmiSum += emi;
+
+        xml += `   <Row ss:Height="19">
+    <Cell ss:StyleID="${cMonth}"><Data ss:Type="Number">${r.month || idx + 1}</Data></Cell>
+    <Cell ss:StyleID="${cDate}"><Data ss:Type="String">${esc(r.dateLabel || r.monthLabel || `Month ${r.month}`)}</Data></Cell>
+    <Cell ss:StyleID="${cNum}"><Data ss:Type="Number">${opening}</Data></Cell>
+    <Cell ss:StyleID="${cEmi}"><Data ss:Type="Number">${emi}</Data></Cell>
+    <Cell ss:StyleID="${cPrin}"><Data ss:Type="Number">${principalAmt}</Data></Cell>
+    <Cell ss:StyleID="${cInt}"><Data ss:Type="Number">${interestAmt}</Data></Cell>
+    <Cell ss:StyleID="${cClose}"><Data ss:Type="Number">${closing}</Data></Cell>
+   </Row>\n`;
+    });
+
+    // Total Row
+    xml += `   <Row ss:Height="24">
+    <Cell ss:MergeAcross="1" ss:StyleID="TotalRowText"><Data ss:Type="String">TOTAL REPAYMENT SUMMARY</Data></Cell>
+    <Cell ss:StyleID="TotalRow"><Data ss:Type="String">—</Data></Cell>
+    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">${totalPayment || totalEmiSum}</Data></Cell>
+    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">${principal || totalPrincipalSum}</Data></Cell>
+    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">${totalInterest || totalInterestSum}</Data></Cell>
+    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:Height="12"/>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="6" ss:StyleID="Disclaimer"><Data ss:Type="String">Disclaimer: Amortization schedule calculated using standard reducing balance compounding formula as per RBI master directions. Verified by BeeFund Financial Services.</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
 
-    const cleanFilename = filename.endsWith('.csv') ? filename : `${filename}.csv`;
+    const cleanFilename = fileName.endsWith('.xls') ? fileName : `${fileName.replace(/\.csv$/, '')}.xls`;
+    link.setAttribute('href', url);
+    link.setAttribute('download', cleanFilename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
+/**
+ * Universal Styled Microsoft Excel (.xls) Export
+ * Automatically detects metadata summaries, applies BeeFund branding,
+ * colors, borders, and column widths across all loan tools.
+ */
+export const exportToExcel = (filename, headers, rows) => {
+    const esc = (v) => {
+        if (v === null || v === undefined) return '';
+        return String(v)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+    };
+
+    const refId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const currentDateStr = new Date().toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+
+    // 1. Check if metadata (LOAN SUMMARY / SANCTION DETAILS) is present
+    let metaIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        if (r && r.length > 0 && typeof r[0] === 'string') {
+            const up = r[0].toUpperCase();
+            if (up.includes('SUMMARY') || up.includes('SANCTION') || up.includes('METADATA')) {
+                metaIdx = i;
+                break;
+            }
+        }
+    }
+
+    const dataRows = (metaIdx !== -1 ? rows.slice(0, metaIdx) : rows)
+        .filter(r => r && r.length > 0 && r.some(c => c !== null && c !== undefined && c !== ''));
+
+    const metaRows = (metaIdx !== -1 ? rows.slice(metaIdx + 1) : [])
+        .filter(r => r && r.length >= 2 && r[0] && r[1]);
+
+    const numCols = Math.max(headers.length, 6);
+    const cleanTitle = (filename || 'BeeFund_Spreadsheet')
+        .replace(/_/g, ' ')
+        .replace(/\.(csv|xls|xlsx)$/i, '')
+        .toUpperCase();
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>BeeFund Financial Services</Author>
+  <Company>BeeFund Capital Advisory</Company>
+  <Created>${new Date().toISOString()}</Created>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center"/>
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#0F172A"/>
+  </Style>
+  <Style ss:ID="BrandBanner">
+   <Font ss:FontName="Segoe UI" ss:Size="14" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1E1B4B" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="BrandRibbon">
+   <Font ss:FontName="Segoe UI" ss:Size="8.5" ss:Color="#FEF3C7" ss:Bold="1"/>
+   <Interior ss:Color="#B45309" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="CardTitle">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1E1B4B" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="CardLbl">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569" ss:Bold="1"/>
+   <Interior ss:Color="#F1F5F9" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CardVal">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#0F172A" ss:Bold="1"/>
+   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CardValAmber">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#B45309" ss:Bold="1"/>
+   <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#F59E0B"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TableTh">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1E1B4B" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#94A3B8"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellRegular">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellCenter">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellCenterAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#475569"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellBold">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A" ss:Bold="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellBoldAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellNum">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellNumAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#0F172A"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellEmi">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#B45309" ss:Bold="1"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellEmiAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9.5" ss:Color="#B45309" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellPrincipal">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#15803D" ss:Bold="1"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellPrincipalAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#15803D" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellInterest">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#B45309"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellInterestAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#B45309"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellClosing">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#1E1B4B" ss:Bold="1"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellClosingAlt">
+   <Font ss:FontName="Segoe UI" ss:Size="9" ss:Color="#1E1B4B" ss:Bold="1"/>
+   <Interior ss:Color="#FEFCE8" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TotalRow">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#78350F" ss:Bold="1"/>
+   <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="#,##0"/>
+   <Borders>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#F59E0B"/>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#F59E0B"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="TotalRowText">
+   <Font ss:FontName="Segoe UI" ss:Size="10" ss:Color="#78350F" ss:Bold="1"/>
+   <Interior ss:Color="#FEF3C7" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#F59E0B"/>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#F59E0B"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="Disclaimer">
+   <Font ss:FontName="Segoe UI" ss:Size="8" ss:Color="#64748B" ss:Italic="1"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="BeeFund Schedule">
+  <Table ss:DefaultRowHeight="19">
+`;
+
+    // Column widths
+    headers.forEach((h, idx) => {
+        let w = 110;
+        const low = String(h).toLowerCase();
+        if (low.includes('month #') || low.includes('entry #') || idx === 0) w = 65;
+        else if (low.includes('date') || low.includes('month / year')) w = 105;
+        else if (low.includes('opening') || low.includes('closing') || low.includes('balance')) w = 125;
+        else if (low.includes('emi')) w = 115;
+        else if (low.includes('principal')) w = 120;
+        else if (low.includes('interest')) w = 115;
+        else if (low.includes('roi') || low.includes('rate') || low.includes('days')) w = 85;
+        xml += `   <Column ss:Width="${w}"/>\n`;
+    });
+
+    // Top Header Banner
+    const spanCols = Math.max(headers.length - 1, 5);
+    xml += `   <Row ss:Height="28">
+    <Cell ss:MergeAcross="${spanCols}" ss:StyleID="BrandBanner"><Data ss:Type="String">BEEFUND FINANCIAL SERVICES  •  ${esc(cleanTitle)}</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="${spanCols}" ss:StyleID="BrandRibbon"><Data ss:Type="String">Bank-Grade Capital Structuring  |  Amortization Intelligence  |  Ref: BF-EX-${refId}  |  Date: ${currentDateStr}</Data></Cell>
+   </Row>
+   <Row ss:Height="8"/>\n`;
+
+    // Render Parameter Card if metaRows exist
+    if (metaRows.length > 0) {
+        xml += `   <Row ss:Height="20">
+    <Cell ss:MergeAcross="${spanCols}" ss:StyleID="CardTitle"><Data ss:Type="String">LOAN SANCTION &amp; FACILITY PARAMETERS</Data></Cell>
+   </Row>\n`;
+
+        for (let m = 0; m < metaRows.length; m += 2) {
+            const m1 = metaRows[m];
+            const m2 = metaRows[m + 1];
+
+            xml += `   <Row ss:Height="20">\n`;
+            if (m1) {
+                const isAmber = String(m1[0]).toLowerCase().includes('emi') || String(m1[0]).toLowerCase().includes('interest');
+                xml += `    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">${esc(m1[0])}</Data></Cell>\n`;
+                xml += `    <Cell ss:MergeAcross="1" ss:StyleID="${isAmber ? 'CardValAmber' : 'CardVal'}"><Data ss:Type="String">${esc(m1[1])}</Data></Cell>\n`;
+            }
+            if (m2) {
+                const isAmber = String(m2[0]).toLowerCase().includes('emi') || String(m2[0]).toLowerCase().includes('interest');
+                const remainSpan = Math.max(0, spanCols - 3);
+                xml += `    <Cell ss:StyleID="CardLbl"><Data ss:Type="String">${esc(m2[0])}</Data></Cell>\n`;
+                xml += `    <Cell ss:MergeAcross="${remainSpan}" ss:StyleID="${isAmber ? 'CardValAmber' : 'CardVal'}"><Data ss:Type="String">${esc(m2[1])}</Data></Cell>\n`;
+            } else {
+                const remainSpan = Math.max(0, spanCols - 2);
+                xml += `    <Cell ss:MergeAcross="${remainSpan}" ss:StyleID="CardVal"><Data ss:Type="String">—</Data></Cell>\n`;
+            }
+            xml += `   </Row>\n`;
+        }
+
+        xml += `   <Row ss:Height="10"/>\n`;
+    }
+
+    // Table Header Row
+    xml += `   <Row ss:Height="24">\n`;
+    headers.forEach(h => {
+        xml += `    <Cell ss:StyleID="TableTh"><Data ss:Type="String">${esc(h)}</Data></Cell>\n`;
+    });
+    xml += `   </Row>\n`;
+
+    // Data Rows
+    let sumPrincipal = 0;
+    let sumInterest = 0;
+    let sumEmi = 0;
+
+    dataRows.forEach((row, rIdx) => {
+        const isAlt = rIdx % 2 === 1;
+        xml += `   <Row ss:Height="19">\n`;
+
+        row.forEach((cell, cIdx) => {
+            const h = (headers[cIdx] || '').toLowerCase();
+            const rawVal = cell;
+            const numVal = typeof rawVal === 'number' ? rawVal : parseFloat(String(rawVal).replace(/[^0-9.-]/g, ''));
+            const isNumeric = !isNaN(numVal) && typeof rawVal === 'number';
+
+            if (cIdx === 0) {
+                // Month / Index
+                const styleId = isAlt ? 'CellCenterAlt' : 'CellCenter';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="${isNumeric ? 'Number' : 'String'}">${isNumeric ? numVal : esc(rawVal)}</Data></Cell>\n`;
+            } else if (h.includes('date') || h.includes('month')) {
+                // Date or Month label
+                const styleId = isAlt ? 'CellLeftAlt' : 'CellLeft';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="String">${esc(rawVal)}</Data></Cell>\n`;
+            } else if (h.includes('emi')) {
+                if (isNumeric) sumEmi += numVal;
+                const styleId = isAlt ? 'CellEmiAlt' : 'CellEmi';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="Number">${isNumeric ? Math.round(numVal) : 0}</Data></Cell>\n`;
+            } else if (h.includes('principal') && !h.includes('cumulative')) {
+                if (isNumeric) sumPrincipal += numVal;
+                const styleId = isAlt ? 'CellPrincipalAlt' : 'CellPrincipal';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="Number">${isNumeric ? Math.round(numVal) : 0}</Data></Cell>\n`;
+            } else if (h.includes('interest') && !h.includes('cumulative')) {
+                if (isNumeric) sumInterest += numVal;
+                const styleId = isAlt ? 'CellInterestAlt' : 'CellInterest';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="Number">${isNumeric ? Math.round(numVal) : 0}</Data></Cell>\n`;
+            } else if (h.includes('closing') || h.includes('balance') || h.includes('pos')) {
+                const styleId = isAlt ? 'CellClosingAlt' : 'CellClosing';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="Number">${isNumeric ? Math.round(numVal) : 0}</Data></Cell>\n`;
+            } else if (isNumeric) {
+                const styleId = isAlt ? 'CellNumAlt' : 'CellNum';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="Number">${Math.round(numVal)}</Data></Cell>\n`;
+            } else {
+                const styleId = isAlt ? 'CellAlt' : 'CellRegular';
+                xml += `    <Cell ss:StyleID="${styleId}"><Data ss:Type="String">${esc(rawVal)}</Data></Cell>\n`;
+            }
+        });
+
+        xml += `   </Row>\n`;
+    });
+
+    // Summary Totals Row if sums were tracked
+    if (sumEmi > 0 || sumPrincipal > 0 || sumInterest > 0) {
+        xml += `   <Row ss:Height="24">\n`;
+        xml += `    <Cell ss:MergeAcross="1" ss:StyleID="TotalRowText"><Data ss:Type="String">TOTAL REPAYMENT SUMMARY</Data></Cell>\n`;
+        for (let c = 2; c < headers.length; c++) {
+            const h = (headers[c] || '').toLowerCase();
+            if (h.includes('emi')) {
+                xml += `    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">${Math.round(sumEmi)}</Data></Cell>\n`;
+            } else if (h.includes('principal') && !h.includes('cumulative')) {
+                xml += `    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">${Math.round(sumPrincipal)}</Data></Cell>\n`;
+            } else if (h.includes('interest') && !h.includes('cumulative')) {
+                xml += `    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">${Math.round(sumInterest)}</Data></Cell>\n`;
+            } else if (h.includes('closing') || h.includes('balance')) {
+                xml += `    <Cell ss:StyleID="TotalRow"><Data ss:Type="Number">0</Data></Cell>\n`;
+            } else {
+                xml += `    <Cell ss:StyleID="TotalRow"><Data ss:Type="String">—</Data></Cell>\n`;
+            }
+        }
+        xml += `   </Row>\n`;
+    }
+
+    xml += `   <Row ss:Height="12"/>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="${spanCols}" ss:StyleID="Disclaimer"><Data ss:Type="String">Disclaimer: Amortization figures are calculated using standard reducing balance compounding formula as per RBI master directions. Verified by BeeFund Financial Services.</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    const cleanFilename = filename.endsWith('.xls') ? filename : `${filename.replace(/\.csv$/, '')}.xls`;
     link.setAttribute('href', url);
     link.setAttribute('download', cleanFilename);
     document.body.appendChild(link);

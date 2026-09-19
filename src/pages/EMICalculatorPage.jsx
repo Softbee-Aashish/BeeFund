@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { exportToExcel, formatINR, formatNumberINR } from '../utils/excelExport';
+import { exportToExcel, exportLoanScheduleToExcel, formatINR, formatNumberINR } from '../utils/excelExport';
 import { generateLoanSchedulePDF } from '../utils/loanPdfExport';
 import './CalculatorPage.css';
 import '../pages/tools/ToolShared.css';
@@ -206,35 +206,32 @@ const CalculatorPage = () => {
 
     // Excel Export
     const exportExcel = () => {
-        const headers = [
-            'Month #',
-            'Month / Year',
-            'EMI (INR)',
-            'Principal Component (INR)',
-            'Interest Component (INR)',
-            'Balance Outstanding (INR)'
-        ];
+        const firstMonth = results.schedule[0]?.monthLabel || '';
+        const lastMonth = results.schedule[results.schedule.length - 1]?.monthLabel || '';
 
-        const rows = results.schedule.map(r => [
-            r.month,
-            r.monthLabel,
-            Math.round(r.emi),
-            Math.round(r.principal),
-            Math.round(r.interest),
-            Math.round(r.balance)
-        ]);
-
-        // Append metadata
-        rows.push([]);
-        rows.push(['LOAN SUMMARY', '', '', '', '', '']);
-        rows.push(['Loan Amount', `INR ${formatNumberINR(results.amount)}`]);
-        rows.push(['Interest Rate', `${results.rate.toFixed(2)}% p.a.`]);
-        rows.push(['Tenure', `${results.tenure} Months (${(results.tenure / 12).toFixed(1)} Years)`]);
-        rows.push(['Monthly EMI', `INR ${formatNumberINR(results.emi)}`]);
-        rows.push(['Total Interest Payable', `INR ${formatNumberINR(results.totalInterest)}`]);
-        rows.push(['Total Amount Payable', `INR ${formatNumberINR(results.totalPayment)}`]);
-
-        exportToExcel('BeeFund_Loan_Repayment_Schedule', headers, rows);
+        exportLoanScheduleToExcel({
+            loanTitle: 'LOAN AMORTIZATION SCHEDULE',
+            loanName: 'Standard Term Loan Facility',
+            principal: results.amount,
+            annualRate: results.rate,
+            rateStructure: 'Reducing Balance',
+            tenureMonths: results.tenure,
+            effectiveEmi: results.emi,
+            totalInterest: results.totalInterest,
+            totalPayment: results.totalPayment,
+            startDateLabel: firstMonth,
+            endDateLabel: lastMonth,
+            scheduleRows: results.schedule.map(r => ({
+                month: r.month,
+                dateLabel: r.monthLabel,
+                openingPos: r.balance + r.principal,
+                emi: r.emi,
+                principal: r.principal,
+                interest: r.interest,
+                closingPos: r.balance
+            })),
+            fileName: 'BeeFund_Loan_Repayment_Schedule.xls'
+        });
     };
 
     const solveOptions = [

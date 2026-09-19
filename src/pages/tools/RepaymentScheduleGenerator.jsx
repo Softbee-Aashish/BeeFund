@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import HexagonBackground from '../../components/HexagonBackground';
-import { exportToExcel, formatINR, formatNumberINR } from '../../utils/excelExport';
+import { exportToExcel, exportLoanScheduleToExcel, formatINR, formatNumberINR } from '../../utils/excelExport';
 import { generateLoanSchedulePDF } from '../../utils/loanPdfExport';
 import './RepaymentScheduleGenerator.css';
 import './ToolShared.css';
@@ -248,45 +248,29 @@ const RepaymentScheduleGenerator = () => {
     // ========================================================
 
     const handleExportExcel = () => {
-        const headers = [
-            'Month #',
-            'Payment Date',
-            'Opening POS (INR)',
-            'EMI Amount (INR)',
-            'Principal Paid (INR)',
-            'Interest Paid (INR)',
-            'Closing POS (INR)',
-            'Cumulative Principal (INR)',
-            'Cumulative Interest (INR)',
-            'Applicable ROI (% p.a.)'
-        ];
-
-        const rows = scheduleData.rows.map(r => [
-            r.month,
-            r.dateLabel,
-            Math.round(r.openingPos),
-            Math.round(r.emi),
-            Math.round(r.principal),
-            Math.round(r.interest),
-            Math.round(r.closingPos),
-            Math.round(r.cumulativePrincipal),
-            Math.round(r.cumulativeInterest),
-            r.annualRate + '%'
-        ]);
-
-        // Add sanction metadata at bottom
-        rows.push([]);
-        rows.push(['SANCTION DETAILS', '', '', '', '', '', '', '', '', '']);
-        rows.push(['Loan Product', loanName]);
-        rows.push(['Sanctioned Amount', `INR ${formatNumberINR(scheduleData.principal)}`]);
-        rows.push(['Initial ROI', `${annualRate}% p.a.`]);
-        rows.push(['Total Tenure', `${totalMonths} Months`]);
-        rows.push(['First EMI Date', scheduleData.startDateLabel]);
-        rows.push(['Final Maturity Date', scheduleData.endDateLabel]);
-        rows.push(['Total Interest Payable', `INR ${formatNumberINR(scheduleData.totalInterestPayable)}`]);
-        rows.push(['Total Amount Payable', `INR ${formatNumberINR(scheduleData.totalAmountPayable)}`]);
-
-        exportToExcel(`BeeFund_Repayment_Schedule_${loanName.replace(/\s+/g, '_')}`, headers, rows);
+        exportLoanScheduleToExcel({
+            loanTitle: 'OFFICIAL LOAN REPAYMENT SCHEDULE',
+            loanName: loanName,
+            principal: scheduleData.principal,
+            annualRate: annualRate,
+            rateStructure: rateStructure === 'fixed' ? 'Fixed Rate' : 'Floating Rate',
+            tenureMonths: totalMonths,
+            effectiveEmi: scheduleData.effectiveEmi,
+            totalInterest: scheduleData.totalInterestPayable,
+            totalPayment: scheduleData.totalAmountPayable,
+            startDateLabel: scheduleData.startDateLabel,
+            endDateLabel: scheduleData.endDateLabel,
+            scheduleRows: scheduleData.rows.map(r => ({
+                month: r.month,
+                dateLabel: r.dateLabel,
+                openingPos: r.openingPos,
+                emi: r.emi,
+                principal: r.principal,
+                interest: r.interest,
+                closingPos: r.closingPos
+            })),
+            fileName: `BeeFund_Repayment_Schedule_${loanName.replace(/[^a-zA-Z0-9]/g, '_')}.xls`
+        });
     };
 
     const handleExportPdf = () => {
