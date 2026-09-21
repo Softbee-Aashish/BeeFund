@@ -2,6 +2,20 @@
 User-agent: *
 Allow: /
 
+# Google AdSense Crawler & Googlebot
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+# Core Verification Files
+Allow: /ads.txt
+Allow: /sitemap.xml
+
 # Priority Core Routes
 Allow: /credit-report
 Allow: /credit-score

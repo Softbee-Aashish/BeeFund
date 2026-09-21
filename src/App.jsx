@@ -7,6 +7,7 @@ import BeeSwarm from './components/BeeSwarm';
 import WhatsAppWidget from './components/WhatsAppWidget';
 import DarkModeToggle from './components/DarkModeToggle';
 import PamphletModal from './components/PamphletModal';
+import CookieConsent from './components/CookieConsent';
 import { ThemeProvider } from './context/ThemeContext';
 import { EnquireModalProvider } from './context/EnquireModalContext';
 
@@ -21,6 +22,8 @@ const AboutPage = React.lazy(() => import('./pages/AboutPage'));
 const ThankYouPage = React.lazy(() => import('./pages/ThankYouPage'));
 const CreditReportPage = React.lazy(() => import('./pages/CreditReportPage'));
 const TermsPage = React.lazy(() => import('./pages/TermsPage'));
+const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
+const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 
 // Tools
 const ToolsHome = React.lazy(() => import('./pages/tools/ToolsHome'));
@@ -75,8 +78,10 @@ function App() {
                   <Route path="/credit-score" element={<CreditReportPage />} />
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/terms" element={<TermsPage />} />
-                  <Route path="/privacy" element={<TermsPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/disclaimer" element={<TermsPage />} />
                   <Route path="/thank-you" element={<ThankYouPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </React.Suspense>
             </main>
@@ -85,6 +90,7 @@ function App() {
             <DarkModeToggle />
             <BottomNav />
             <PamphletModal />
+            <CookieConsent />
           </div>
         </Router>
       </EnquireModalProvider>
