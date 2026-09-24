@@ -1,9 +1,26 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useAdminAuth } from '../context/AdminAuthContext';
 import './Footer.css';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const { openLoginModal } = useAdminAuth();
+    const clickCountRef = useRef(0);
+    const clickTimerRef = useRef(null);
+
+    const handleSecretTrigger = () => {
+        clickCountRef.current += 1;
+        if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+        if (clickCountRef.current >= 3) {
+            clickCountRef.current = 0;
+            openLoginModal();
+        } else {
+            clickTimerRef.current = setTimeout(() => {
+                clickCountRef.current = 0;
+            }, 600);
+        }
+    };
 
     return (
         <footer className="site-footer">
@@ -22,16 +39,16 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Quick Links / Loans */}
+                    {/* Quick Links / Products */}
                     <div className="footer-col">
-                        <h4 className="footer-col-title">Loan Products</h4>
+                        <h4 className="footer-col-title">Financial Products</h4>
                         <ul className="footer-links">
-                            <li><Link to="/loans#business">Business Term Loan</Link></li>
-                            <li><Link to="/loans#secured">Loan Against Property (LAP)</Link></li>
-                            <li><Link to="/loans#machinery">Machinery & Equipment Loan</Link></li>
-                            <li><Link to="/loans#government">PMEGP & CGTMSE Cover</Link></li>
-                            <li><Link to="/loans#personal">Personal & Vehicle Loans</Link></li>
-                            <li><Link to="/loans#working-capital">Working Capital (OD / CC)</Link></li>
+                            <li><Link to="/products#credit-card">Apply for Credit Card</Link></li>
+                            <li><Link to="/products#government">Mudra & PMEGP Schemes</Link></li>
+                            <li><Link to="/products#secured">Home Loan & LAP</Link></li>
+                            <li><Link to="/products#secured">Machinery & Vehicle Loan</Link></li>
+                            <li><Link to="/products#working-capital">Working Capital (OD / CC)</Link></li>
+                            <li><Link to="/products#working-capital">Unsecured Business Loan</Link></li>
                         </ul>
                     </div>
 
@@ -71,7 +88,9 @@ const Footer = () => {
 
                 {/* Bottom Bar */}
                 <div className="footer-bottom-bar">
-                    <p>© {currentYear} BeeFund Financial Services Pvt Ltd. All rights reserved.</p>
+                    <p onClick={handleSecretTrigger} style={{ cursor: 'default', userSelect: 'none' }}>
+                        © {currentYear} BeeFund Financial Services Pvt Ltd. All rights reserved.
+                    </p>
                     <div className="footer-bottom-links">
                         <Link to="/terms">Terms of Service</Link>
                         <span>•</span>

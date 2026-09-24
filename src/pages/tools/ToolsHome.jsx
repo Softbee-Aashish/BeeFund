@@ -1,34 +1,147 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import HexagonBackground from '../../components/HexagonBackground';
+import { ToolIcons } from '../../components/NavIcons';
 import './ToolsHome.css';
 
-const svgIcons = {
-    emi: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="18" rx="2" /><path d="M2 9h20" /><path d="M9 21V9" /></svg>,
-    eligibility: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>,
-    comparison: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="2" x2="12" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>,
-    gst: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>,
-    tax: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /></svg>,
-    inflation: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>,
-    afford: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>,
-    roi: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>,
-    fixfloat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /></svg>,
-    odcc: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /><line x1="7" y1="15" x2="7.01" y2="15" /><line x1="11" y1="15" x2="13" y2="15" /></svg>,
-    repayment: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>,
-};
-
 const tools = [
-    { id: 'od-cc-calculator', icon: svgIcons.odcc, title: 'OD / CC Interest Calculator', desc: 'Calculate daily interest on Overdraft accounts with variable balances, random date gap entries, credit card revolving charges, and export to Excel.', keywords: 'OD interest calculator, CC interest calculator, overdraft interest, credit card interest, variable balance interest excel' },
-    { id: 'repayment-schedule', icon: svgIcons.repayment, title: 'Repayment Schedule Generator', desc: 'Generate complete bank-grade loan amortization schedules from sanction letters with opening/closing POS, principal & interest left chart, and Excel & PDF export.', keywords: 'repayment schedule generator, sanction letter repayment schedule, loan amortization schedule excel, POS balance schedule' },
-    { id: 'emi-calculator', icon: svgIcons.emi, title: 'EMI Calculator', desc: 'Calculate monthly loan EMI instantly with full repayment schedule, interest breakdown, and amortization table.', keywords: 'EMI calculator, loan EMI, monthly installment, business loan EMI, home loan EMI calculator India' },
-    { id: 'eligibility', icon: svgIcons.eligibility, title: 'Loan Eligibility Calculator', desc: 'Know how much loan you can qualify for based on your income, expenses, credit score, and existing obligations.', keywords: 'loan eligibility calculator, how much loan can I get, business loan eligibility, home loan eligibility check' },
-    { id: 'loan-comparison', icon: svgIcons.comparison, title: 'Loan Comparison Tool', desc: 'Compare two different loan offers side by side — interest rates, total cost, tenure, and monthly EMI to find the best deal.', keywords: 'loan comparison tool, compare loan rates, best loan offer, interest rate comparison India' },
-    { id: 'gst-calculator', icon: svgIcons.gst, title: 'GST Calculator', desc: 'Compute GST on invoices, service fees, and business transactions. Calculate CGST, SGST, IGST for all slab rates.', keywords: 'GST calculator, GST calculation online, CGST SGST calculator, GST for business, invoice GST calculator' },
-    { id: 'tax-benefit', icon: svgIcons.tax, title: 'Tax Benefit Calculator', desc: 'Calculate tax savings on Home Loan (80C + 24b) and Business Loan interest deductions under Income Tax Act.', keywords: 'tax benefit calculator, home loan tax deduction, Section 80C calculator, loan interest tax saving India' },
-    { id: 'inflation-impact', icon: svgIcons.inflation, title: 'Inflation Impact Analyzer', desc: 'Understand how inflation reduces the real burden of your loan over time. See the true cost in today\'s rupees.', keywords: 'inflation impact calculator, loan inflation effect, real cost of loan, inflation adjusted EMI India' },
-    { id: 'affordability', icon: svgIcons.afford, title: 'Home Affordability Calculator', desc: 'Determine the maximum property price you can comfortably afford based on income, savings, and loan eligibility.', keywords: 'home affordability calculator, how much house can I afford, property budget calculator, home loan affordability' },
-    { id: 'roi-calculator', icon: svgIcons.roi, title: 'Business ROI Calculator', desc: 'Evaluate whether a loan-funded business investment makes financial sense. Calculate return on investment vs loan cost.', keywords: 'business ROI calculator, return on investment calculator, loan funded business ROI, investment vs loan cost' },
-    { id: 'fixed-vs-floating', icon: svgIcons.fixfloat, title: 'Fixed vs Floating Rate', desc: 'Compare fixed and floating interest rate options for your loan. See which saves more based on RBI rate projections.', keywords: 'fixed vs floating rate, fixed rate loan, floating rate loan comparison, best interest type for loan India' },
+    // 1. Repayment & Working Capital
+    {
+        id: 'emi-calculator',
+        iconKey: 'emi',
+        color: 'amber',
+        category: 'repayment',
+        categoryLabel: 'Repayment',
+        badge: 'Most Popular',
+        title: 'Loan EMI Calculator',
+        desc: 'Calculate monthly installment, total interest payable, and comprehensive loan amortization table instantly.',
+        tags: ['Instant Calculation', 'Monthly Breakdown'],
+        keywords: 'EMI calculator, loan EMI, monthly installment, business loan EMI, home loan EMI calculator India'
+    },
+    {
+        id: 'repayment-schedule',
+        iconKey: 'repayment',
+        color: 'blue',
+        category: 'repayment',
+        categoryLabel: 'Amortization',
+        badge: 'Excel & PDF Export',
+        title: 'Repayment Schedule Generator',
+        desc: 'Generate complete bank-grade loan amortization schedules from sanction letters with opening/closing POS and download in Excel or PDF.',
+        tags: ['Excel Export', 'POS Tracking'],
+        keywords: 'repayment schedule generator, sanction letter repayment schedule, loan amortization schedule excel, POS balance schedule'
+    },
+    {
+        id: 'od-cc-calculator',
+        iconKey: 'odcc',
+        color: 'emerald',
+        category: 'repayment',
+        categoryLabel: 'Working Capital',
+        badge: 'Daily Utilization',
+        title: 'OD / CC Interest Calculator',
+        desc: 'Calculate daily interest on Overdraft accounts with variable balances, random date gap entries, credit card revolving charges, and export to Excel.',
+        tags: ['Variable Balances', 'Export to Excel'],
+        keywords: 'OD interest calculator, CC interest calculator, overdraft interest, credit card interest, variable balance interest excel'
+    },
+
+    // 2. Eligibility & Loan Decision
+    {
+        id: 'eligibility',
+        iconKey: 'eligibility',
+        color: 'purple',
+        category: 'eligibility',
+        categoryLabel: 'Eligibility',
+        badge: 'Instant Check',
+        title: 'Loan Eligibility Calculator',
+        desc: 'Know how much loan you can qualify for based on your net income, living expenses, existing EMI obligations, and bank multipliers.',
+        tags: ['FOIR Analysis', 'Multi-Bank Formula'],
+        keywords: 'loan eligibility calculator, how much loan can I get, business loan eligibility, home loan eligibility check'
+    },
+    {
+        id: 'affordability',
+        iconKey: 'affordability',
+        color: 'blue',
+        category: 'eligibility',
+        categoryLabel: 'Budgeting',
+        badge: 'Budget Planner',
+        title: 'Home Affordability Calculator',
+        desc: 'Determine the maximum property price you can comfortably afford based on income, savings, and safe EMI capacity.',
+        tags: ['Safe EMI Limits', 'Down Payment Plan'],
+        keywords: 'home affordability calculator, how much house can I afford, property budget calculator, home loan affordability'
+    },
+    {
+        id: 'loan-comparison',
+        iconKey: 'comparison',
+        color: 'indigo',
+        category: 'eligibility',
+        categoryLabel: 'Comparison',
+        badge: 'Side-by-Side',
+        title: 'Loan Comparison Tool',
+        desc: 'Compare two different loan offers side by side — interest rates, total lifetime cost, tenure, and monthly EMI to find the best deal.',
+        tags: ['Compare 2 Loans', 'Total Cost View'],
+        keywords: 'loan comparison tool, compare loan rates, best loan offer, interest rate comparison India'
+    },
+    {
+        id: 'fixed-vs-floating',
+        iconKey: 'fixedFloating',
+        color: 'teal',
+        category: 'eligibility',
+        categoryLabel: 'Interest Rate',
+        badge: 'Rate Forecast',
+        title: 'Fixed vs Floating Rate Analyzer',
+        desc: 'Compare fixed and floating interest rate options for your loan. See which saves more based on RBI benchmark rate projections.',
+        tags: ['Repo Rate Shift', 'Cost Sensitivity'],
+        keywords: 'fixed vs floating rate, fixed rate loan, floating rate loan comparison, best interest type for loan India'
+    },
+
+    // 3. Tax & Business Growth
+    {
+        id: 'gst-calculator',
+        iconKey: 'gst',
+        color: 'blue',
+        category: 'tax-business',
+        categoryLabel: 'Taxation',
+        badge: 'All Slabs (5%-28%)',
+        title: 'GST Calculator',
+        desc: 'Compute GST on invoices, service fees, and business transactions. Calculate CGST, SGST, IGST for all slab rates with inclusive/exclusive modes.',
+        tags: ['CGST / SGST / IGST', 'Inclusive & Exclusive'],
+        keywords: 'GST calculator, GST calculation online, CGST SGST calculator, GST for business, invoice GST calculator'
+    },
+    {
+        id: 'tax-benefit',
+        iconKey: 'tax',
+        color: 'rose',
+        category: 'tax-business',
+        categoryLabel: 'Tax Savings',
+        badge: 'Sec 80C & 24(b)',
+        title: 'Tax Benefit Calculator',
+        desc: 'Calculate annual tax savings on Home Loan (80C + 24b) and Business Loan interest deductions under the Income Tax Act.',
+        tags: ['Old & New Slabs', 'Up to ₹3.5L Deduction'],
+        keywords: 'tax benefit calculator, home loan tax deduction, Section 80C calculator, loan interest tax saving India'
+    },
+    {
+        id: 'roi-calculator',
+        iconKey: 'roi',
+        color: 'amber',
+        category: 'tax-business',
+        categoryLabel: 'Business Growth',
+        badge: 'CapEx Evaluation',
+        title: 'Business ROI Calculator',
+        desc: 'Evaluate whether a loan-funded business investment makes financial sense. Calculate return on investment vs debt service cost.',
+        tags: ['Net Present Value', 'Payback Period'],
+        keywords: 'business ROI calculator, return on investment calculator, loan funded business ROI, investment vs loan cost'
+    },
+    {
+        id: 'inflation-impact',
+        iconKey: 'inflation',
+        color: 'amber',
+        category: 'tax-business',
+        categoryLabel: 'Economics',
+        badge: 'Real Cost Value',
+        title: 'Inflation Impact Analyzer',
+        desc: 'Understand how inflation reduces the real burden of your loan over time. See the true discounted cost in today\'s rupees.',
+        tags: ['Purchasing Power', 'Real vs Nominal EMI'],
+        keywords: 'inflation impact calculator, loan inflation effect, real cost of loan, inflation adjusted EMI India'
+    }
 ];
 
 /* ---- FAQ ---- */
@@ -45,6 +158,11 @@ const toolsFaqs = [
 
 const ToolsHome = () => {
     const [openFaq, setOpenFaq] = useState(null);
+    const [activeFilter, setActiveFilter] = useState('all');
+
+    const filteredTools = activeFilter === 'all'
+        ? tools
+        : tools.filter(tool => tool.category === activeFilter);
 
     return (
         <div className="tools-home-page">
@@ -54,14 +172,13 @@ const ToolsHome = () => {
                 <div className="container th-hero-inner">
                     <span className="th-badge">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
-                        Free • No Sign-up • 100% Private
+                        Free • No Sign-up • 100% Client-Side Private
                     </span>
                     <h1 className="th-title">
-                        Free <span className="th-hl">Financial Calculators</span> & Loan Tools
+                        Smart <span className="th-hl">Financial Tools</span> & Calculators
                     </h1>
                     <p className="th-subtitle">
-                        Plan your finances with <strong>EMI calculators</strong>, <strong>loan eligibility checkers</strong>, <strong>GST calculators</strong>, <strong>tax benefit tools</strong>, and more.
-                        All tools run on your browser — your data stays private and secure.
+                        Empower your borrowing decisions with bank-accurate <strong>EMI calculators</strong>, <strong>repayment schedule generators</strong>, <strong>eligibility checkers</strong>, and <strong>tax optimization tools</strong>.
                     </p>
 
                     <div className="th-stats">
@@ -74,34 +191,83 @@ const ToolsHome = () => {
                 </div>
             </section>
 
-            {/* === SEO INTRO === */}
-            <section className="th-seo">
-                <div className="container">
-                    <div className="th-seo-block">
-                        <h2 className="th-seo-h2">Best Free Financial Calculators Online — <span className="th-hl">India 2025</span></h2>
-                        <p className="th-seo-text">
-                            Make smarter financial decisions with our suite of <strong>free online financial calculators</strong>. Whether you're planning a <strong>business loan</strong>, buying a <strong>home</strong>, comparing <strong>interest rates</strong>, or calculating <strong>GST</strong> — our tools give you instant, accurate results. Built by BeeFund, powered by <strong>AADYASHIV CONSULTING PRIVATE LIMITED</strong>, these calculators are used by thousands of borrowers, CAs, and financial advisors across India.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* === TOOL CARDS === */}
+            {/* === CATEGORY FILTER BAR & TOOL CARDS === */}
             <section className="th-grid-section">
-                <HexagonBackground opacity={0.08} className="hex-right" />
+                <HexagonBackground opacity={0.06} className="hex-right" />
                 <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                    {/* Category Filter Pills */}
+                    <div className="th-filter-wrapper">
+                        <div className="th-filter-tabs">
+                            <button
+                                type="button"
+                                className={`th-filter-tab ${activeFilter === 'all' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('all')}
+                            >
+                                All Tools ({tools.length})
+                            </button>
+                            <button
+                                type="button"
+                                className={`th-filter-tab ${activeFilter === 'repayment' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('repayment')}
+                            >
+                                EMI & Repayment (3)
+                            </button>
+                            <button
+                                type="button"
+                                className={`th-filter-tab ${activeFilter === 'eligibility' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('eligibility')}
+                            >
+                                Eligibility & Loans (4)
+                            </button>
+                            <button
+                                type="button"
+                                className={`th-filter-tab ${activeFilter === 'tax-business' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('tax-business')}
+                            >
+                                Tax & Business (4)
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Cards Grid */}
                     <div className="th-grid">
-                        {tools.map((tool, i) => (
+                        {filteredTools.map((tool) => (
                             <Link to={`/tools/${tool.id}`} key={tool.id} className="th-card" id={`tool-${tool.id}`}>
-                                <div className="th-card-top">
-                                    <span className="th-card-icon">{tool.icon}</span>
-                                    <span className="th-card-num">0{i + 1}</span>
+                                <div className="th-card-header">
+                                    <span className={`th-card-icon-box icon-color-${tool.color}`}>
+                                        {ToolIcons[tool.iconKey]}
+                                    </span>
+                                    <div className="th-card-badges">
+                                        <span className={`th-badge-category badge-color-${tool.color}`}>
+                                            {tool.categoryLabel}
+                                        </span>
+                                        {tool.badge && (
+                                            <span className="th-badge-highlight">
+                                                {tool.badge}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                                <h3 className="th-card-title">{tool.title}</h3>
-                                <p className="th-card-desc">{tool.desc}</p>
+                                <div className="th-card-body">
+                                    <h3 className="th-card-title">{tool.title}</h3>
+                                    <p className="th-card-desc">{tool.desc}</p>
+                                </div>
+                                <div className="th-card-footer">
+                                    <div className="th-card-tags">
+                                        {tool.tags.map((t, idx) => (
+                                            <span key={idx} className="th-micro-tag">{t}</span>
+                                        ))}
+                                    </div>
+                                    <span className="th-card-action">
+                                        <span>Open Tool</span>
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="5" y1="12" x2="19" y2="12" />
+                                            <polyline points="12 5 19 12 12 19" />
+                                        </svg>
+                                    </span>
+                                </div>
                                 {/* Hidden SEO keywords */}
                                 <span className="sr-only">{tool.keywords}</span>
-                                <span className="th-card-cta">Open Calculator →</span>
                             </Link>
                         ))}
                     </div>

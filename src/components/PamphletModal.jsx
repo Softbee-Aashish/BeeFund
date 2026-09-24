@@ -31,6 +31,7 @@ const FlyingCarrierBee = ({ flip = false }) => (
 );
 
 const LOAN_OPTIONS = [
+    { value: 'Credit Card', label: 'Credit Card (Instant Approval)' },
     { value: 'Working Capital', label: 'Working Capital Loan' },
     { value: 'BL', label: 'Business Loan (BL)' },
     { value: 'HL', label: 'Home Loan (HL)' },
@@ -49,6 +50,7 @@ const LOAN_OPTIONS = [
 const mapLoanType = (incoming) => {
     if (!incoming) return 'BL';
     const lower = incoming.toLowerCase();
+    if (lower.includes('credit') || lower.includes('card')) return 'Credit Card';
     if (lower.includes('work') || lower.includes('capital')) return 'Working Capital';
     if (lower.includes('lap') || lower.includes('property')) return 'LAP';
     if (lower.includes('home')) return 'HL';

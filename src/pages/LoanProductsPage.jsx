@@ -1,413 +1,978 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import HexagonBackground from '../components/HexagonBackground';
 import { useEnquiryModal } from '../context/EnquireModalContext';
+import { LoanIcons } from '../components/NavIcons';
 import './LoanProductsPage.css';
 
-/* ================================================
-   LOAN DATA — All loan categories with rich content
-   ================================================ */
-const loanCategories = [
+/* ========================================================
+   CONSOLIDATED FINANCIAL PRODUCT SUITES (10 Core Products)
+   With bank-grade vector logos & concise, punchy cards
+   ======================================================== */
+const ALL_PRODUCTS = [
     {
-        id: 'secured', tab: 'Secured', title: 'Secured Loans (Collateral-Based)',
-        description: 'Get higher loan amounts at lower interest rates by pledging property or assets as collateral. Ideal for large-scale business expansion, home purchase, or equipment financing.',
-        loans: [
-            { id: 'lap', name: 'Loan Against Property (LAP)', amount: 'Up to ₹5 Crore', rate: '8.50% – 10.50% p.a.', tenure: 'Up to 15 years', desc: 'Unlock the value of your residential or commercial property for business expansion, debt consolidation, or personal needs. LAP offers the best interest rates among all loan products.', features: ['Long repayment tenure up to 15 years', 'No end-use restriction on funds', 'Lower interest rates vs unsecured loans', 'Overdraft facility available'] },
-            { id: 'home-loan', name: 'Home Loan (HL)', amount: 'Up to ₹10 Crore', rate: '8.40% – 10.25% p.a.', tenure: 'Up to 30 years', desc: 'Purchase, construct, or renovate your dream home with affordable EMIs and tax benefits under Section 80C and 24(b) of the Income Tax Act.', features: ['Tax benefits under Sec 80C & 24(b)', 'Up to 90% Loan-to-Value ratio', 'Balance transfer from other banks', 'Top-up loan available'] },
-            { id: 'business-secured', name: 'Secured Business Loan', amount: 'Up to ₹2 Crore+', rate: '9% – 12% p.a.', tenure: 'Up to 5-7 years', desc: 'Expand your business with a high-limit capital loan backed by business or personal assets. Perfect for working capital, equipment, or expansion.', features: ['Higher loan amounts available', 'Lower interest rate vs unsecured', 'Flexible collateral options accepted', 'Customized repayment schedule'] },
-            { id: 'machinery', name: 'Machinery & Equipment Finance', amount: 'Up to 90% cost', rate: '9% – 13% p.a.', tenure: 'Up to 5-7 years', desc: 'Finance new or used machinery, industrial equipment, and technology upgrades. Preserve your working capital while growing production capacity.', features: ['Preserve working capital for operations', 'Tax benefits on depreciation', '3-6 months moratorium option', 'New and used equipment covered'] },
-            { id: 'commercial-vehicle', name: 'Commercial Vehicle & Auto Loan', amount: 'Up to 90% cost', rate: '8.75% – 12% p.a.', tenure: 'Up to 5-7 years', desc: 'Get financing for trucks, buses, tempos, passenger vehicles, and construction equipment. Quick approval with flexible repayment.', features: ['Quick 24-48 hour approval', 'New & used vehicles covered', 'Flexible EMI repayment options', 'Insurance bundling available'] },
+        id: 'credit-card',
+        name: 'Instant Credit Cards',
+        category: 'Credit Cards',
+        categoryId: 'cards',
+        iconKey: 'creditCard',
+        iconColor: '#e11d48',
+        iconBg: 'rgba(225, 29, 72, 0.1)',
+        badge: 'Zero Joining Fee',
+        amount: 'Up to ₹10 Lakhs',
+        rate: '0% (Up to 50 Days)',
+        tenure: 'Revolving Line',
+        tagline: 'Paperless application with lounge perks, 50-day 0% interest & cashback rewards.',
+        variants: [
+            'Lifetime Free',
+            'Airport Lounge',
+            'Cashback & Rewards',
+            'Fuel Waiver'
+        ],
+        description: 'BeeFund partners with India’s leading private and PSU banks to offer pre-approved credit cards tailored to your lifestyle and spending profile. Enjoy up to 50 days interest-free credit, complimentary domestic and international airport lounge access, 10x reward points on online spends, and fuel surcharge waivers nationwide.',
+        features: [
+            '100% paperless digital verification process',
+            'Up to 50 days interest-free billing cycle',
+            'Complimentary airport lounge access across India & overseas',
+            'Fuel surcharge waivers and up to 5% direct cashback',
+            'Zero joining fee and lifetime-free card options available'
+        ],
+        eligibility: [
+            'Age: 21 to 65 years',
+            'Salaried: Min ₹20,000/month net in bank account',
+            'Self-Employed: Annual ITR of ₹3,00,000 or above',
+            'CIBIL Score: 700+ preferred (650+ for secured FD-backed cards)'
+        ],
+        documents: [
+            'PAN Card & Aadhaar Card (with mobile linked for OTP)',
+            'Last 3 months salary slips or last 1 year ITR',
+            'Last 3 months bank statement (PDF)'
+        ],
+        isCreditCard: true
+    },
+    {
+        id: 'home-loan-lap',
+        name: 'Home Loan & LAP',
+        category: 'Property & Housing',
+        categoryId: 'property',
+        iconKey: 'homeLoan',
+        iconColor: '#0284c7',
+        iconBg: 'rgba(2, 132, 199, 0.1)',
+        badge: 'Lowest Interest',
+        amount: 'Up to ₹15 Cr',
+        rate: '8.40% – 10.50%',
+        tenure: 'Up to 30 Yrs',
+        tagline: 'Home purchase, plot construction, and high-ticket mortgage liquidity against property.',
+        variants: [
+            'Home Purchase',
+            'Mortgage LAP',
+            'Plot Construction',
+            'Balance Transfer'
+        ],
+        description: 'Whether buying your dream home or unlocking the hidden equity in your existing real estate, our mortgage solutions combine the lowest institutional rates with flexible tenures. LAP provides unrestricted liquidity for business Capex, debt consolidation, or expansion at half the cost of unsecured loans.',
+        features: [
+            'Financing up to 90% for Home Loans and up to 70% LTV for LAP',
+            'Lowest borrowing cost across all retail and secured debt instruments',
+            'Tax deductions up to ₹1.5L (Sec 80C) and ₹2L (Sec 24b) on Home Loans',
+            'Residential, commercial shops, offices, and industrial land accepted',
+            'Attractive balance transfer with massive top-up facilities'
+        ],
+        eligibility: [
+            'Salaried individuals, self-employed professionals, and business owners',
+            'Age: 21 to 65 years at maturity',
+            'Clear and marketable title deeds for the pledged property',
+            'CIBIL Score: 680+ (750+ secures best prime rate discounts)'
+        ],
+        documents: [
+            'Property Chain Documents (Registry, Mutation, Approved Map)',
+            'Last 3 years ITR with computation, P&L, Balance Sheet (or 6 months salary slips)',
+            'Last 12 months primary bank statement',
+            'KYC documents of all property co-owners & applicants'
         ]
     },
     {
-        id: 'working-capital', tab: 'Business', title: 'Business & Working Capital Products',
-        description: 'Short-term and collateral-free funding solutions to keep your day-to-day business operations running smoothly. Ideal for MSMEs, traders, and service businesses.',
-        loans: [
-            { id: 'working-capital-loan', name: 'Working Capital Loan', amount: 'Based on turnover', rate: '10% – 15% p.a.', tenure: '12 months (renewable)', desc: 'Manage day-to-day operations, purchase inventory, pay salaries, and bridge cash flow gaps with flexible working capital financing.', features: ['Overdraft (OD) facility', 'Cash Credit (CC) limit', 'Pay interest only on utilized amount', 'Renewable annually'] },
-            { id: 'bill-discounting', name: 'Bill / Invoice Discounting', amount: 'Up to 90% of invoice', rate: '8% – 14% p.a.', tenure: '30-180 days', desc: 'Convert your unpaid invoices into immediate cash. Don\'t wait for customer payments — get funds upfront against your receivables.', features: ['Improve cash flow immediately', 'No additional collateral required', 'Credit assessment on your customer', 'Quick 48-hour processing'] },
-            { id: 'business-unsecured', name: 'Unsecured Business Loan', amount: 'Up to ₹50 Lakhs', rate: '12% – 18% p.a.', tenure: '1-5 years', desc: 'Collateral-free business loan based on your turnover, profitability, and credit history. Ideal for MSMEs, traders, and small business owners.', features: ['Zero collateral requirement', 'Fast 7 day processing time', 'For MSMEs, traders & service providers', 'Minimal documentation needed'] },
-            { id: 'professional', name: 'Professional Loan', amount: 'Up to ₹50 Lakhs', rate: '11% – 16% p.a.', tenure: 'Up to 5-7 years', desc: 'Unsecured loan exclusively for Doctors, Chartered Accountants, Company Secretaries, Architects, and other qualified professionals.', features: ['No collateral required for professionals', 'Moratorium period available', 'Setup new clinic or office space', 'Technology & equipment upgrades'] },
+        id: 'business-loan',
+        name: 'Business Loan (BL)',
+        category: 'Business & MSME',
+        categoryId: 'business',
+        iconKey: 'businessUnsecured',
+        iconColor: '#d97706',
+        iconBg: 'rgba(217, 119, 6, 0.1)',
+        badge: 'Zero Collateral',
+        amount: 'Up to ₹5 Cr+',
+        rate: '9.50% – 16.50%',
+        tenure: '1 to 7 Yrs',
+        tagline: 'Collateral-free business capital for growth and Capex evaluated on GST & banking flows.',
+        variants: [
+            'Unsecured BL',
+            'Secured BL',
+            'Merchant POS',
+            'Capex Loan'
+        ],
+        description: 'Fuel your enterprise growth without stalling operations. Unsecured business loans require zero asset pledging and are evaluated directly on your banking cash flows and GST filings. For larger Capex, secured business facilities unlock prime corporate rates and extended multi-year repayment terms.',
+        features: [
+            'Collateral-free options up to ₹50 Lakhs for quick liquidity',
+            'Secured business options up to ₹5 Crore+ for large projects',
+            'Predictable monthly EMIs tailored to business cash cycles',
+            'Underwriting based on digital GST and banking flows',
+            'No restrictions on end-use: purchase inventory, hire staff, or open branches'
+        ],
+        eligibility: [
+            'Proprietorships, Partnerships, LLPs, and Private Limited Companies',
+            'Minimum 2 years operational vintage with active GST filing',
+            'Annual turnover > ₹30 Lakhs with healthy banking credits',
+            'Borrower / Key Director CIBIL: 675+'
+        ],
+        documents: [
+            'PAN, Aadhaar & Business Registration (Udyam / GST / Shop Act)',
+            'Last 12 months primary bank statements in PDF',
+            'Last 2 years ITR with computation and balance sheet',
+            'Company constitutional documents (MOA, AOA, Partnership Deed)'
         ]
     },
     {
-        id: 'government', tab: 'Govt Schemes', title: 'Government Schemes & MSME Loans',
-        description: 'Access subsidized, low-interest loans backed by Indian government initiatives like PMMY, Stand-Up India, and PMEGP. Perfect for micro-enterprises and first-generation entrepreneurs.',
-        loans: [
-            { id: 'standup-india', name: 'Stand-Up India Loan', amount: '₹10L to ₹1 Crore', rate: 'Competitive', tenure: 'Up to 7 years', desc: 'Promoting entrepreneurship among women and SC/ST communities for greenfield manufacturing or service enterprises.', features: ['Composite term + working capital loan', 'CGTMSE credit guarantee coverage', 'For manufacturing, services & trading', 'Special rates for women entrepreneurs'] },
-            { id: 'pmegp', name: 'PMEGP Loan', amount: 'Up to ₹50 Lakhs', rate: '8% – 10% p.a.', tenure: 'Up to 7 years', desc: 'Prime Minister Employment Generation Programme offering subsidized loans with 15-35% government subsidy for setting up new micro-enterprises.', features: ['15%-35% government subsidy on project cost', 'Only 5%-10% margin money required', 'Moratorium period included', 'For manufacturing & service sector'] },
-            { id: 'msme-general', name: 'MSME Business Loan', amount: '₹1 Lakh – ₹2 Crore+', rate: '9% – 15% p.a.', tenure: '1-5 years', desc: 'Customized funding solutions for Micro, Small, and Medium Enterprises across manufacturing, trading, and services sectors in India.', features: ['CGTMSE cover available', 'Fast track with GST analysis', 'Flexible terms & repayment', 'Priority sector lending benefit'] },
+        id: 'working-capital-od-cc',
+        name: 'Working Capital (OD / CC)',
+        category: 'Business & MSME',
+        categoryId: 'business',
+        iconKey: 'workingCapital',
+        iconColor: '#059669',
+        iconBg: 'rgba(5, 150, 105, 0.1)',
+        badge: 'Daily Reducing ROI',
+        amount: 'Turnover Linked',
+        rate: '9.25% – 14.50%',
+        tenure: '12 Mo (Renewable)',
+        tagline: 'Revolving Overdraft & Cash Credit where you pay interest only on exact funds utilized.',
+        variants: [
+            'Cash Credit (CC)',
+            'Bank Overdraft (OD)',
+            'Drop-line OD',
+            'Invoice Finance'
+        ],
+        description: 'Never let receivables delays stall your supply chain. An Overdraft or Cash Credit limit allows you to draw down funds as needed to pay suppliers and payroll. Deposit customer receipts back into the account anytime to immediately eliminate interest charges on that surplus.',
+        features: [
+            'Pay interest strictly on the utilized amount on a daily reducing balance',
+            'Deposit customer surplus funds anytime to immediately slash interest outgo',
+            'Seamless annual renewal based on healthy turnover credits',
+            'Available against book debts, stock hypothecation, or property collateral',
+            'Invoice discounting options to unlock cash from 60-90 day customer bills'
+        ],
+        eligibility: [
+            'Manufacturers, traders, distributors, contractors, and service providers',
+            'Minimum 2 years continuous operating history',
+            'Annual turnover > ₹40 Lakhs with healthy banking flows'
+        ],
+        documents: [
+            'Last 12 months primary current account bank statements',
+            'Last 2 years audited ITR, Balance Sheet, and P&L statements',
+            'Latest GST returns (GSTR-3B & GSTR-1)',
+            'Stock statement & debtors aging schedule'
         ]
     },
     {
-        id: 'personal', tab: 'Personal', title: 'Personal & Consumer Loans',
-        description: 'Flexible funding for salaried and self-employed individuals to meet personal goals, emergencies, education expenses, and vehicle purchases.',
-        loans: [
-            { id: 'personal-loan', name: 'Personal Loan (PL)', amount: 'Up to ₹40 Lakhs', rate: '10.50% – 18% p.a.', tenure: '1-5 years', desc: 'Multipurpose unsecured personal loan for medical emergencies, weddings, travel, home renovation, or debt consolidation with quick disbursal.', features: ['No end-use restriction on funds', 'Minimal documentation required', '24-48 hour disbursal possible', 'No collateral or guarantor needed'] },
-            { id: 'car-loan', name: 'Personal Car Loan', amount: 'Up to 100% on-road price', rate: '8.50% – 11% p.a.', tenure: 'Up to 7 years', desc: 'Finance a new or pre-owned personal car with competitive interest rates, zero prepayment charges, and quick approval.', features: ['EV special discounted rates', 'No prepayment penalties', 'Insurance financing included', 'Pre-approved offers available'] },
-            { id: 'two-wheeler', name: 'Two-Wheeler Loan', amount: 'Up to 95% on-road price', rate: '9% – 15% p.a.', tenure: 'Up to 5 years', desc: 'Affordable financing for motorcycles, scooters, and electric two-wheelers with minimal documentation and quick processing.', features: ['24-hour processing time', 'Minimal documentation needed', 'Up to 95% Loan-to-Value ratio', 'Electric vehicle special rates'] },
-            { id: 'education', name: 'Education Loan', amount: 'Up to ₹1.5 Crore', rate: '8% – 13% p.a.', tenure: 'Up to 15 years', desc: 'Fund higher education in India or abroad covering tuition fees, accommodation, books, and living expenses. Moratorium during course.', features: ['Moratorium during study period', 'Tax benefits under Section 80E', 'Overseas education coverage', 'Covers tuition + living expenses'] },
+        id: 'govt-schemes',
+        name: 'Govt MSME Schemes',
+        category: 'Govt Schemes',
+        categoryId: 'government',
+        iconKey: 'government',
+        iconColor: '#0d9488',
+        iconBg: 'rgba(13, 148, 136, 0.1)',
+        badge: 'Govt Subsidized',
+        amount: '₹50K to ₹5 Cr',
+        rate: '5.00% – 11.50%',
+        tenure: 'Up to 7 Yrs',
+        tagline: 'Central credit initiatives offering 15%–35% capital subsidies and 0% collateral guarantee.',
+        variants: [
+            'Mudra (PMMY)',
+            'PMEGP Subsidy',
+            'CGTMSE Guarantee',
+            'Stand-Up India'
+        ],
+        description: 'Unlock subsidized institutional capital through flagship government welfare and entrepreneurship programs. From micro loans under Mudra to large capital grants under PMEGP and 85% credit default guarantees under CGTMSE, we assist in navigating approvals with zero third-party collateral.',
+        features: [
+            '15% to 35% direct capital subsidy credited to your bank under PMEGP',
+            'Zero property mortgage required under CGTMSE & Mudra schemes',
+            'Concessional interest rates subsidized by central ministries',
+            'Special quotas and lower margin requirements for Women & SC/ST entrepreneurs',
+            'Comprehensive guidance on Project Report (DPR) preparation'
+        ],
+        eligibility: [
+            'Micro, Small & Medium Enterprises, retail traders, artisans, startups',
+            'Age: 18 to 65 years',
+            'Valid Udyam Registration Certificate',
+            'Clean banking track record with no prior institutional defaults'
+        ],
+        documents: [
+            'Udyam Registration Certificate & GST returns',
+            'Detailed Project Report (DPR) for new/expansion projects',
+            'Promoters KYC: PAN Card and Aadhaar Card',
+            'Last 6 to 12 months bank statements & past financial reports'
         ]
     },
     {
-        id: 'specialized', tab: 'Specialized', title: 'Specialized Business Products',
-        description: 'Trade finance instruments, bank guarantees, and specialized financial products for importers, exporters, and businesses participating in government tenders.',
-        loans: [
-            { id: 'letter-of-credit', name: 'Letter of Credit (LC)', amount: 'Customized', rate: 'Competitive', tenure: 'As per contract', desc: 'Bank guarantee ensuring payment to your supplier upon fulfillment of contract terms. Essential for domestic and international trade.', features: ['Import LC for overseas purchases', 'Domestic LC for local suppliers', 'Builds trust with new suppliers', 'Reduces counterparty risk'] },
-            { id: 'bank-guarantee', name: 'Bank Guarantee (BG)', amount: 'Customized', rate: 'Competitive', tenure: 'As per requirement', desc: 'Commitment by the bank to cover a loss if you default. Essential for government tenders, construction contracts, and trade deals.', features: ['Financial guarantee for trade', 'Performance guarantee for projects', 'Advance payment guarantee', 'Bid bond for tenders'] },
-            { id: 'export-credit', name: 'Export Credit / Pre-shipment', amount: 'Up to 80% of order', rate: '7% – 9% p.a.', tenure: '90-180 days', desc: 'Working capital finance for exporters to procure raw materials, manufacture, and process goods before shipment at subsidized government rates.', features: ['Subsidized interest rates', 'INR or foreign currency options', 'Based on confirmed export order', 'Post-shipment credit also available'] },
+        id: 'machinery-loan',
+        name: 'Machinery & Equipment (ML)',
+        category: 'Business & MSME',
+        categoryId: 'business',
+        iconKey: 'machinery',
+        iconColor: '#4f46e5',
+        iconBg: 'rgba(79, 70, 229, 0.1)',
+        badge: 'Asset Hypothecation',
+        amount: 'Up to 90% Cost',
+        rate: '9.00% – 13.00%',
+        tenure: 'Up to 7 Yrs',
+        tagline: 'Finance industrial machinery, CNC and medical equipment with zero property mortgage.',
+        variants: [
+            'Industrial CNC',
+            'Medical Equipment',
+            'Plant Machinery',
+            'Moratorium Option'
+        ],
+        description: 'Upgrade your manufacturing capacity, automate factory lines, or install specialized medical diagnostics without locking up liquid working capital. The equipment itself serves as security via hypothecation, preserving your commercial real estate for other borrowing needs.',
+        features: [
+            'Finances up to 90% of invoice cost (including GST, transit insurance & freight)',
+            'Machinery hypothecation serves as primary collateral — no property mortgage needed',
+            'Depreciation tax benefits on the capital asset value',
+            'Initial moratorium period of 3 to 6 months during equipment installation',
+            'Direct supplier payment to OEM upon proforma verification'
+        ],
+        eligibility: [
+            'Manufacturing units, engineering firms, healthcare clinics, diagnostic centers',
+            'Minimum 2 years operating history with profitable track record',
+            'Valid order book or demonstrated capacity utilization need'
+        ],
+        documents: [
+            'Proforma Invoice / Quotation from authorized machinery OEM',
+            'Last 2 years ITR, P&L, and Balance Sheet certified by CA',
+            'Last 12 months bank statements of operating account',
+            'Factory electricity bill, lease agreement / ownership proof'
+        ]
+    },
+    {
+        id: 'trade-finance-lc-bg',
+        name: 'Trade Finance (LC & BG)',
+        category: 'Trade Finance',
+        categoryId: 'trade-finance',
+        iconKey: 'tradeFinance',
+        iconColor: '#0891b2',
+        iconBg: 'rgba(8, 145, 178, 0.1)',
+        badge: 'Bank Guaranteed',
+        amount: 'Contract Linked',
+        rate: 'Bank Commission',
+        tenure: 'Contract Term',
+        tagline: 'Letters of Credit and Bank Guarantees for domestic and global trade procurement.',
+        variants: [
+            'Inland & Import LC',
+            'Performance BG',
+            'Financial BG',
+            'Trade Factoring'
+        ],
+        description: 'Trade with confidence across India and worldwide. A Letter of Credit (LC) guarantees payment to suppliers upon document verification, allowing you to secure preferential cash prices. Bank Guarantees (BG) satisfy tender, performance, and contract retention requirements without locking cash.',
+        features: [
+            'Eliminates non-payment risk for suppliers, commanding maximum supplier discounts',
+            'Both Inland (domestic) and Foreign Import / Export LC supported',
+            'Performance BG and Financial BG for tenders and EPC contracts',
+            'Backed by premier PSU and Private sector banks with global SWIFT network',
+            'Preserves cash liquidity by utilizing non-fund-based bank credit limits'
+        ],
+        eligibility: [
+            'Importers, exporters, government contractors, manufacturers, EPC firms',
+            'Active IEC (Import Export Code) for international trade',
+            'Established credit rating and sanctioned non-fund-based bank limit'
+        ],
+        documents: [
+            'Sales Contract / Purchase Order / Tender Document',
+            'IEC Certificate, GST Registration, and Udyam Certificate',
+            'Last 2 years audited balance sheets and tax returns',
+            'Counter-indemnity and security documentation'
+        ]
+    },
+    {
+        id: 'auto-vehicle-loan',
+        name: 'Auto & Commercial Vehicle',
+        category: 'Auto & Vehicles',
+        categoryId: 'vehicles',
+        iconKey: 'commercialVehicle',
+        iconColor: '#ea580c',
+        iconBg: 'rgba(234, 88, 12, 0.1)',
+        badge: 'Up to 100% Funding',
+        amount: 'Up to 100% On-Road',
+        rate: '8.50% – 12.50%',
+        tenure: 'Up to 7 Yrs',
+        tagline: 'Commercial fleets, freight trucks, passenger cars and electric vehicles.',
+        variants: [
+            'Commercial Fleet',
+            'Trucks & Tippers',
+            'Car Loans',
+            'EV Finance'
+        ],
+        description: 'Scale your logistics fleet or drive your personal vehicle with minimal upfront down payment. We finance everything from single freight trucks and multi-vehicle transport fleets to new electric cars and commuter two-wheelers with flexible EMI schedules.',
+        features: [
+            'Up to 90% to 100% financing on ex-showroom and on-road prices',
+            'Covers commercial fleets (trucks, tippers, buses) and personal cars',
+            'Special discounted interest rate tiers for Electric Vehicles (EVs)',
+            'Structured EMI plans tailored for seasonal logistics revenue',
+            'Bundled funding for vehicle body-building and comprehensive insurance'
+        ],
+        eligibility: [
+            'Fleet operators, transport contractors, salaried individuals, self-employed',
+            'Valid commercial driving permit (for CV) or photo ID',
+            'Minimum 1 year employment or 2 years logistics operations'
+        ],
+        documents: [
+            'Dealer quotation / Proforma invoice for chosen vehicle',
+            'Borrower KYC (PAN Card, Aadhaar Card)',
+            'Last 6 months bank statement showing income or freight receipts',
+            'RC copies of existing fleet (for fleet operators)'
+        ]
+    },
+    {
+        id: 'professional-education-loan',
+        name: 'Professional & Student Loans',
+        category: 'Professional & Education',
+        categoryId: 'education-personal',
+        iconKey: 'professional',
+        iconColor: '#7c3aed',
+        iconBg: 'rgba(124, 58, 237, 0.1)',
+        badge: 'Study Moratorium',
+        amount: 'Up to ₹1.5 Cr',
+        rate: '8.50% – 14.50%',
+        tenure: 'Up to 15 Yrs',
+        tagline: 'Higher education loans with study moratorium, plus practice loans for Doctors & CAs.',
+        variants: [
+            'Doctor & Clinic',
+            'CA / CS Practice',
+            'Overseas Study',
+            'Sec 80E Rebate'
+        ],
+        description: 'Tailored financing for academic ambitions and professional milestones. Students get comprehensive education loans covering tuition, stay, and flights with zero EMI during studies. Certified professionals (Doctors, CAs, Architects) get high-limit collateral-free practice loans.',
+        features: [
+            'Full study moratorium: No EMI during study course + 6 to 12 month grace period',
+            '100% tax deduction on education loan interest paid under Section 80E',
+            'High-ticket collateral-free loans for listed global and Indian universities',
+            'Special preferential rates and waived processing fees for Doctors and CAs',
+            'Fast-track digital paperwork evaluated on professional credentials'
+        ],
+        eligibility: [
+            'Students: Confirmed admission to recognized Indian/international university with co-borrower',
+            'Doctors: MBBS/BDS/MD with active council registration and min 2 years experience',
+            'CAs/CS: Valid Certificate of Practice (COP) with min 2 years practice vintage'
+        ],
+        documents: [
+            'Admission letter & fee breakdown (Students) or COP / Degree certificate (Professionals)',
+            'Applicant and co-borrower KYC (PAN, Aadhaar)',
+            'Last 6 months bank statements & Last 2 years ITR',
+            'Academic transcripts (10th, 12th, Graduation degrees)'
+        ]
+    },
+    {
+        id: 'gold-loan',
+        name: 'Gold Loan (Instant Cash)',
+        category: 'Instant & Secured',
+        categoryId: 'gold',
+        iconKey: 'gold',
+        iconColor: '#d97706',
+        iconBg: 'rgba(217, 119, 6, 0.1)',
+        badge: 'Instant Disbursal',
+        amount: 'Up to ₹1.5 Cr',
+        rate: '8.00% – 12.00%',
+        tenure: '3 to 36 Months',
+        tagline: 'Instant liquidity against gold ornaments with 0% balance sheet paperwork.',
+        variants: [
+            'Working Capital',
+            'Emergency Cash',
+            'Bullet Repay',
+            '0% Foreclosure'
+        ],
+        description: 'Gold loans are the fastest way to access capital for sudden business opportunities or personal needs. Pledging your gold ornaments provides up to 75% LTV of the gold market value with complete vault insurance, minimal documentation, and flexible bullet repayment options.',
+        features: [
+            'Direct credit to your bank account upon quick physical appraisal',
+            'Zero business balance sheet or complex financial statement prerequisites',
+            'Choice between bullet repayment (pay interest at end) or monthly EMI',
+            'Gold stored in high-security bank lockers with 100% insurance coverage',
+            'Zero prepayment penalty on foreclosure'
+        ],
+        eligibility: [
+            'Any Indian citizen aged 18 years or above',
+            'Owner of 18-22 karat gold ornaments or bank minted coins',
+            'Valid photo identification (PAN & Aadhaar)'
+        ],
+        documents: [
+            'PAN Card and Aadhaar Card',
+            'Passport-size photographs',
+            'Bank account details (cancelled cheque / passbook) for NEFT/RTGS disbursal'
         ]
     }
 ];
 
-/* ================================================
-   SEO FAQ — Questions & Answers
-   ================================================ */
-const faqs = [
-    { q: 'What is a Business Loan and how does it work?', a: 'A Business Loan is a financing facility provided by banks and NBFCs to entrepreneurs, MSMEs, traders, and professionals for business purposes. It can be secured (backed by collateral like property) or unsecured (based on credit score and turnover). BeeFund helps you compare 25+ lenders to find the best business loan rates starting from 8.50% p.a.' },
-    { q: 'What documents are required for a Business Loan in India?', a: 'Typically you need: PAN Card, Aadhaar Card, last 12 months bank statements, 2 years ITR, GST registration, business proof (incorporation certificate / Udyam registration), and property documents (for secured loans). BeeFund simplifies this — our team pre-checks your eligibility before submission.' },
-    { q: 'How much loan can I get for my MSME business?', a: 'MSME loans range from ₹1 Lakh to ₹2 Crore+ depending on your turnover, profitability, and credit score. Government schemes like Mudra Loan offer up to ₹10 Lakhs without collateral. For secured loans, you can get up to ₹5 Crore against property.' },
-    { q: 'What is the interest rate on Home Loan in 2025?', a: 'Home loan interest rates in India currently range from 8.40% to 10.25% p.a. depending on your credit score, loan amount, and the lending institution. BeeFund partners with HDFC, SBI, ICICI, Axis, and 20+ other banks to get you the best rate.' },
-    { q: 'What is CGTMSE and how does it help my loan application?', a: 'Credit Guarantee Fund Trust for Micro and Small Enterprises (CGTMSE) is a government scheme that provides credit guarantee to lenders, reducing their risk. This enables collateral-free loans up to ₹5 Crore for MSMEs. BeeFund helps eligible businesses access CGTMSE-covered loans.' },
-    { q: 'Can I get a loan for my startup in India?', a: 'Yes! Under the Startup India scheme, DPIIT-recognized startups can get loans up to ₹50 Lakhs with government credit guarantee at competitive rates of 8.50% – 12% p.a. with up to 12 months moratorium. BeeFund specializes in startup financing.' },
-    { q: 'What is Loan Against Property (LAP) and who is eligible?', a: 'LAP allows you to pledge your residential or commercial property to get a loan of up to 60-70% of the property value. Salaried individuals, self-employed professionals, and business owners with clear property titles are eligible. Interest rates start from 8.50% p.a.' },
-    { q: 'How long does it take to get a business loan approved?', a: 'Unsecured business loans can be approved in 7 working days. Secured loans (LAP, Home Loan) typically take 10-15 days including property valuation. With BeeFund\'s pre-screening and dedicated ops team, we cut processing time by up to 40%.' },
-    { q: 'Is BeeFund a bank or an NBFC?', a: 'BeeFund is the digital lending platform of AADYASHIV CONSULTING PRIVATE LIMITED, a Direct Selling Agent (DSA) authorized by 25+ banks and NBFCs. We don\'t lend directly — we connect you with the best lender for your profile at zero cost to you.' },
-    { q: 'Are there any charges or fees for using BeeFund?', a: 'BeeFund charges absolutely ZERO fees to borrowers. Our services are completely free. We earn a commission from our banking partners when your loan is disbursed. No hidden charges, no upfront fees — guaranteed.' },
+/* Category Filter Tabs */
+const CATEGORIES = [
+    { id: 'all', label: 'All Products' },
+    { id: 'business', label: 'Business & MSME' },
+    { id: 'property', label: 'Property & Housing' },
+    { id: 'government', label: 'Govt Schemes' },
+    { id: 'trade-finance', label: 'Trade Finance' },
+    { id: 'vehicles', label: 'Auto & Vehicles' },
+    { id: 'education-personal', label: 'Professional & Education' },
+    { id: 'cards', label: 'Credit Cards' },
+    { id: 'gold', label: 'Gold Loan' }
+];
+
+/* SEO FAQs */
+const FAQS = [
+    {
+        q: 'How does BeeFund help me get the best loan or credit card?',
+        a: 'BeeFund acts as an authorized institutional digital loan partner and debt advisor. We evaluate your profile across 25+ top partner banks and NBFCs, matching your financial requirements with the lender offering the lowest interest rate, maximum loan-to-value (LTV), and highest approval likelihood — at 100% ZERO cost to you.'
+    },
+    {
+        q: 'What is the difference between Enquire Now and Apply Now?',
+        a: 'Both options connect directly to our senior loan advisory desk. "Enquire Now" opens a rapid 30-second inquiry form if you want a callback with customized loan options. "Apply Now" takes you to our full application form where you can submit comprehensive business/personal details for fast-track underwriting review.'
+    },
+    {
+        q: 'Are BeeFund services completely free of charge?',
+        a: 'Yes, 100% guaranteed. BeeFund never charges borrowers, applicants, or partners any upfront consultation fee, file charge, or commission. We are compensated directly by our empaneled banking partners when your facility is sanctioned.'
+    },
+    {
+        q: 'Can I get a loan if I don’t have property collateral?',
+        a: 'Absolutely! We offer multiple collateral-free loan solutions including Mudra Loans (up to ₹10L), CGTMSE MSME Loans (up to ₹5Cr), Unsecured Business Loans (up to ₹50L), Invoice Discounting, and Instant Credit Cards.'
+    },
+    {
+        q: 'How does checking credit score or applying affect my CIBIL score?',
+        a: 'Soft credit checks and initial profile reviews conducted through BeeFund do not affect your credit score. Hard inquiries are only initiated with partner banks upon your explicit authorization when formal sanction is requested.'
+    }
 ];
 
 const LoanProductsPage = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const { openEnquiryModal } = useEnquiryModal();
-    const [activeCategory, setActiveCategory] = useState(loanCategories[0].id);
-    const [currentSlide, setCurrentSlide] = useState(0);
+
+    // Active Category Filter
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    // Search Query
+    const [searchQuery, setSearchQuery] = useState('');
+    // Selected Product for Popup Modal
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    // Open FAQ Accordion
     const [openFaq, setOpenFaq] = useState(null);
-    const [isHovered, setIsHovered] = useState(false);
 
-    const touchStartX = useRef(0);
-    const touchEndX = useRef(0);
-
-    // Reset slide index when category changes
-    useEffect(() => {
-        setCurrentSlide(0);
-    }, [activeCategory]);
-
+    // Sync hash with category or product modal
     useEffect(() => {
         const hash = location.hash.replace('#', '');
         if (hash) {
-            const cat = loanCategories.find(c => c.id === hash);
-            if (cat) {
-                setActiveCategory(cat.id);
-                setTimeout(() => {
-                    const el = document.getElementById(`cat-${cat.id}`);
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 200);
+            const foundCat = CATEGORIES.find(c => c.id === hash);
+            if (foundCat) {
+                setSelectedCategory(foundCat.id);
+            } else {
+                const matchedProduct = ALL_PRODUCTS.find(p => p.id === hash);
+                if (matchedProduct) {
+                    setSelectedProduct(matchedProduct);
+                }
             }
         }
     }, [location.hash]);
 
-    const activeCat = loanCategories.find(c => c.id === activeCategory);
-    const totalSlides = activeCat.loans.length;
-
-    const nextSlide = () => setCurrentSlide(prev => (prev === totalSlides - 1 ? 0 : prev + 1));
-    const prevSlide = () => setCurrentSlide(prev => (prev === 0 ? totalSlides - 1 : prev - 1));
-
-    // Auto-scroll every 4.5 seconds (4-5s interval), pauses on hover or touch
+    // Handle ESC key to close modal
     useEffect(() => {
-        if (isHovered) return;
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                setSelectedProduct(null);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
-        const interval = setInterval(() => {
-            setCurrentSlide(prev => (prev === totalSlides - 1 ? 0 : prev + 1));
-        }, 4500);
+    // Filter products based on selected category and search query
+    const filteredProducts = useMemo(() => {
+        return ALL_PRODUCTS.filter(product => {
+            const matchesCategory =
+                selectedCategory === 'all' ||
+                product.categoryId === selectedCategory;
 
-        return () => clearInterval(interval);
-    }, [totalSlides, isHovered, activeCategory]);
+            if (!matchesCategory) return false;
 
-    const handleTouchStart = (e) => {
-        touchStartX.current = e.touches[0].clientX;
+            if (!searchQuery.trim()) return true;
+
+            const q = searchQuery.toLowerCase().trim();
+            const nameMatch = product.name.toLowerCase().includes(q);
+            const catMatch = product.category.toLowerCase().includes(q);
+            const taglineMatch = product.tagline.toLowerCase().includes(q);
+            const variantMatch = product.variants?.some(v => v.toLowerCase().includes(q));
+            const descMatch = product.description.toLowerCase().includes(q);
+
+            return nameMatch || catMatch || taglineMatch || variantMatch || descMatch;
+        });
+    }, [selectedCategory, searchQuery]);
+
+    // Quick enquiry handler
+    const handleQuickEnquire = (e, product) => {
+        e.stopPropagation();
+        openEnquiryModal({
+            loanType: product.name,
+            source: `Product Card Quick Enquiry - ${product.name}`
+        });
     };
 
-    const handleTouchMove = (e) => {
-        touchEndX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = () => {
-        if (!touchStartX.current || !touchEndX.current) return;
-        const diff = touchStartX.current - touchEndX.current;
-        if (diff > 50) {
-            nextSlide();
-        } else if (diff < -50) {
-            prevSlide();
-        }
-        touchStartX.current = 0;
-        touchEndX.current = 0;
+    // Full application form handler
+    const handleFullApply = (e, product) => {
+        e.stopPropagation();
+        navigate(`/apply?loan=${encodeURIComponent(product.name)}`);
     };
 
     return (
         <div className="loan-products-page">
-            {/* === SEO META (handled by Helmet or title) === */}
+            <HexagonBackground opacity={0.07} />
 
-            {/* === HERO === */}
+            {/* ========================================================
+               HERO SECTION
+               ======================================================== */}
             <section className="lp-hero">
-                <HexagonBackground opacity={0.12} />
                 <div className="container lp-hero-inner">
                     <span className="lp-badge">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>
-                        25+ Banking Partners • Zero Fees
+                        <span>✦</span>
+                        <span>Institutional Direct Lending & Advisory</span>
                     </span>
+
                     <h1 className="lp-title">
-                        All <span className="lp-hl">Loan Products</span> in India — Compare & Apply
+                        All <span className="lp-hl">Financial Products & Cards</span> — Compare & Apply
                     </h1>
+
                     <p className="lp-subtitle">
-                        Compare <strong>business loans</strong>, <strong>home loans</strong>, <strong>MSME loans</strong>, <strong>personal loans</strong>, and <strong>government-backed schemes</strong> from 25+ banks.
-                        <br />Best interest rates starting <strong>8.40% p.a.</strong> — processed by BeeFund's expert team at zero cost.
+                        Explore our consolidated catalog of retail, business, government, and trade credit facilities.
+                        Transparent terms, institutional pricing, and 100% zero consulting fee.
                     </p>
 
-                    {/* Quick stats */}
+                    {/* Stats Highlights Bar */}
                     <div className="lp-stats">
-                        <div className="lp-stat"><span className="lp-stat-val">25+</span><span className="lp-stat-lbl">Bank Partners</span></div>
+                        <div className="lp-stat">
+                            <span className="lp-stat-val">25+</span>
+                            <span className="lp-stat-lbl">Partner Banks</span>
+                        </div>
                         <div className="lp-stat-sep" />
-                        <div className="lp-stat"><span className="lp-stat-val">8.4%</span><span className="lp-stat-lbl">Starting Rate</span></div>
+                        <div className="lp-stat">
+                            <span className="lp-stat-val">8.40%</span>
+                            <span className="lp-stat-lbl">Lowest Rates Starting</span>
+                        </div>
                         <div className="lp-stat-sep" />
-                        <div className="lp-stat"><span className="lp-stat-val">₹10Cr</span><span className="lp-stat-lbl">Max Amount</span></div>
+                        <div className="lp-stat">
+                            <span className="lp-stat-val">₹15 Cr+</span>
+                            <span className="lp-stat-lbl">Max Credit Limit</span>
+                        </div>
                         <div className="lp-stat-sep" />
-                        <div className="lp-stat"><span className="lp-stat-val">7 Days</span><span className="lp-stat-lbl">Min Approval</span></div>
-                    </div>
-                </div>
-            </section>
-
-            {/* === CATEGORY TABS === */}
-            <section className="lp-tabs-wrap">
-                <div className="container">
-                    <div className="lp-tabs">
-                        {loanCategories.map(cat => (
-                            <button
-                                key={cat.id}
-                                className={`lp-tab ${activeCategory === cat.id ? 'lp-tab--active' : ''}`}
-                                onClick={() => setActiveCategory(cat.id)}
-                            >
-                                {cat.tab}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* === SEO INTRO TEXT === */}
-            <section className="lp-seo-intro">
-                <div className="container">
-                    <div className="seo-block">
-                        <h2 className="seo-h2">
-                            {activeCat.title} — <span className="lp-hl">Best Rates in India 2025</span>
-                        </h2>
-                        <p className="seo-text">
-                            {activeCat.description} At BeeFund, powered by AADYASHIV CONSULTING PRIVATE LIMITED, we process your loan application through 25+ authorized banking partners including SBI, HDFC, ICICI, Axis Bank, and more — ensuring you get the <strong>lowest interest rates</strong> and <strong>fastest approval</strong> available in the market.
-                        </p>
-                        <div className="seo-cta-row">
-                            <button
-                                type="button"
-                                onClick={() => openEnquiryModal({ loanType: activeCat.title, source: 'Loans Top SEO CTA' })}
-                                className="btn btn-primary"
-                                id="lp-apply-top"
-                            >
-                                Check Eligibility — Free
-                            </button>
-                            <Link to="/tools/emi-calculator" className="lp-link">Calculate EMI →</Link>
+                        <div className="lp-stat">
+                            <span className="lp-stat-val">100% Free</span>
+                            <span className="lp-stat-lbl">Zero Upfront Fees</span>
                         </div>
                     </div>
-                </div>
-            </section>
 
-            {/* === LOAN CARDS CAROUSEL === */}
-            <section className="lp-cards-section" id={`cat-${activeCat.id}`}>
-                <div className="container">
-                    <div className="lp-carousel-wrapper">
-                        {/* Carousel Navigation Bar (Counter) */}
-                        <div className="lp-carousel-nav">
-                            <div className="lp-carousel-counter">
-                                <span className="current-num">0{currentSlide + 1}</span>
-                                <span className="counter-sep">/</span>
-                                <span className="total-num">0{totalSlides}</span>
-                                <span className="counter-label">{activeCat.loans[currentSlide]?.name}</span>
-                            </div>
-                        </div>
-
-                        {/* Carousel Stage: Left Arrow, Card in Between, Right Arrow */}
-                        <div
-                            className="lp-carousel-stage"
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                        >
-                            {/* Left Navigation Arrow */}
-                            <button
-                                type="button"
-                                className="lp-side-arrow lp-side-arrow--prev"
-                                onClick={prevSlide}
-                                aria-label="Previous loan product"
-                            >
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="15 18 9 12 15 6"></polyline>
-                                </svg>
-                            </button>
-
-                            {/* Carousel Viewport (Card in between) */}
-                            <div
-                                className="lp-carousel-viewport"
-                                onTouchStart={(e) => {
-                                    setIsHovered(true);
-                                    handleTouchStart(e);
-                                }}
-                                onTouchMove={handleTouchMove}
-                                onTouchEnd={() => {
-                                    setIsHovered(false);
-                                    handleTouchEnd();
-                                }}
-                            >
-                                <div
-                                    className="lp-carousel-track"
-                                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                                >
-                                    {activeCat.loans.map((loan, idx) => (
-                                        <div className="lp-carousel-slide" key={loan.id}>
-                                            <article className="lp-loan-card" id={`loan-${loan.id}`}>
-                                                <div className="lp-card-top">
-                                                    <span className="lp-card-num">0{idx + 1}</span>
-                                                    <h3 className="lp-card-name">{loan.name}</h3>
-                                                </div>
-                                                <p className="lp-card-desc">{loan.desc}</p>
-
-                                                <div className="lp-card-stats">
-                                                    <div className="lp-card-stat">
-                                                        <span className="lp-cs-label">Max Amount</span>
-                                                        <span className="lp-cs-val">{loan.amount}</span>
-                                                    </div>
-                                                    <div className="lp-card-stat">
-                                                        <span className="lp-cs-label">Interest Rate</span>
-                                                        <span className="lp-cs-val">{loan.rate}</span>
-                                                    </div>
-                                                    <div className="lp-card-stat">
-                                                        <span className="lp-cs-label">Tenure</span>
-                                                        <span className="lp-cs-val">{loan.tenure}</span>
-                                                    </div>
-                                                </div>
-
-                                                <ul className="lp-card-features">
-                                                    {loan.features.map((f, i) => <li key={i}>{f}</li>)}
-                                                </ul>
-
-                                                <div className="lp-card-actions">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => openEnquiryModal({ loanType: loan.name, source: `Loan Carousel - ${loan.name}` })}
-                                                        className="btn btn-primary lp-card-btn"
-                                                    >
-                                                        Enquire Now
-                                                    </button>
-                                                    <Link to="/tools/emi-calculator" className="lp-card-link">Calculate EMI →</Link>
-                                                </div>
-                                            </article>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Right Navigation Arrow */}
-                            <button
-                                type="button"
-                                className="lp-side-arrow lp-side-arrow--next"
-                                onClick={nextSlide}
-                                aria-label="Next loan product"
-                            >
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="9 18 15 12 9 6"></polyline>
-                                </svg>
-                            </button>
-                        </div>
-
-                        {/* Carousel Pagination Dots */}
-                        <div className="lp-carousel-dots">
-                            {activeCat.loans.map((_, dotIdx) => (
+                    {/* Search Bar */}
+                    <div className="lp-search-container">
+                        <div className="lp-search-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                                type="text"
+                                placeholder="Search products (e.g. LAP, Mudra, Credit Card, OD/CC, Education, Gold)..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            {searchQuery && (
                                 <button
-                                    key={dotIdx}
-                                    className={`lp-dot ${currentSlide === dotIdx ? 'lp-dot--active' : ''}`}
-                                    onClick={() => setCurrentSlide(dotIdx)}
-                                    aria-label={`Go to slide ${dotIdx + 1}`}
-                                />
+                                    type="button"
+                                    className="lp-search-clear"
+                                    onClick={() => setSearchQuery('')}
+                                    aria-label="Clear search"
+                                >
+                                    &times;
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ========================================================
+               CONTROLS BAR (Category Filter Pills)
+               ======================================================== */}
+            <div className="lp-controls-section">
+                <div className="container lp-controls-bar">
+                    <div className="lp-category-pills">
+                        {CATEGORIES.map(cat => {
+                            const count = cat.id === 'all'
+                                ? ALL_PRODUCTS.length
+                                : ALL_PRODUCTS.filter(p => p.categoryId === cat.id).length;
+
+                            return (
+                                <button
+                                    key={cat.id}
+                                    type="button"
+                                    className={`lp-pill ${selectedCategory === cat.id ? 'lp-pill--active' : ''}`}
+                                    onClick={() => setSelectedCategory(cat.id)}
+                                >
+                                    <span>{cat.label}</span>
+                                    <span className="lp-pill-count">{count}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            {/* ========================================================
+               PRODUCTS GRID SECTION
+               ======================================================== */}
+            <section className="lp-products-grid-section">
+                <div className="container">
+                    <div className="lp-results-header">
+                        <span className="lp-results-count">
+                            Showing <strong>{filteredProducts.length}</strong> financial product {filteredProducts.length === 1 ? 'suite' : 'suites'}
+                        </span>
+                        <span className="lp-click-hint">
+                            Click any card for full specs, eligibility & documents
+                        </span>
+                    </div>
+
+                    {filteredProducts.length === 0 ? (
+                        <div className="lp-no-results">
+                            <h3>No matching products found</h3>
+                            <p>We could not find any financial facility matching "{searchQuery}".</p>
+                            <button
+                                type="button"
+                                className="lp-btn-apply"
+                                onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+                            >
+                                Reset Search Filters
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="lp-cards-grid">
+                            {filteredProducts.map((product) => (
+                                <div
+                                    key={product.id}
+                                    className="lp-product-card"
+                                    onClick={() => setSelectedProduct(product)}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') setSelectedProduct(product); }}
+                                >
+                                    {/* Card Header */}
+                                    <div className="lp-card-header">
+                                        <div
+                                            className="lp-card-icon"
+                                            style={{
+                                                color: product.iconColor || '#d97706',
+                                                background: product.iconBg || 'rgba(217, 119, 6, 0.1)'
+                                            }}
+                                        >
+                                            {LoanIcons[product.iconKey] || LoanIcons.businessUnsecured}
+                                        </div>
+                                        <div className="lp-card-tags">
+                                            <span className="lp-tag-cat">{product.category}</span>
+                                            <span className="lp-tag-badge">{product.badge}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Product Title & Tagline */}
+                                    <h3 className="lp-card-title">{product.name}</h3>
+                                    <p className="lp-card-tagline">{product.tagline}</p>
+
+                                    {/* Included Variants Chips */}
+                                    {product.variants && (
+                                        <div className="lp-card-variants">
+                                            <span className="lp-variants-label">Includes:</span>
+                                            <div className="lp-variants-list">
+                                                {product.variants.map((v, i) => (
+                                                    <span key={i} className="lp-variant-chip">{v}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Key Metrics Grid */}
+                                    <div className="lp-card-metrics">
+                                        <div className="lp-metric-item">
+                                            <span className="metric-label">Max Limit</span>
+                                            <span className="metric-val">{product.amount}</span>
+                                        </div>
+                                        <div className="lp-metric-item">
+                                            <span className="metric-label">Indicative ROI</span>
+                                            <span className="metric-val highlight">{product.rate}</span>
+                                        </div>
+                                        <div className="lp-metric-item">
+                                            <span className="metric-label">Tenure</span>
+                                            <span className="metric-val">{product.tenure}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Card Action Buttons (Both write to Google Sheets) */}
+                                    <div className="lp-card-actions">
+                                        <button
+                                            type="button"
+                                            className="lp-btn-enquire"
+                                            onClick={(e) => handleQuickEnquire(e, product)}
+                                            title="Submit instant 30-sec enquiry to our team"
+                                        >
+                                            Quick Enquiry
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="lp-btn-apply"
+                                            onClick={(e) => handleFullApply(e, product)}
+                                            title="Go to full application form"
+                                        >
+                                            Apply Now &rarr;
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="lp-btn-details"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedProduct(product);
+                                            }}
+                                            title="View detailed loan description, eligibility & checklist"
+                                        >
+                                            Details &bull;
+                                        </button>
+                                    </div>
+                                </div>
                             ))}
                         </div>
-                    </div>
+                    )}
                 </div>
             </section>
 
-            {/* === HOW IT WORKS === */}
-            <section className="lp-how-section">
-                <HexagonBackground opacity={0.08} />
-                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                    <h2 className="lp-sec-title">How to Apply for a Loan Through <span className="lp-hl">BeeFund</span></h2>
-                    <div className="lp-steps">
-                        {[
-                            { num: '01', t: 'Submit Application', d: 'Fill in basic details — takes just 2 minutes. No documents needed initially.' },
-                            { num: '02', t: 'Expert Review', d: 'Our team reviews your profile and pre-screens eligibility across 25+ lenders.' },
-                            { num: '03', t: 'Best Offer Match', d: 'We present the best loan offers with lowest rates & highest approval probability.' },
-                            { num: '04', t: 'Quick Disbursal', d: 'Submit documents, get approved, and receive funds directly to your account.' },
-                        ].map((s, i) => (
-                            <div className="lp-step" key={i}>
-                                <span className="lp-step-num">{s.num}</span>
-                                <h3>{s.t}</h3>
-                                <p>{s.d}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            {/* ========================================================
+               PRODUCT DETAILS POPUP MODAL
+               Opens when ANY product is clicked (No TAT days)
+               ======================================================== */}
+            {selectedProduct && (
+                <div className="lp-modal-overlay" onClick={() => setSelectedProduct(null)}>
+                    <div className="lp-modal-card" onClick={e => e.stopPropagation()}>
+                        {/* Close button */}
+                        <button
+                            type="button"
+                            className="lp-modal-close"
+                            onClick={() => setSelectedProduct(null)}
+                            aria-label="Close details"
+                        >
+                            &times;
+                        </button>
 
-            {/* === FAQs === */}
-            <section className="lp-faq-section">
-                <div className="container">
-                    <h2 className="lp-sec-title">Frequently Asked Questions About <span className="lp-hl">Loans in India</span></h2>
-                    <p className="lp-sec-sub">Everything you need to know about business loans, home loans, MSME loans, and government loan schemes.</p>
-
-                    <div className="faq-list">
-                        {faqs.map((faq, i) => (
-                            <div className={`faq-item ${openFaq === i ? 'faq-item--open' : ''}`} key={i}>
-                                <button className="faq-q" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
-                                    <span>{faq.q}</span>
-                                    <svg className="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
-                                </button>
-                                <div className="faq-a">
-                                    <p>{faq.a}</p>
+                        {/* Modal Header */}
+                        <div className="lp-modal-header">
+                            <div className="lp-modal-header-top">
+                                {selectedProduct.iconKey && LoanIcons[selectedProduct.iconKey] && (
+                                    <div
+                                        className="lp-modal-icon"
+                                        style={{
+                                            color: selectedProduct.iconColor || '#d97706',
+                                            background: selectedProduct.iconBg || 'rgba(217, 119, 6, 0.1)'
+                                        }}
+                                    >
+                                        {LoanIcons[selectedProduct.iconKey]}
+                                    </div>
+                                )}
+                                <div className="lp-modal-badge-row">
+                                    <span className="lp-tag-cat">{selectedProduct.category}</span>
+                                    <span className="lp-tag-badge">{selectedProduct.badge}</span>
                                 </div>
                             </div>
-                        ))}
+                            <h2 className="lp-modal-title">{selectedProduct.name}</h2>
+                            <p className="lp-modal-subtitle">{selectedProduct.tagline}</p>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="lp-modal-body">
+                            {/* Key Numbers Bar (Max Funding, Rate ROI, Tenure) */}
+                            <div className="lp-modal-specs-bar">
+                                <div className="modal-spec">
+                                    <span className="spec-label">Maximum Limit</span>
+                                    <span className="spec-val">{selectedProduct.amount}</span>
+                                </div>
+                                <div className="modal-spec">
+                                    <span className="spec-label">Indicative Rate (ROI)</span>
+                                    <span className="spec-val gold">{selectedProduct.rate}</span>
+                                </div>
+                                <div className="modal-spec">
+                                    <span className="spec-label">Repayment Tenure</span>
+                                    <span className="spec-val">{selectedProduct.tenure}</span>
+                                </div>
+                            </div>
+
+                            {/* Covered Variants / Loan Sub-Types */}
+                            {selectedProduct.variants && (
+                                <div className="lp-modal-section">
+                                    <h4 className="modal-sec-heading">Covered Loan Types & Variants</h4>
+                                    <div className="modal-variants-grid">
+                                        {selectedProduct.variants.map((variant, i) => (
+                                            <div key={i} className="modal-variant-badge">
+                                                <span className="variant-bullet">✦</span>
+                                                <span>{variant}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Detailed Description */}
+                            <div className="lp-modal-section">
+                                <h4 className="modal-sec-heading">About This Facility</h4>
+                                <p className="modal-sec-text">{selectedProduct.description}</p>
+                            </div>
+
+                            {/* Key Benefits & Features */}
+                            <div className="lp-modal-section">
+                                <h4 className="modal-sec-heading">Key Institutional Benefits</h4>
+                                <ul className="modal-checklist">
+                                    {selectedProduct.features.map((feat, i) => (
+                                        <li key={i}>
+                                            <span className="check-icon">✓</span>
+                                            <span>{feat}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Eligibility Criteria */}
+                            <div className="lp-modal-section">
+                                <h4 className="modal-sec-heading">Eligibility Criteria</h4>
+                                <ul className="modal-bullet-list">
+                                    {selectedProduct.eligibility.map((item, i) => (
+                                        <li key={i}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Required Documents Checklist */}
+                            <div className="lp-modal-section">
+                                <h4 className="modal-sec-heading">Required Documents</h4>
+                                <ul className="modal-bullet-list docs">
+                                    {selectedProduct.documents.map((doc, i) => (
+                                        <li key={i}>{doc}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="lp-modal-footer">
+                            <div className="modal-footer-hint">
+                                <span>🔒 100% Free &bull; Zero Upfront Fee &bull; RBI-Licensed Banking Partners</span>
+                            </div>
+
+                            <div className="modal-footer-actions">
+                                <button
+                                    type="button"
+                                    className="btn-modal-enquire"
+                                    onClick={() => {
+                                        const prod = selectedProduct;
+                                        setSelectedProduct(null);
+                                        openEnquiryModal({
+                                            loanType: prod.name,
+                                            source: `Modal Quick Enquiry - ${prod.name}`
+                                        });
+                                    }}
+                                >
+                                    Quick Enquiry (30s)
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn-modal-apply"
+                                    onClick={() => {
+                                        const prod = selectedProduct;
+                                        setSelectedProduct(null);
+                                        navigate(`/apply?loan=${encodeURIComponent(prod.name)}`);
+                                    }}
+                                >
+                                    Full Application Form &rarr;
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
+            )}
 
-            {/* === DISCLAIMER === */}
-            <section className="lp-disclaimer-section">
-                <div className="container">
-                    <div className="lp-disclaimer">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
-                        <div>
-                            <p><strong>Disclaimer:</strong> The interest rates, loan amounts, tenure, and eligibility criteria mentioned above are indicative and subject to change based on individual profiles, credit scores, lender policies, and market conditions as of 2025.</p>
-                            <p style={{ marginTop: '0.5rem' }}><strong>🐝 BeeFund Specialty:</strong> We specialize in helping <strong>startups, MSMEs, first-time borrowers, and new businesses</strong> navigate the loan process. Our dedicated team at AADYASHIV CONSULTING will work with you to find the best financing solution. <Link to="/contact" style={{ color: '#d97706', fontWeight: 700 }}>Talk to us →</Link></p>
+            {/* HOW IT WORKS SECTION (Realistic institutional steps, no TAT promises) */}
+            <section className="lp-how-section">
+                <HexagonBackground opacity={0.06} />
+                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                    <h2 className="lp-sec-title">
+                        How Loans Are Processed Through <span className="lp-hl">BeeFund</span>
+                    </h2>
+                    <p className="lp-sec-sub">
+                        Direct loan application assistance linked with authorized bank underwriters.
+                    </p>
+
+                    <div className="lp-steps-grid">
+                        <div className="lp-step-item">
+                            <span className="lp-step-num">01</span>
+                            <h3>Submit Details</h3>
+                            <p>Fill our 2-minute quick enquiry or apply form. Our credit advisory team reviews your requirements promptly.</p>
+                        </div>
+                        <div className="lp-step-item">
+                            <span className="lp-step-num">02</span>
+                            <h3>Underwriting Review</h3>
+                            <p>Our dedicated debt syndication team compares your profile across 25+ empaneled lenders.</p>
+                        </div>
+                        <div className="lp-step-item">
+                            <span className="lp-step-num">03</span>
+                            <h3>Best Offer Selection</h3>
+                            <p>Receive loan options with the lowest interest rate and maximum sanctioned limit.</p>
+                        </div>
+                        <div className="lp-step-item">
+                            <span className="lp-step-num">04</span>
+                            <h3>Bank Sanction & Disbursal</h3>
+                            <p>Complete KYC verification with our bank partners and receive sanctioned loan funds directly in your account.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* === CTA === */}
-            <section className="lp-cta">
-                <div className="container text-center">
-                    <h2 className="lp-cta-h">Ready to get the best loan rates in India?</h2>
-                    <p className="lp-cta-p">Apply in 2 minutes. Zero fees. Expert guidance from AADYASHIV CONSULTING's team.</p>
-                    <button
-                        type="button"
-                        onClick={() => openEnquiryModal({ source: 'Loans Page Bottom CTA' })}
-                        className="btn-cta-dark"
-                        id="lp-cta-apply"
-                    >
-                        Enquire Now — It's Free
-                    </button>
+            {/* FREQUENTLY ASKED QUESTIONS */}
+            <section className="lp-faq-section">
+                <div className="container">
+                    <h2 className="lp-sec-title">
+                        Frequently Asked Questions About <span className="lp-hl">Financial Products</span>
+                    </h2>
+                    <p className="lp-sec-sub">Everything you need to know before applying for retail, business, or government loans.</p>
+
+                    <div className="lp-faq-list">
+                        {FAQS.map((faq, i) => (
+                            <div className={`lp-faq-item ${openFaq === i ? 'open' : ''}`} key={i}>
+                                <button
+                                    type="button"
+                                    className="lp-faq-question"
+                                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                                >
+                                    <span>{faq.q}</span>
+                                    <span className="lp-faq-arrow">{openFaq === i ? '▲' : '▼'}</span>
+                                </button>
+                                {openFaq === i && (
+                                    <div className="lp-faq-answer">
+                                        <p>{faq.a}</p>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* STATUTORY DISCLAIMER */}
+            <section className="lp-disclaimer-section">
+                <div className="container">
+                    <div className="lp-disclaimer-box">
+                        <div className="disclaimer-icon">🛡️</div>
+                        <div className="disclaimer-text">
+                            <strong>Regulatory Notice & Transparency:</strong> All interest rates, loan amounts, tenures, and eligibility requirements listed on this page are indicative as of 2026 and subject to independent credit evaluation by our RBI-licensed banking partners. BeeFund (AADYASHIV CONSULTING PRIVATE LIMITED) acts solely as an authorized direct selling agent and loan facilitator. We never charge upfront processing fees to borrowers. Loan approval timelines are governed by respective lender underwriting policies and verification procedures.
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>

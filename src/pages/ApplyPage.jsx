@@ -8,17 +8,19 @@ import './ApplyPage.css';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjEOhV9L2B-ff3faIZ_WZNm-6kVNxQ6N24PVw3w8MKXO0y41TJVJ3exYFIwjjppM87gA/exec';
 
 const LOAN_OPTIONS = [
-    { value: 'Working Capital', label: 'Working Capital Loan' },
+    { value: 'Credit Card', label: 'Credit Card (Instant Approval)' },
+    { value: 'Working Capital', label: 'Working Capital Loan (OD / CC)' },
     { value: 'BL', label: 'Business Loan (BL)' },
     { value: 'HL', label: 'Home Loan (HL)' },
     { value: 'LAP', label: 'Loan Against Property (LAP)' },
     { value: 'Machinery', label: 'Machinery & Equipment Finance' },
     { value: 'Mudra', label: 'Mudra Loan (PMMY)' },
     { value: 'Professional', label: 'Professional Loan (Doctors, CAs)' },
-    { value: 'Vehicle', label: 'Vehicle & Auto Loan' },
+    { value: 'Vehicle', label: 'Commercial Vehicle & Auto Loan' },
     { value: 'PL', label: 'Personal Loan (PL)' },
     { value: 'Education', label: 'Education Loan' },
     { value: 'Startup', label: 'Startup India Loan' },
+    { value: 'Trade Finance', label: 'Letter of Credit / Bank Guarantee / Trade' },
     { value: 'Secured', label: 'Other Secured Loan' },
     { value: 'Unsecured', label: 'Other Unsecured Loan' }
 ];
@@ -26,13 +28,15 @@ const LOAN_OPTIONS = [
 const mapParamToLoan = (param) => {
     if (!param) return 'BL';
     const lower = param.toLowerCase();
-    if (lower.includes('work') || lower.includes('capital')) return 'Working Capital';
+    if (lower.includes('credit card') || lower.includes('card')) return 'Credit Card';
+    if (lower.includes('work') || lower.includes('capital') || lower.includes('od') || lower.includes('cc')) return 'Working Capital';
     if (lower.includes('lap') || lower.includes('property')) return 'LAP';
     if (lower.includes('home')) return 'HL';
     if (lower.includes('machin')) return 'Machinery';
     if (lower.includes('mudra')) return 'Mudra';
     if (lower.includes('prof')) return 'Professional';
     if (lower.includes('vehic') || lower.includes('auto') || lower.includes('car')) return 'Vehicle';
+    if (lower.includes('letter of credit') || lower.includes('bank guarantee') || lower.includes('trade') || lower.includes('export')) return 'Trade Finance';
     if (lower.includes('pers')) return 'PL';
     if (lower.includes('edu')) return 'Education';
     if (lower.includes('start')) return 'Startup';
@@ -63,7 +67,7 @@ const ApplyPage = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const product = params.get('product') || params.get('loanType');
+        const product = params.get('product') || params.get('loanType') || params.get('loan');
         if (product) {
             setFormData(prev => ({
                 ...prev,
@@ -167,7 +171,8 @@ const ApplyPage = () => {
             <div className="container apply-container">
                 <div className="apply-header">
                     <div className="apply-badge">
-                        <span>🐝 25+ Banks & NBFCs • Zero Upfront Fees</span>
+                        <img src="/logo.png" alt="BeeFund" style={{ width: 16, height: 16, objectFit: 'contain', display: 'inline-block', verticalAlign: '-2px', marginRight: '6px' }} />
+                        <span>25+ Banks & NBFCs • Zero Upfront Fees</span>
                     </div>
                     <h1 className="apply-title">
                         Loan <span className="apply-hl">Enquiry & Application</span>

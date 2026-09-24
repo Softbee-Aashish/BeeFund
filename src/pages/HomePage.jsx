@@ -3,20 +3,133 @@ import { Link } from 'react-router-dom';
 import BeePosterCarrier from '../components/BeePosterCarrier';
 import HexagonBackground from '../components/HexagonBackground';
 import { useEnquiryModal } from '../context/EnquireModalContext';
+import { ToolIcons } from '../components/NavIcons';
 import './HomePage.css';
 
-/* ---- All products — Apply links now go to specific loan sections ---- */
+/* ---- Concise Products: Govt & Credit Card on Top, Secured Middle, Unsecured Next ---- */
 const products = [
-    { icon: 'briefcase', name: 'Working Capital', desc: 'Flexible funds for day-to-day ops, inventory & salaries.', tags: ['Up to ₹50L', 'From 9%'], ctaLink: '/loans#working-capital', dir: 'left' },
-    { icon: 'factory', name: 'Business Loan', desc: 'Unsecured business funding based on turnover & credit.', tags: ['Up to ₹50L', '3-7 days'], ctaLink: '/loans#working-capital', dir: 'right' },
-    { icon: 'home', name: 'Home Loan', desc: 'Purchase or renovate your dream home with tax benefits.', tags: ['Up to ₹10Cr', 'From 8.4%'], ctaLink: '/loans#secured', dir: 'left' },
-    { icon: 'building', name: 'Loan Against Property', desc: 'Unlock property value for business or personal needs.', tags: ['Up to ₹5Cr', 'Low rates'], ctaLink: '/loans#secured', dir: 'right' },
-    { icon: 'gear', name: 'Machinery Loan', desc: 'Finance new or used machinery for operational growth.', tags: ['90% cost', 'Moratorium'], ctaLink: '/loans#secured', dir: 'bottom' },
-    { icon: 'shield', name: 'Mudra Loan (PMMY)', desc: 'Govt-backed collateral-free loans for micro-enterprises.', tags: ['Up to ₹10L', 'Govt scheme'], ctaLink: '/loans#government', dir: 'left' },
-    { icon: 'users', name: 'Professional Loan', desc: 'For Doctors, CAs, Architects — expand your practice.', tags: ['No collateral', 'Up to ₹50L'], ctaLink: '/loans#working-capital', dir: 'right' },
-    { icon: 'car', name: 'Vehicle Loan', desc: 'Finance cars, bikes, trucks & commercial vehicles.', tags: ['From 8.5%', '90% LTV'], ctaLink: '/loans#personal', dir: 'bottom' },
-    { icon: 'graduation', name: 'Education Loan', desc: 'Fund higher education in India or abroad.', tags: ['Up to ₹1.5Cr', 'Moratorium'], ctaLink: '/loans#personal', dir: 'left' },
-    { icon: 'star', name: 'Startup India Loan', desc: 'DPIIT-recognized startups with CGTMSE guarantee.', tags: ['Govt backed', 'Up to ₹50L'], ctaLink: '/loans#government', dir: 'right' },
+    // 1. Govt Schemes & Credit Cards (Top Priority)
+    {
+        iconKey: 'creditCard',
+        color: 'rose',
+        badge: 'Instant Approval',
+        name: 'Instant Credit Cards',
+        desc: 'Pre-approved lifetime-free & reward credit cards from 20+ partner banks.',
+        tags: ['50 Days 0% Int', 'Zero Annual Fee'],
+        ctaText: 'Apply for Card',
+        ctaLink: '/products#credit-card',
+        enquiryType: 'Credit Card',
+        dir: 'left'
+    },
+    {
+        iconKey: 'government',
+        color: 'green',
+        badge: 'Subsidized',
+        name: 'Mudra Loan (PMMY)',
+        desc: 'Govt-backed collateral-free micro funding for MSMEs and retailers.',
+        tags: ['Up to ₹10 Lakhs', 'Zero Collateral'],
+        ctaText: 'Enquire for Mudra',
+        ctaLink: '/products#government',
+        enquiryType: 'Mudra',
+        dir: 'bottom'
+    },
+    {
+        iconKey: 'msme',
+        color: 'green',
+        badge: 'CGTMSE Cover',
+        name: 'PMEGP & MSME Scheme',
+        desc: 'Subsidized enterprise loans with up to 35% government subsidy support.',
+        tags: ['Up to ₹50 Lakhs', '15-35% Subsidy'],
+        ctaText: 'Enquire for MSME',
+        ctaLink: '/products#government',
+        enquiryType: 'MSME',
+        dir: 'right'
+    },
+
+    // 2. Secured Financing
+    {
+        iconKey: 'lap',
+        color: 'blue',
+        badge: 'From 8.5%',
+        name: 'Loan Against Property',
+        desc: 'Unlock high capital against residential, commercial, or industrial property.',
+        tags: ['Up to ₹5 Crore', 'Tenure 15 Yrs'],
+        ctaText: 'Enquire for LAP',
+        ctaLink: '/products#secured',
+        enquiryType: 'LAP',
+        dir: 'left'
+    },
+    {
+        iconKey: 'homeLoan',
+        color: 'blue',
+        badge: 'Low ROI',
+        name: 'Home Loan',
+        desc: 'Purchase or construct your dream home with Sec 80C & 24(b) tax savings.',
+        tags: ['Up to ₹10 Crore', 'From 8.4% ROI'],
+        ctaText: 'Enquire for Home Loan',
+        ctaLink: '/products#secured',
+        enquiryType: 'HL',
+        dir: 'bottom'
+    },
+    {
+        iconKey: 'machinery',
+        color: 'blue',
+        badge: '90% Cost',
+        name: 'Machinery & Equipment',
+        desc: 'Finance new or refurbished machinery with rapid 48-hour approval.',
+        tags: ['90% Cost Covered', 'Moratorium'],
+        ctaText: 'Enquire for Machinery',
+        ctaLink: '/products#secured',
+        enquiryType: 'Machinery',
+        dir: 'right'
+    },
+
+    // 3. Unsecured & Working Capital
+    {
+        iconKey: 'workingCapital',
+        color: 'amber',
+        badge: 'Daily Interest',
+        name: 'Working Capital (OD/CC)',
+        desc: 'Flexible credit line for day-to-day operations, vendor dues & payroll.',
+        tags: ['Pay on Utilized', 'Annual Renewal'],
+        ctaText: 'Enquire for OD/CC',
+        ctaLink: '/products#working-capital',
+        enquiryType: 'Working Capital',
+        dir: 'left'
+    },
+    {
+        iconKey: 'businessUnsecured',
+        color: 'amber',
+        badge: 'Zero Collateral',
+        name: 'Unsecured Business Loan',
+        desc: 'Fast unsecured capital based on your banking turnover & GST filings.',
+        tags: ['Up to ₹50 Lakhs', 'Fast 3-7 Days'],
+        ctaText: 'Enquire for Business',
+        ctaLink: '/products#working-capital',
+        enquiryType: 'BL',
+        dir: 'bottom'
+    },
+    {
+        iconKey: 'professional',
+        color: 'amber',
+        badge: 'Doctors & CAs',
+        name: 'Professional Loan',
+        desc: 'Exclusive high-ticket loans for Doctors, CAs, and licensed Architects.',
+        tags: ['Up to ₹50 Lakhs', 'No Collateral'],
+        ctaText: 'Enquire for Loan',
+        ctaLink: '/products#working-capital',
+        enquiryType: 'Professional',
+        dir: 'right'
+    }
+];
+
+const homeTools = [
+    { to: '/tools/emi-calculator', iconKey: 'emi', color: 'amber', name: 'EMI Calculator', desc: 'Calculate monthly installment & schedule' },
+    { to: '/tools/repayment-schedule', iconKey: 'repayment', color: 'blue', name: 'Repayment Schedule', desc: 'Sanction letter amortization export' },
+    { to: '/tools/od-cc-calculator', iconKey: 'odcc', color: 'emerald', name: 'OD / CC Calculator', desc: 'Compute daily utilization interest' },
+    { to: '/tools/eligibility', iconKey: 'eligibility', color: 'purple', name: 'Eligibility Check', desc: 'Know maximum qualifying loan amount' },
+    { to: '/tools/loan-comparison', iconKey: 'comparison', color: 'indigo', name: 'Loan Comparison', desc: 'Compare two loan offers side-by-side' },
+    { to: '/tools/tax-benefit', iconKey: 'tax', color: 'rose', name: 'Tax Benefits', desc: 'Calculate Sec 80C & 24(b) savings' },
 ];
 
 const HomePage = () => {
@@ -31,7 +144,10 @@ const HomePage = () => {
                 <HexagonBackground opacity={0.08} />
 
                 <div className="container hero-inner">
-                    <span className="hero-badge">🐝 Trusted by 10,000+ Businesses</span>
+                    <span className="hero-badge">
+                        <img src="/logo.png" alt="BeeFund" style={{ width: 16, height: 16, objectFit: 'contain', display: 'inline-block', verticalAlign: '-2px', marginRight: '6px' }} />
+                        Trusted by 10,000+ Businesses
+                    </span>
                     <h1 className="hero-title" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                         <span style={{ fontSize: '1.2em', letterSpacing: '-1px' }}>
                             <span className="hero-highlight">BEEFUND</span>
@@ -70,26 +186,33 @@ const HomePage = () => {
             </section>
 
             {/* ====== PRODUCTS — bee-carried cards ====== */}
-            <section className="products-section" id="loan-products">
+            <section className="products-section" id="products">
                 <HexagonBackground opacity={0.05} className="hex-right" />
                 <div className="container">
-                    <h2 className="sec-title text-center">Our <span className="hero-highlight">Loan Products</span></h2>
-                    <p className="sec-sub text-center">Scroll down — our bees will deliver each product to you.</p>
+                    <h2 className="sec-title text-center">Our <span className="hero-highlight">Financial Products</span></h2>
+                    <p className="sec-sub text-center">Compare credit cards, government schemes, and tailored loan solutions delivered by our bees.</p>
                     <div className="products-grid">
                         {products.map((p, i) => (
                             <BeePosterCarrier
                                 key={i}
                                 direction={p.dir}
-                                icon={p.icon}
+                                iconKey={p.iconKey}
+                                color={p.color}
+                                badge={p.badge}
                                 name={p.name}
                                 description={p.desc}
                                 tags={p.tags}
-                                ctaText="Enquire for it"
+                                ctaText={p.ctaText}
                                 ctaLink={p.ctaLink}
-                                onCtaClick={() => openEnquiryModal({ loanType: p.name, source: `Home Card - ${p.name}` })}
+                                onCtaClick={() => openEnquiryModal({ loanType: p.enquiryType || p.name, source: `Home Card - ${p.name}` })}
                                 delay={80 + (i % 3) * 150}
                             />
                         ))}
+                    </div>
+                    <div className="text-center" style={{ marginTop: '3rem' }}>
+                        <Link to="/products" className="btn btn-outline" id="view-all-products">
+                            Explore All Financial Products & Cards →
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -99,24 +222,19 @@ const HomePage = () => {
                 <HexagonBackground opacity={0.04} className="hex-left" />
                 <div className="container">
                     <h2 className="sec-title text-center">Smart <span className="hero-highlight">Financial Tools</span></h2>
-                    <p className="sec-sub text-center">Plan your finances before you commit.</p>
+                    <p className="sec-sub text-center">Plan your finances with bank-grade calculators before committing.</p>
                     <div className="tools-grid">
-                        {[
-                            { to: '/tools/emi-calculator', icon: 'M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zM2 9h20M8 6h8M8 13h3M13 13h3M8 17h8', name: 'EMI Calculator', desc: 'Calculate monthly installments' },
-                            { to: '/tools/eligibility', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4', name: 'Eligibility Check', desc: 'Know your loan eligibility' },
-                            { to: '/tools/loan-comparison', icon: 'M18 20V10M12 20V4M6 20v-6', name: 'Loan Comparison', desc: 'Compare options side by side' },
-                            { to: '/tools/tax-benefit', icon: 'M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v12M8 9.5h7a1.5 1.5 0 010 3H9a1.5 1.5 0 000 3h7', name: 'Tax Benefits', desc: 'Calculate tax savings' },
-                            { to: '/tools/affordability', icon: 'M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5zM9 21V12h6v9', name: 'Affordability', desc: 'How much can you afford?' },
-                            { to: '/tools/gst-calculator', icon: 'M1 4h22v16a2 2 0 01-2 2H3a2 2 0 01-2-2V4zM1 10h22M6 15h4M14 15h4', name: 'GST Calculator', desc: 'Quick GST computation' },
-                        ].map((t, i) => (
+                        {homeTools.map((t, i) => (
                             <Link to={t.to} className="tool-card" key={i} id={`tool-${i}`}>
-                                <svg className="tool-icon" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round"><path d={t.icon} /></svg>
+                                <span className={`tool-card-icon-box icon-color-${t.color}`}>
+                                    {ToolIcons[t.iconKey]}
+                                </span>
                                 <span className="tool-name">{t.name}</span>
                                 <span className="tool-desc">{t.desc}</span>
                             </Link>
                         ))}
                     </div>
-                    <div className="text-center" style={{ marginTop: '2rem' }}>
+                    <div className="text-center" style={{ marginTop: '2.5rem' }}>
                         <Link to="/tools" className="btn btn-outline" id="view-all-tools">View All Tools →</Link>
                     </div>
                 </div>

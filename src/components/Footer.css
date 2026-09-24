@@ -31,6 +31,12 @@
     width: auto;
     margin-bottom: 1.25rem;
     display: inline-block;
+    filter: brightness(0) invert(1);
+    transition: all 0.25s ease;
+}
+
+.footer-logo:hover {
+    filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
 }
 
 .footer-brand-desc {

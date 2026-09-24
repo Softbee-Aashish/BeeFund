@@ -42,21 +42,91 @@
     border-radius: 18px 18px 0 0;
 }
 
-/* Card icon */
-.bee-card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.15));
+/* Card header row & icon */
+.bee-card-header-row {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     margin-bottom: 1rem;
 }
 
-.bee-card-icon svg {
+.bee-card-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.bee-card:hover .bee-card-icon-box {
+    transform: scale(1.08);
+}
+
+.bee-card-icon-box svg {
     width: 24px;
     height: 24px;
+}
+
+/* Palette variations */
+.bee-card-icon-box.icon-color-blue {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+}
+
+.bee-card-icon-box.icon-color-amber {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.bee-card-icon-box.icon-color-green {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.bee-card-icon-box.icon-color-rose {
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid rgba(225, 29, 72, 0.2);
+}
+
+/* Badge pills */
+.bee-card-badge-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    display: inline-block;
+}
+
+.bee-card-badge-pill.pill-color-rose {
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid rgba(225, 29, 72, 0.22);
+}
+
+.bee-card-badge-pill.pill-color-green {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid rgba(5, 150, 105, 0.22);
+}
+
+.bee-card-badge-pill.pill-color-blue {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.22);
+}
+
+.bee-card-badge-pill.pill-color-amber {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid rgba(217, 119, 6, 0.22);
 }
 
 .bee-card-name {

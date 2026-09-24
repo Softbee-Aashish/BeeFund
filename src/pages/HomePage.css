@@ -325,10 +325,62 @@
     box-shadow: 0 12px 30px rgba(245, 158, 11, 0.1);
 }
 
-.tool-icon {
-    width: 40px;
-    height: 40px;
+.tool-card-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 1rem;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.tool-card:hover .tool-card-icon-box {
+    transform: scale(1.08);
+}
+
+.tool-card-icon-box svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Palette variations */
+.tool-card-icon-box.icon-color-amber {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.tool-card-icon-box.icon-color-blue {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+}
+
+.tool-card-icon-box.icon-color-emerald {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.tool-card-icon-box.icon-color-purple {
+    background: #faf5ff;
+    color: #7c3aed;
+    border: 1px solid rgba(124, 58, 237, 0.18);
+}
+
+.tool-card-icon-box.icon-color-indigo {
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1px solid rgba(79, 70, 229, 0.18);
+}
+
+.tool-card-icon-box.icon-color-rose {
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid rgba(225, 29, 72, 0.2);
 }
 
 .tool-name {

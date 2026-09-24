@@ -1,35 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useEnquiryModal } from '../context/EnquireModalContext';
+import { LoanIcons, ToolIcons } from './NavIcons';
 import './Header.css';
 
 const LOAN_MENU_ITEMS = [
     {
-        category: 'Secured Loans',
+        category: 'Govt Schemes & Credit Cards',
+        theme: 'green',
         items: [
-            { name: 'Loan Against Property (LAP)', icon: '🏠', path: '/loans#secured', badge: 'From 8.5%' },
-            { name: 'Home Loan (HL)', icon: '🏡', path: '/loans#secured', badge: 'Up to ₹10 Cr' },
-            { name: 'Secured Business Loan', icon: '🏢', path: '/loans#secured', badge: 'Low ROI' },
-            { name: 'Machinery & Equipment', icon: '⚙️', path: '/loans#secured', badge: '90% Cost' },
-            { name: 'Commercial Vehicle Loan', icon: '🚛', path: '/loans#secured', badge: 'Fast 48h' }
+            { name: 'Apply for Credit Card', iconKey: 'creditCard', color: 'rose', path: '/products#credit-card', badge: 'Instant Approval' },
+            { name: 'Mudra / Stand-Up India', iconKey: 'government', color: 'green', path: '/products#government', badge: 'Subsidized' },
+            { name: 'PMEGP & MSME Schemes', iconKey: 'msme', color: 'green', path: '/products#government', badge: 'CGTMSE cover' },
+            { name: 'Personal Loan (PL)', iconKey: 'personal', color: 'rose', path: '/products#personal', badge: 'Quick disbursal' },
+            { name: 'Car & Education Loan', iconKey: 'carEducation', color: 'rose', path: '/products#personal', badge: 'Low rates' }
+        ]
+    },
+    {
+        category: 'Secured Products',
+        theme: 'blue',
+        items: [
+            { name: 'Loan Against Property (LAP)', iconKey: 'lap', color: 'blue', path: '/products#secured', badge: 'From 8.5%' },
+            { name: 'Home Loan (HL)', iconKey: 'homeLoan', color: 'blue', path: '/products#secured', badge: 'Up to ₹10 Cr' },
+            { name: 'Secured Business Loan', iconKey: 'businessSecured', color: 'blue', path: '/products#secured', badge: 'Low ROI' },
+            { name: 'Machinery & Equipment', iconKey: 'machinery', color: 'blue', path: '/products#secured', badge: '90% Cost' },
+            { name: 'Commercial Vehicle Loan', iconKey: 'commercialVehicle', color: 'blue', path: '/products#secured', badge: 'Fast 48h' }
         ]
     },
     {
         category: 'Business & Working Capital',
+        theme: 'amber',
         items: [
-            { name: 'Working Capital (OD/CC)', icon: '💼', path: '/loans#working-capital', badge: 'Turnover based' },
-            { name: 'Bill / Invoice Discounting', icon: '🧾', path: '/loans#working-capital', badge: 'Immediate cash' },
-            { name: 'Unsecured Business Loan', icon: '📈', path: '/loans#working-capital', badge: 'Zero collateral' },
-            { name: 'Professional Loan', icon: '👨‍⚕️', path: '/loans#working-capital', badge: 'Doctors & CAs' }
-        ]
-    },
-    {
-        category: 'Govt Schemes & Personal',
-        items: [
-            { name: 'Mudra / Stand-Up India', icon: '🇮🇳', path: '/loans#government', badge: 'Subsidized' },
-            { name: 'PMEGP & MSME Schemes', icon: '🏭', path: '/loans#government', badge: 'CGTMSE cover' },
-            { name: 'Personal Loan (PL)', icon: '💳', path: '/loans#personal', badge: 'Quick disbursal' },
-            { name: 'Car & Education Loan', icon: '🚗', path: '/loans#personal', badge: 'Low rates' }
+            { name: 'Working Capital (OD/CC)', iconKey: 'workingCapital', color: 'amber', path: '/products#working-capital', badge: 'Turnover based' },
+            { name: 'Bill / Invoice Discounting', iconKey: 'billDiscounting', color: 'amber', path: '/products#working-capital', badge: 'Immediate cash' },
+            { name: 'Unsecured Business Loan', iconKey: 'businessUnsecured', color: 'amber', path: '/products#working-capital', badge: 'Zero collateral' },
+            { name: 'Professional Loan', iconKey: 'professional', color: 'amber', path: '/products#working-capital', badge: 'Doctors & CAs' }
         ]
     }
 ];
@@ -38,70 +43,80 @@ const TOOL_MENU_ITEMS = [
     {
         id: 'emi-calculator',
         name: 'Loan EMI Calculator',
-        icon: '🧮',
+        iconKey: 'emi',
+        color: 'amber',
         desc: 'Calculate monthly installment & schedule',
         path: '/tools/emi-calculator'
     },
     {
         id: 'repayment-schedule',
         name: 'Repayment Schedule Generator',
-        icon: '📑',
+        iconKey: 'repayment',
+        color: 'blue',
         desc: 'Sanction letter amortization & Excel export',
         path: '/tools/repayment-schedule'
     },
     {
         id: 'od-cc-calculator',
         name: 'OD / CC Interest Calculator',
-        icon: '💳',
+        iconKey: 'odcc',
+        color: 'emerald',
         desc: 'Overdraft daily interest & Excel generator',
         path: '/tools/od-cc-calculator'
     },
     {
         id: 'eligibility',
         name: 'Loan Eligibility Checker',
-        icon: '✅',
+        iconKey: 'eligibility',
+        color: 'purple',
         desc: 'Find maximum qualifying loan amount',
         path: '/tools/eligibility'
     },
     {
         id: 'loan-comparison',
         name: 'Loan Comparison Tool',
-        icon: '⚖️',
+        iconKey: 'comparison',
+        color: 'indigo',
         desc: 'Compare two loan offers side-by-side',
         path: '/tools/loan-comparison'
     },
     {
         id: 'gst-calculator',
         name: 'GST Calculator',
-        icon: '🧾',
+        iconKey: 'gst',
+        color: 'blue',
         desc: 'Compute CGST, SGST & IGST slabs',
         path: '/tools/gst-calculator'
     },
     {
         id: 'tax-benefit',
         name: 'Tax Benefit Calculator',
-        icon: '🛡️',
+        iconKey: 'tax',
+        color: 'rose',
         desc: 'Sec 80C & 24(b) deduction savings',
         path: '/tools/tax-benefit'
     },
     {
         id: 'inflation-impact',
         name: 'Inflation Impact Analyzer',
-        icon: '📈',
+        iconKey: 'inflation',
+        color: 'amber',
         desc: 'Real purchasing power cost of loan',
         path: '/tools/inflation-impact'
     },
     {
         id: 'affordability',
         name: 'Home Affordability Tool',
-        icon: '🏠',
+        iconKey: 'affordability',
+        color: 'blue',
         desc: 'Property budget & EMI capacity',
         path: '/tools/affordability'
     },
     {
         id: 'fixed-vs-floating',
         name: 'Fixed vs Floating ROI',
-        icon: '🔄',
+        iconKey: 'fixedFloating',
+        color: 'teal',
         desc: 'Compare fixed & variable benchmark rate',
         path: '/tools/fixed-vs-floating'
     }
@@ -173,10 +188,10 @@ const Header = () => {
                             onMouseLeave={() => setLoansOpen(false)}
                         >
                             <Link
-                                to="/loans"
-                                className={`nav-link ${location.pathname.startsWith('/loans') ? 'active' : ''}`}
+                                to="/products"
+                                className={`nav-link ${location.pathname.startsWith('/products') || location.pathname.startsWith('/loans') ? 'active' : ''}`}
                             >
-                                Loans <span className="dropdown-caret">▾</span>
+                                Products <span className="dropdown-caret">▾</span>
                             </Link>
 
                             <div className={`nav-dropdown loans-mega-dropdown ${loansOpen ? 'open' : ''}`}>
@@ -188,10 +203,14 @@ const Header = () => {
                                                 {col.items.map((item, i) => (
                                                     <li key={i}>
                                                         <Link to={item.path} className="dropdown-item-link">
-                                                            <span className="dropdown-item-icon">{item.icon}</span>
+                                                            <span className={`dropdown-item-icon-box icon-color-${item.color || 'blue'}`}>
+                                                                 {LoanIcons[item.iconKey]}
+                                                            </span>
                                                             <div className="dropdown-item-text">
-                                                                <span className="dropdown-item-name">{item.name}</span>
-                                                                <span className="dropdown-item-badge">{item.badge}</span>
+                                                                <div className="dropdown-title-row">
+                                                                    <span className="dropdown-item-name">{item.name}</span>
+                                                                    <span className="dropdown-item-badge">{item.badge}</span>
+                                                                </div>
                                                             </div>
                                                         </Link>
                                                     </li>
@@ -201,9 +220,9 @@ const Header = () => {
                                     ))}
                                 </div>
                                 <div className="dropdown-footer-bar">
-                                    <span>Looking for a tailored corporate loan?</span>
-                                    <Link to="/loans" className="dropdown-footer-link">
-                                        View All Loan Products →
+                                    <span>Looking for customized enterprise financing or card offers?</span>
+                                    <Link to="/products" className="dropdown-footer-link">
+                                        View All Financial Products →
                                     </Link>
                                 </div>
                             </div>
@@ -226,7 +245,9 @@ const Header = () => {
                                 <div className="tools-dropdown-grid">
                                     {TOOL_MENU_ITEMS.map((tool) => (
                                         <Link key={tool.id} to={tool.path} className="tool-dropdown-item">
-                                            <span className="tool-dropdown-icon">{tool.icon}</span>
+                                            <span className={`tool-dropdown-icon-box icon-color-${tool.color || 'amber'}`}>
+                                                {ToolIcons[tool.iconKey]}
+                                            </span>
                                             <div className="tool-dropdown-info">
                                                 <span className="tool-dropdown-title">{tool.name}</span>
                                                 <span className="tool-dropdown-desc">{tool.desc}</span>
@@ -251,6 +272,16 @@ const Header = () => {
                             >
                                 <span>Credit Report</span>
                                 <span className="nav-free-badge">FREE</span>
+                            </Link>
+                        </li>
+
+                        {/* DEDICATED CREDIT CARDS SHOWCASE */}
+                        <li>
+                            <Link
+                                to="/credit-cards"
+                                className={`nav-link ${location.pathname.startsWith('/credit-cards') || location.pathname.startsWith('/cards') ? 'active' : ''}`}
+                            >
+                                <span>Credit Cards</span>
                             </Link>
                         </li>
 
@@ -300,9 +331,18 @@ const Header = () => {
                         aria-label={mobileMenuOpen ? 'Close Menu' : 'Open Navigation Menu'}
                         aria-expanded={mobileMenuOpen}
                     >
-                        <span className="hamburger-bar"></span>
-                        <span className="hamburger-bar"></span>
-                        <span className="hamburger-bar"></span>
+                        {mobileMenuOpen ? (
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        ) : (
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        )}
                     </button>
                 </div>
             </div>
@@ -334,7 +374,7 @@ const Header = () => {
                     <ul className="mobile-nav-list">
                         <li>
                             <Link to="/" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-                                <span>🏠 Home</span>
+                                <span>Home</span>
                             </Link>
                         </li>
 
@@ -346,7 +386,7 @@ const Header = () => {
                                 className={`mobile-nav-link mobile-nav-highlight ${location.pathname.startsWith('/credit-report') || location.pathname.startsWith('/credit-score') ? 'active' : ''}`}
                             >
                                 <div className="mobile-nav-link-content">
-                                    <span>📊 Free Credit Report</span>
+                                    <span>Free Credit Report</span>
                                     <span className="nav-free-badge">FREE</span>
                                 </div>
                             </Link>
@@ -359,7 +399,7 @@ const Header = () => {
                                 className={`mobile-accordion-btn ${mobileLoansOpen ? 'expanded' : ''}`}
                                 onClick={() => setMobileLoansOpen(!mobileLoansOpen)}
                             >
-                                <span>💰 Loan Products</span>
+                                <span>Products & Cards</span>
                                 <span className="accordion-arrow">{mobileLoansOpen ? '▲' : '▼'}</span>
                             </button>
 
@@ -375,15 +415,19 @@ const Header = () => {
                                                     onClick={closeMobileMenu}
                                                     className="mobile-sub-link"
                                                 >
-                                                    <span className="sub-icon">{item.icon}</span>
-                                                    <span className="sub-name">{item.name}</span>
-                                                    <span className="sub-badge">{item.badge}</span>
+                                                    <span className={`mobile-sub-icon icon-color-${item.color || 'blue'}`}>
+                                                        {LoanIcons[item.iconKey]}
+                                                    </span>
+                                                    <div className="sub-text">
+                                                        <span className="sub-name">{item.name}</span>
+                                                        <span className="sub-badge">{item.badge}</span>
+                                                    </div>
                                                 </Link>
                                             ))}
                                         </div>
                                     ))}
-                                    <Link to="/loans" onClick={closeMobileMenu} className="mobile-view-all-link">
-                                        View All Loan Products →
+                                    <Link to="/products" onClick={closeMobileMenu} className="mobile-view-all-link">
+                                        View All Financial Products →
                                     </Link>
                                 </div>
                             )}
@@ -396,7 +440,7 @@ const Header = () => {
                                 className={`mobile-accordion-btn ${mobileToolsOpen ? 'expanded' : ''}`}
                                 onClick={() => setMobileToolsOpen(!mobileToolsOpen)}
                             >
-                                <span>🧮 Financial Calculators & Tools</span>
+                                <span>Financial Calculators & Tools</span>
                                 <span className="accordion-arrow">{mobileToolsOpen ? '▲' : '▼'}</span>
                             </button>
 
@@ -409,7 +453,9 @@ const Header = () => {
                                             onClick={closeMobileMenu}
                                             className="mobile-sub-link"
                                         >
-                                            <span className="sub-icon">{tool.icon}</span>
+                                            <span className={`mobile-sub-icon icon-color-${tool.color || 'amber'}`}>
+                                                {ToolIcons[tool.iconKey]}
+                                            </span>
                                             <div className="sub-text">
                                                 <span className="sub-name">{tool.name}</span>
                                                 <span className="sub-desc">{tool.desc}</span>
@@ -424,23 +470,29 @@ const Header = () => {
                         </li>
 
                         <li>
+                            <Link to="/credit-cards" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname.startsWith('/credit-cards') || location.pathname.startsWith('/cards') ? 'active' : ''}`}>
+                                <span>Credit Cards Showcase</span>
+                            </Link>
+                        </li>
+
+                        <li>
                             <Link to="/about" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/about' ? 'active' : ''}`}>
-                                <span>🏢 About BeeFund</span>
+                                <span>About BeeFund</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/blog" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname.startsWith('/blog') ? 'active' : ''}`}>
-                                <span>📝 Financial Insights & Blog</span>
+                                <span>Financial Insights & Blog</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/contact" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/contact' ? 'active' : ''}`}>
-                                <span>📞 Contact Us</span>
+                                <span>Contact Us</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/terms" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/terms' ? 'active' : ''}`}>
-                                <span>📜 Terms & Privacy</span>
+                                <span>Terms & Privacy</span>
                             </Link>
                         </li>
                     </ul>

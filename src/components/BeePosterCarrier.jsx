@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { LoanIcons } from './NavIcons';
 import './BeePosterCarrier.css';
 
 /* ---- Small Carrier Bee SVG ---- */
@@ -54,6 +55,9 @@ const getStart = (dir) => {
 const BeePosterCarrier = ({
     direction = 'left',
     icon = 'briefcase',
+    iconKey = null,
+    color = 'amber',
+    badge = null,
     name = 'Loan Product',
     description = '',
     tags = [],
@@ -279,7 +283,8 @@ const BeePosterCarrier = ({
     }, []);
 
     const beeClass = `card-bee${struggling ? ' bee-struggle' : ''}`;
-    const iconSvg = ICONS[icon] || ICONS.briefcase;
+    const fallbackSvg = ICONS[icon] || ICONS.briefcase;
+    const resolvedIcon = (iconKey && LoanIcons[iconKey]) ? LoanIcons[iconKey] : fallbackSvg;
 
     return (
         <div ref={wrapperRef} className="bee-card-wrapper">
@@ -288,7 +293,12 @@ const BeePosterCarrier = ({
                 <div className={`${beeClass} card-bee--2`}><BeeSVG /></div>
                 <div className="card-thread card-thread--1" />
                 <div className="card-thread card-thread--2" />
-                <div className="bee-card-icon">{iconSvg}</div>
+                <div className="bee-card-header-row">
+                    <div className={`bee-card-icon-box icon-color-${color}`}>
+                        {resolvedIcon}
+                    </div>
+                    {badge && <span className={`bee-card-badge-pill pill-color-${color}`}>{badge}</span>}
+                </div>
                 <div className="bee-card-name">{name}</div>
                 <div className="bee-card-desc">{description}</div>
                 {tags.length > 0 && (

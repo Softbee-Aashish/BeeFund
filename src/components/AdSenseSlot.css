@@ -1,0 +1,266 @@
+/* ========================================================
+   Google AdSense Slot Styling (Policy Compliant & CLS Safe)
+   ======================================================== */
+
+.adsense-wrapper {
+    margin: 2rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    clear: both;
+}
+
+.adsense-label-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+}
+
+.adsense-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.adsense-info-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #94a3b8;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .adsense-info-badge {
+    background: rgba(255, 255, 255, 0.06);
+    color: #64748b;
+}
+
+.adsense-content-box {
+    width: 100%;
+    background: #f8fafc;
+    border: 1px dashed rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .adsense-content-box {
+    background: #111827;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================================
+   SLOT TYPE SPECIFIC MIN-HEIGHTS (PREVENTS CLS)
+   ======================================================== */
+
+/* 1. Top Leaderboard */
+.adsense-top-leaderboard {
+    margin: 1.5rem 0 2rem;
+}
+
+.adsense-top-leaderboard .adsense-content-box {
+    min-height: 100px;
+    max-height: 130px;
+}
+
+/* 2. Sidebar Medium Rectangle (300x250) */
+.adsense-sidebar-rectangle {
+    margin: 1.5rem 0;
+}
+
+.adsense-sidebar-rectangle .adsense-content-box {
+    min-height: 250px;
+    width: 100%;
+}
+
+/* 3. Sidebar Sticky Half-Page (300x600) */
+.adsense-sidebar-halfpage {
+    margin: 1.5rem 0;
+    position: sticky;
+    top: 5.5rem;
+    z-index: 10;
+}
+
+.adsense-sidebar-halfpage .adsense-content-box {
+    min-height: 380px;
+    width: 100%;
+}
+
+/* 4. In-Article Native Ad */
+.adsense-in-article {
+    margin: 2.5rem 0;
+    padding: 0.5rem 0;
+}
+
+.adsense-in-article .adsense-content-box {
+    min-height: 140px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.04), rgba(2, 132, 199, 0.04));
+    border-style: solid;
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .adsense-in-article .adsense-content-box {
+    background: rgba(17, 24, 39, 0.95);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+/* 5. Bottom Banner */
+.adsense-bottom-banner {
+    margin: 3rem 0 1.5rem;
+}
+
+.adsense-bottom-banner .adsense-content-box {
+    min-height: 120px;
+}
+
+/* ========================================================
+   MOCK AD UNIT PREVIEW STYLING
+   ======================================================== */
+.adsense-mock-unit {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.mock-ad-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 0.4rem;
+}
+
+[data-theme="dark"] .mock-ad-header {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+    color: #64748b;
+}
+
+.mock-ad-brand {
+    font-weight: 700;
+    color: #d97706;
+}
+
+[data-theme="dark"] .mock-ad-brand {
+    color: #fbbf24;
+}
+
+.mock-ad-specs {
+    font-family: monospace;
+    font-size: 0.68rem;
+    background: rgba(0, 0, 0, 0.04);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .mock-ad-specs {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.mock-ad-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.mock-ad-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(217, 119, 6, 0.1);
+    color: #d97706;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .mock-ad-icon {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.mock-ad-text {
+    flex: 1;
+    min-width: 200px;
+}
+
+.mock-ad-headline {
+    margin: 0 0 0.2rem 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary, #0f172a);
+    line-height: 1.3;
+}
+
+[data-theme="dark"] .mock-ad-headline {
+    color: #f8fafc;
+}
+
+.mock-ad-sub {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #64748b);
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .mock-ad-sub {
+    color: #94a3b8;
+}
+
+.mock-ad-cta {
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .mock-ad-cta {
+    background: #f59e0b;
+    color: #0f172a;
+}
+
+.mock-ad-cta:hover {
+    transform: scale(1.04);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .mock-ad-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .mock-ad-cta {
+        width: 100%;
+        text-align: center;
+    }
+}

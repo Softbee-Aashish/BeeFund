@@ -1,0 +1,278 @@
+[
+  {
+    "id": "card_hdfc_regalia_gold",
+    "name": "HDFC Regalia Gold Credit Card",
+    "bank": "HDFC Bank",
+    "category": "Airport Lounge & Travel",
+    "badge": "12 Airport Lounge Visits",
+    "imageUrl": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='190' viewBox='0 0 300 190'><defs><linearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231a237e'/><stop offset='100%25' stop-color='%230d1b2a'/></linearGradient></defs><rect width='300' height='190' rx='14' fill='url(%23g1)' stroke='%23fbbf24' stroke-width='2'/><rect x='24' y='30' width='38' height='26' rx='5' fill='%23fbbf24'/><text x='24' y='135' fill='%23ffffff' font-family='sans-serif' font-size='15' font-weight='bold' letter-spacing='1'>REGALIA GOLD</text><text x='24' y='160' fill='%23fbbf24' font-family='sans-serif' font-size='11' font-weight='bold'>HDFC BANK • VIP</text><circle cx='250' cy='150' r='16' fill='%23e53935' opacity='0.85'/><circle cx='268' cy='150' r='16' fill='%23fbc02d' opacity='0.85'/></svg>",
+    "rating": "4.9",
+    "joiningFee": "₹2,500 + Taxes",
+    "annualFee": "₹2,500 (Waived on ₹4 Lakh annual spend)",
+    "tagline": "Premium lifestyle & travel card offering complimentary global airport lounge access and 4X rewards on luxury brands.",
+    "description": "The HDFC Regalia Gold is an elite travel and dining companion. Get complimentary lounge access across India and overseas, Marks & Spencer / Myntra vouchers on milestone spends, and comprehensive travel insurance.",
+    "benefits": [
+      {
+        "icon": "travel",
+        "title": "Airport Lounge Access",
+        "desc": "12 complimentary airport lounge visits annually at domestic and international terminals via Priority Pass."
+      },
+      {
+        "icon": "rewards",
+        "title": "4X Reward Points",
+        "desc": "Earn 4 reward points on every ₹150 spent, and 20 reward points on select retail and lifestyle partners."
+      },
+      {
+        "icon": "vip",
+        "title": "Milestone Privileges",
+        "desc": "Quarterly vouchers worth ₹1,500 on spends of ₹1.5 Lakhs every calendar quarter."
+      },
+      {
+        "icon": "protection",
+        "title": "Low 2% Forex Markup",
+        "desc": "Save heavily on international shopping and overseas hotel bookings with reduced foreign exchange fees."
+      }
+    ],
+    "features": [
+      "12 Complimentary Airport Lounge access",
+      "Club Vistara Silver tier membership",
+      "Low foreign currency markup of 2%",
+      "Comprehensive air accidental cover up to ₹1 Crore"
+    ],
+    "applyLink": "https://www.hdfcbank.com",
+    "docUrl": "https://www.hdfcbank.com",
+    "docName": "HDFC Regalia Gold MITC & Terms (PDF)",
+    "status": "active",
+    "updatedAt": "2026-09-24T22:00:00.000Z"
+  },
+  {
+    "id": "card_sbi_cashback",
+    "name": "SBI Cashback Credit Card",
+    "bank": "SBI Card",
+    "category": "Cashback",
+    "badge": "5% Direct Cashback",
+    "imageUrl": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='190' viewBox='0 0 300 190'><defs><linearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23047857'/><stop offset='100%25' stop-color='%23064e3b'/></linearGradient></defs><rect width='300' height='190' rx='14' fill='url(%23g2)' stroke='%2334d399' stroke-width='2'/><rect x='24' y='30' width='38' height='26' rx='5' fill='%23a7f3d0'/><text x='24' y='135' fill='%23ffffff' font-family='sans-serif' font-size='15' font-weight='bold' letter-spacing='1'>CASHBACK 5%</text><text x='24' y='160' fill='%2334d399' font-family='sans-serif' font-size='11' font-weight='bold'>SBI CARD</text><circle cx='250' cy='150' r='16' fill='%230284c7' opacity='0.85'/><circle cx='268' cy='150' r='16' fill='%2338bdf8' opacity='0.85'/></svg>",
+    "rating": "4.8",
+    "joiningFee": "₹999 + Taxes",
+    "annualFee": "₹999 (Waived on ₹2 Lakh annual spend)",
+    "tagline": "Direct 5% statement cashback on all online merchant spending with no merchant restrictions.",
+    "description": "Simply the best pure cashback credit card in India. Earn 5% cashback auto-credited into your monthly statement on Amazon, Flipkart, Swiggy, Zomato, BookMyShow, and all digital platforms.",
+    "benefits": [
+      {
+        "icon": "cashback",
+        "title": "5% Online Cashback",
+        "desc": "Flat 5% direct statement credit cashback on almost all online spending up to ₹5,000 per billing month."
+      },
+      {
+        "icon": "shopping",
+        "title": "1% Offline Cashback",
+        "desc": "Earn 1% cashback on in-store retail card swipes, dining, and offline fuel stations with zero capping."
+      },
+      {
+        "icon": "fuel",
+        "title": "1% Fuel Surcharge Waiver",
+        "desc": "Valid across petrol pumps in India for transactions between ₹500 and ₹3,000."
+      },
+      {
+        "icon": "rewards",
+        "title": "Annual Fee Reversal",
+        "desc": "Spend ₹2,00,000 or more in an anniversary year to get your next year annual renewal fee waived completely."
+      }
+    ],
+    "features": [
+      "Auto statement credit within next billing cycle",
+      "No merchant restrictions on 5% cashback",
+      "Contactless NFC payments supported worldwide",
+      "Instant add-on card for family members"
+    ],
+    "applyLink": "https://www.sbicard.com",
+    "docUrl": "https://www.sbicard.com",
+    "docName": "SBI Cashback Most Important Terms (PDF)",
+    "status": "active",
+    "updatedAt": "2026-09-24T22:00:00.000Z"
+  },
+  {
+    "id": "card_icici_amazon_pay",
+    "name": "Amazon Pay ICICI Bank Card",
+    "bank": "ICICI Bank",
+    "category": "Lifetime Free",
+    "badge": "Zero Joining & Annual Fee",
+    "imageUrl": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='190' viewBox='0 0 300 190'><defs><linearGradient id='g3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231e293b'/><stop offset='100%25' stop-color='%230f172a'/></linearGradient></defs><rect width='300' height='190' rx='14' fill='url(%23g3)' stroke='%23f97316' stroke-width='2'/><rect x='24' y='30' width='38' height='26' rx='5' fill='%23fed7aa'/><text x='24' y='135' fill='%23f97316' font-family='sans-serif' font-size='15' font-weight='bold' letter-spacing='1'>AMAZON PAY</text><text x='24' y='160' fill='%2394a3b8' font-family='sans-serif' font-size='11' font-weight='bold'>ICICI BANK • LIFETIME FREE</text><circle cx='250' cy='150' r='16' fill='%23ea580c' opacity='0.85'/><circle cx='268' cy='150' r='16' fill='%23fbbf24' opacity='0.85'/></svg>",
+    "rating": "4.9",
+    "joiningFee": "₹0 (Lifetime Free)",
+    "annualFee": "₹0 (Zero Annual Fee Forever)",
+    "tagline": "Unconditional lifetime free card with 5% Amazon Prime rewards and zero maintenance costs.",
+    "description": "The highest rated Lifetime Free card in India. Amazon Prime members earn 5% unlimited reward points directly converted to Amazon Pay balance, with zero joining fees and zero renewal charges forever.",
+    "benefits": [
+      {
+        "icon": "cashback",
+        "title": "5% Unlimited Rewards",
+        "desc": "Prime members earn 5% cashback on all Amazon India orders with no minimum transaction requirement."
+      },
+      {
+        "icon": "rewards",
+        "title": "Lifetime Zero Fees",
+        "desc": "Never pay a joining fee or annual renewal charge. Completely free card ownership for life."
+      },
+      {
+        "icon": "shopping",
+        "title": "2% on Bill Payments",
+        "desc": "Earn 2% on mobile recharges, electricity, broadband, and 100+ partner merchants through Amazon Pay."
+      },
+      {
+        "icon": "dining",
+        "title": "Culinary Treats Dining",
+        "desc": "Minimum 15% discount on dining bills at 2,500+ partnered restaurants across India."
+      }
+    ],
+    "features": [
+      "1 reward point = ₹1 Amazon Pay balance",
+      "No expiry date on earned reward points",
+      "Lifetime zero membership and renewal charges",
+      "1% fuel surcharge waiver on all fuel stations"
+    ],
+    "applyLink": "https://www.icicibank.com",
+    "docUrl": "https://www.icicibank.com",
+    "docName": "Amazon Pay ICICI Cardholder Agreement (PDF)",
+    "status": "active",
+    "updatedAt": "2026-09-24T22:00:00.000Z"
+  },
+  {
+    "id": "card_axis_atlas",
+    "name": "Axis Bank Atlas Credit Card",
+    "bank": "Axis Bank",
+    "category": "Airport Lounge & Travel",
+    "badge": "EDGE Miles & Tier Perks",
+    "imageUrl": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='190' viewBox='0 0 300 190'><defs><linearGradient id='g4' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23831843'/><stop offset='100%25' stop-color='%23500724'/></linearGradient></defs><rect width='300' height='190' rx='14' fill='url(%23g4)' stroke='%23f472b6' stroke-width='2'/><rect x='24' y='30' width='38' height='26' rx='5' fill='%23fbcfe8'/><text x='24' y='135' fill='%23ffffff' font-family='sans-serif' font-size='15' font-weight='bold' letter-spacing='1'>ATLAS MILES</text><text x='24' y='160' fill='%23f472b6' font-family='sans-serif' font-size='11' font-weight='bold'>AXIS BANK • TRAVEL</text><circle cx='250' cy='150' r='16' fill='%23db2777' opacity='0.85'/><circle cx='268' cy='150' r='16' fill='%23f43f5e' opacity='0.85'/></svg>",
+    "rating": "4.8",
+    "joiningFee": "₹5,000 + Taxes",
+    "annualFee": "₹5,000 (Waived on ₹15 Lakh spend)",
+    "tagline": "The ultimate miles card for frequent flyers: convert EDGE Miles to Singapore Airlines, Qatar, and Marriott.",
+    "description": "Axis Atlas delivers an unprecedented rewards rate on airline bookings and hotel stays. Earn up to 5 EDGE Miles per ₹100 spent and transfer 1:2 to world-class airlines and hotel loyalty programs.",
+    "benefits": [
+      {
+        "icon": "travel",
+        "title": "5,000 Welcome Miles",
+        "desc": "Get 5,000 bonus EDGE Miles upon paying the joining fee and initiating your first 30-day swipe."
+      },
+      {
+        "icon": "vip",
+        "title": "5X on Travel Bookings",
+        "desc": "Earn 5 EDGE Miles on every ₹100 spent directly on domestic/international flights and hotel bookings."
+      },
+      {
+        "icon": "travel",
+        "title": "International Lounge + Guest",
+        "desc": "Up to 18 complimentary international lounge visits with guest access based on your Tier status."
+      },
+      {
+        "icon": "rewards",
+        "title": "1:2 Airline Transfer",
+        "desc": "Transfer points to 20+ airline and hotel partners at the highest conversion ratios in India."
+      }
+    ],
+    "features": [
+      "Up to 18 international & domestic lounge visits",
+      "Complimentary guest access privileges",
+      "Direct 1:2 airline miles transfer ratio",
+      "Exclusive silver, gold, and platinum tier acceleration"
+    ],
+    "applyLink": "https://www.axisbank.com",
+    "docUrl": "https://www.axisbank.com",
+    "docName": "Axis Atlas Card Schedule of Benefits (PDF)",
+    "status": "active",
+    "updatedAt": "2026-09-24T22:00:00.000Z"
+  },
+  {
+    "id": "card_au_lit",
+    "name": "AU LIT Credit Card",
+    "bank": "AU Small Finance Bank",
+    "category": "Lifetime Free",
+    "badge": "Customizable Features",
+    "imageUrl": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='190' viewBox='0 0 300 190'><defs><linearGradient id='g5' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23581c87'/><stop offset='100%25' stop-color='%233b0764'/></linearGradient></defs><rect width='300' height='190' rx='14' fill='url(%23g5)' stroke='%23c084fc' stroke-width='2'/><rect x='24' y='30' width='38' height='26' rx='5' fill='%23e9d5ff'/><text x='24' y='135' fill='%23ffffff' font-family='sans-serif' font-size='16' font-weight='bold' letter-spacing='1'>LIT CUSTOM</text><text x='24' y='160' fill='%23c084fc' font-family='sans-serif' font-size='11' font-weight='bold'>AU SMALL FINANCE BANK</text><circle cx='250' cy='150' r='16' fill='%239333ea' opacity='0.85'/><circle cx='268' cy='150' r='16' fill='%23c084fc' opacity='0.85'/></svg>",
+    "rating": "4.7",
+    "joiningFee": "₹0 (Lifetime Free Base)",
+    "annualFee": "₹0 (Zero Base Annual Fee)",
+    "tagline": "India's first customizable credit card: switch perks like lounge access or 5% cashback on and off via app.",
+    "description": "Why pay for features you do not use? AU LIT allows you to turn on airport lounge visits when traveling, switch to 5% grocery cashback when shopping, and turn off features when resting — paying only when active.",
+    "benefits": [
+      {
+        "icon": "vip",
+        "title": "On-Demand Features",
+        "desc": "Turn on/off airport lounge access, accelerated reward points, and OTT subs via the mobile app."
+      },
+      {
+        "icon": "cashback",
+        "title": "5% Extra Cashback",
+        "desc": "Activate 5% cashback on apparel, dining, and grocery purchases for 90-day periods."
+      },
+      {
+        "icon": "travel",
+        "title": "Free Lounge Activation",
+        "desc": "Activate 4 airport lounge visits per 90 days specifically when you have an upcoming trip."
+      },
+      {
+        "icon": "fuel",
+        "title": "1% Fuel Surcharge Waiver",
+        "desc": "Continuous 1% fuel surcharge waiver valid across all fuel stations in India."
+      }
+    ],
+    "features": [
+      "Customizable power: pay only for active perks",
+      "No permanent annual fees on the base card",
+      "Instant feature toggle via AU 0101 app",
+      "Up to 10X reward points on active categories"
+    ],
+    "applyLink": "https://www.aubank.in",
+    "docUrl": "https://www.aubank.in",
+    "docName": "AU LIT Card User Handbook & Terms (PDF)",
+    "status": "active",
+    "updatedAt": "2026-09-24T22:00:00.000Z"
+  },
+  {
+    "id": "card_sbi_bpcl_octane",
+    "name": "BPCL SBI Card Octane",
+    "bank": "SBI Card",
+    "category": "Fuel & Utilities",
+    "badge": "7.25% Valueback on Fuel",
+    "imageUrl": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='190' viewBox='0 0 300 190'><defs><linearGradient id='g6' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%237c2d12'/><stop offset='100%25' stop-color='%23431407'/></linearGradient></defs><rect width='300' height='190' rx='14' fill='url(%23g6)' stroke='%23ea580c' stroke-width='2'/><rect x='24' y='30' width='38' height='26' rx='5' fill='%23ffedd5'/><text x='24' y='135' fill='%23ffffff' font-family='sans-serif' font-size='15' font-weight='bold' letter-spacing='1'>OCTANE 7.25%</text><text x='24' y='160' fill='%23fb923c' font-family='sans-serif' font-size='11' font-weight='bold'>BPCL • SBI CARD</text><circle cx='250' cy='150' r='16' fill='%23c2410c' opacity='0.85'/><circle cx='268' cy='150' r='16' fill='%23ea580c' opacity='0.85'/></svg>",
+    "rating": "4.8",
+    "joiningFee": "₹1,499 + Taxes",
+    "annualFee": "₹1,499 (Waived on ₹2 Lakh annual spend)",
+    "tagline": "Save up to 7.25% (25X reward points) on Bharat Petroleum fuel, lubricants, and Bharat Gas bookings.",
+    "description": "Engineered for vehicle owners and commuters, the BPCL SBI Card Octane offers unbeatable savings on petrol and diesel, combined with 4 domestic airport lounge visits each year.",
+    "benefits": [
+      {
+        "icon": "fuel",
+        "title": "7.25% Valueback on Fuel",
+        "desc": "Earn 25 reward points per ₹100 spent at BPCL fuel stations + 1% fuel surcharge waiver."
+      },
+      {
+        "icon": "rewards",
+        "title": "6,000 Welcome Points",
+        "desc": "Receive 6,000 reward points worth ₹1,500 immediately upon paying joining fee."
+      },
+      {
+        "icon": "travel",
+        "title": "4 Airport Lounge Visits",
+        "desc": "Complimentary access to domestic airport lounges (1 per calendar quarter)."
+      },
+      {
+        "icon": "shopping",
+        "title": "10X on Groceries & Dining",
+        "desc": "Earn 10 reward points per ₹100 on groceries, departmental stores, and dining."
+      }
+    ],
+    "features": [
+      "7.25% effective savings on fuel and gas",
+      "4 domestic airport lounge visits per year",
+      "Welcome bonus points worth ₹1,500",
+      "Annual fee waiver on ₹2 Lakh annual spend"
+    ],
+    "applyLink": "https://www.sbicard.com",
+    "docUrl": "https://www.sbicard.com",
+    "docName": "BPCL SBI Card Octane Tariff Sheet (PDF)",
+    "status": "active",
+    "updatedAt": "2026-09-24T22:00:00.000Z"
+  }
+]

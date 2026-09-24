@@ -37,7 +37,7 @@ const createBee = (i) => ({
     vy: random(-1, 1),
     rotation: random(0, 360),
     opacity: 0,
-    scale: random(0.75, 1.15),
+    scale: random(0.72, 0.92),
     state: 'FLYING',
     targetX: null,
     targetY: null,
@@ -51,7 +51,9 @@ const createBee = (i) => ({
 
 // Find a random landing target for ONE bee
 const findLandingTarget = () => {
-    const elements = Array.from(document.querySelectorAll('h1, h2, h3, h4, p, span, button, .card, img, label, a'));
+    const elements = Array.from(document.querySelectorAll('h1, h2, h3, h4, p, span, button, .card, img, label, a')).filter(
+        el => !el.closest('.th-card, .tool-card, .bee-card, .bee-card-wrapper, .card-bee, header, nav, footer')
+    );
     const w = window.innerWidth;
     const h = window.innerHeight;
     const validRects = [];
@@ -350,7 +352,7 @@ const BeeSwarm = () => {
                     ref={(el) => (beeNodesRef.current[i] = el)}
                     style={{
                         position: 'fixed', left: 0, top: 0,
-                        width: '32px', height: '32px',
+                        width: '28px', height: '28px',
                         pointerEvents: 'none', zIndex: 9999,
                         opacity: 0,
                         transition: 'opacity 0.6s ease',
