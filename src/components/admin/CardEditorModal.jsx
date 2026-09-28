@@ -31,14 +31,14 @@ const POPULAR_BANKS = [
 ];
 
 const BENEFIT_THEMES = [
-    { label: '✈️ Airport Lounge & Travel', value: 'travel' },
-    { label: '💰 Direct Cashback', value: 'cashback' },
-    { label: '🎁 Reward Points & Gifts', value: 'rewards' },
-    { label: '⛽ Fuel & Gas Savings', value: 'fuel' },
-    { label: '🛡️ Insurance & Fraud Cover', value: 'protection' },
-    { label: '⭐ VIP Concierge & Milestones', value: 'vip' },
-    { label: '🛍️ Shopping & Dining Deals', value: 'shopping' },
-    { label: '📱 OTT & Subscriptions', value: 'entertainment' }
+    { label: 'Airport Lounge & Travel', value: 'travel' },
+    { label: 'Direct Cashback', value: 'cashback' },
+    { label: 'Reward Points & Gifts', value: 'rewards' },
+    { label: 'Fuel & Gas Savings', value: 'fuel' },
+    { label: 'Insurance & Fraud Cover', value: 'protection' },
+    { label: 'VIP Concierge & Milestones', value: 'vip' },
+    { label: 'Shopping & Dining Deals', value: 'shopping' },
+    { label: 'OTT & Subscriptions', value: 'entertainment' }
 ];
 
 const CardEditorModal = ({ isOpen, onClose, onSave, editingCard }) => {
@@ -650,7 +650,8 @@ const CardEditorModal = ({ isOpen, onClose, onSave, editingCard }) => {
                                             />
                                             {formData.docUrl && (
                                                 <span className="doc-status-badge">
-                                                    ✓ Attached
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '3px' }}><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                    Attached
                                                 </span>
                                             )}
                                         </div>
@@ -707,7 +708,8 @@ const CardEditorModal = ({ isOpen, onClose, onSave, editingCard }) => {
                             Cancel
                         </button>
                         <button type="submit" className="studio-btn studio-btn-primary save-btn">
-                            💾 Save & Publish Credit Card
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" style={{ marginRight: '6px' }}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            <span>Save &amp; Publish Credit Card</span>
                         </button>
                     </div>
                 </form>

@@ -1643,6 +1643,67 @@
     border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
 }
 
+/* GSheet Lock & Guide Bar */
+.studio-sheet-lock-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.sheet-lock-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sheet-lock-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #f59e0b;
+    cursor: pointer;
+}
+
+.setup-guide-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #60a5fa;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.setup-guide-link-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #60a5fa;
+    color: #93c5fd;
+}
+
+.studio-sheet-input-group .studio-input.input-locked,
+.gsheet-input.input-locked {
+    background: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
 /* ========================================================
    WORKSPACE TAB STRIP
    ======================================================== */
@@ -3275,6 +3336,33 @@
 [data-theme="light"] .studio-sheet-section-title {
     color: #d97706;
     border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .studio-sheet-lock-bar {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+[data-theme="light"] .sheet-lock-checkbox-label {
+    color: #1e293b;
+}
+
+[data-theme="light"] .setup-guide-link-btn {
+    border-color: #93c5fd;
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+[data-theme="light"] .setup-guide-link-btn:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+[data-theme="light"] .studio-sheet-input-group .studio-input.input-locked,
+[data-theme="light"] .gsheet-input.input-locked {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #64748b !important;
 }
 
 /* Light mode for Cards Studio Table & Drawer */

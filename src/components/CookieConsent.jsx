@@ -31,7 +31,9 @@ const CookieConsent = () => {
         <aside className="cookie-consent-bar" role="dialog" aria-live="polite" aria-label="Cookie and Privacy Consent">
             <div className="container cookie-consent-inner">
                 <div className="cookie-consent-text">
-                    <span className="cookie-icon" aria-hidden="true">🍪</span>
+                    <span className="cookie-icon" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="8" cy="9" r="1.5" fill="currentColor"></circle><circle cx="15" cy="8" r="1.5" fill="currentColor"></circle><circle cx="10" cy="15" r="1.5" fill="currentColor"></circle><circle cx="15" cy="14" r="1" fill="currentColor"></circle></svg>
+                    </span>
                     <p>
                         We use cookies, including third-party advertising cookies from Google AdSense, to improve your experience, analyze site usage, and serve personalized ads. By using our site, you agree to our{' '}
                         <Link to="/privacy" className="cookie-policy-link">Privacy & Cookie Policy</Link>.

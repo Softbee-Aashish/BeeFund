@@ -7,7 +7,9 @@ const NotFoundPage = () => {
         <div className="page-wrapper container section" style={{ minHeight: '65vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', position: 'relative' }}>
             <HexagonBackground opacity={0.04} />
             <div style={{ maxWidth: '600px', margin: '0 auto', zIndex: 2 }}>
-                <span style={{ fontSize: '4.5rem', display: 'block', marginBottom: '1rem' }}>🔍</span>
+                <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
                 <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1rem', color: '#0f172a' }}>Page Not Found</h1>
                 <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '2rem', lineHeight: '1.6' }}>
                     The page you are looking for might have been moved, removed, or is temporarily unavailable. Explore our official financial tools and services below.

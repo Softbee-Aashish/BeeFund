@@ -7,6 +7,7 @@ import { useTheme } from '../../context/ThemeContext';
 import DarkModeToggle from '../../components/DarkModeToggle';
 import CardsStudioSection from '../../components/admin/CardsStudioSection';
 import GoogleSheetsHubSection from '../../components/admin/GoogleSheetsHubSection';
+import GoogleSheetsSetupGuideModal from '../../components/admin/GoogleSheetsSetupGuideModal';
 import HexagonBackground from '../../components/HexagonBackground';
 import './AdminStudioPage.css';
 
@@ -64,6 +65,14 @@ const AdminStudioPage = () => {
     const [isSheetModalOpen, setIsSheetModalOpen] = useState(false);
     const [inputSheetUrl, setInputSheetUrl] = useState('');
     const [sheetActionNotice, setSheetActionNotice] = useState('');
+    const [isSheetLocked, setIsSheetLocked] = useState(() => {
+        try {
+            return localStorage.getItem('beefund_sheet_locked') === 'true';
+        } catch {
+            return false;
+        }
+    });
+    const [isSetupGuideModalOpen, setIsSetupGuideModalOpen] = useState(false);
 
     // Search and filter state
     const [searchQuery, setSearchQuery] = useState('');
@@ -307,21 +316,21 @@ const AdminStudioPage = () => {
         if (style === 'tip') {
             calloutHtml = `
                 <div class="blog-callout blog-callout-tip">
-                    <strong>💡 Financial Pro-Tip:</strong> Businesses that maintain their FOIR (Fixed Obligation to Income Ratio) under 45% consistently qualify for up to 1.5% interest rate concessions across leading partner banks.
+                    <strong>Financial Pro-Tip:</strong> Businesses that maintain their FOIR (Fixed Obligation to Income Ratio) under 45% consistently qualify for up to 1.5% interest rate concessions across leading partner banks.
                 </div>
                 <p><br></p>
             `;
         } else if (style === 'warning') {
             calloutHtml = `
                 <div class="blog-callout blog-callout-warning">
-                    <strong>⚠️ Important Regulatory Note:</strong> Always review the Sanction Letter APR (Annual Percentage Rate) including processing charges, doc charges, and stamp duty before executing final loan agreements.
+                    <strong>Important Regulatory Note:</strong> Always review the Sanction Letter APR (Annual Percentage Rate) including processing charges, doc charges, and stamp duty before executing final loan agreements.
                 </div>
                 <p><br></p>
             `;
         } else {
             calloutHtml = `
                 <div class="blog-callout blog-callout-info">
-                    <strong>ℹ️ Industry Fact:</strong> Over 68% of commercial bank loan applications in India utilize GST returns (GSTR-3B) and bank banking analytics for digital pre-qualification.
+                    <strong>Industry Fact:</strong> Over 68% of commercial bank loan applications in India utilize GST returns (GSTR-3B) and bank banking analytics for digital pre-qualification.
                 </div>
                 <p><br></p>
             `;
@@ -520,14 +529,14 @@ const AdminStudioPage = () => {
                     </svg>
                     <span>Google Sheets Hub</span>
                     <span className={`workspace-tab-badge ${sheetUrl ? 'badge-success' : 'badge-neutral'}`}>
-                        {sheetUrl ? '🟢 Live' : '⚪ Setup'}
+                        {sheetUrl ? 'Live' : 'Setup'}
                     </span>
                 </button>
             </div>
 
             {saveSuccessNotice && (
                 <div className="studio-toast-banner">
-                    <span>✨ {saveSuccessNotice}</span>
+                    <span>{saveSuccessNotice}</span>
                 </div>
             )}
 
@@ -644,7 +653,9 @@ const AdminStudioPage = () => {
                 <div className="studio-table-card">
                     {filteredPosts.length === 0 ? (
                         <div className="studio-empty-state">
-                            <div className="empty-icon">📝</div>
+                            <div className="empty-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            </div>
                             <h3>No articles found</h3>
                             <p>No matching blog posts based on your search or filter.</p>
                             <button onClick={handleOpenNew} className="studio-btn studio-btn-primary mt-3">
@@ -738,7 +749,7 @@ const AdminStudioPage = () => {
                 {/* Footer Controls & Reset */}
                 <div className="studio-footer-note">
                     <div>
-                        <strong>💡 How Changes Work:</strong> All created or edited articles are instantly saved and live on your site via browser local storage. When you are ready to persist them into source code, click <strong>"Export JSON"</strong> and replace <code>src/data/blogPosts.json</code> before committing.
+                        <strong>How Changes Work:</strong> All created or edited articles are instantly saved and live on your site via browser local storage. When you are ready to persist them into source code, click <strong>"Export JSON"</strong> and replace <code>src/data/blogPosts.json</code> before committing.
                     </div>
                     <button
                         onClick={() => setResetConfirmOpen(true)}
@@ -770,7 +781,10 @@ const AdminStudioPage = () => {
                                     className={`editor-tab-btn ${activeEditorTab === 'edit' ? 'active' : ''}`}
                                     onClick={() => setActiveEditorTab('edit')}
                                 >
-                                    📄 Document Editor
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        <span>Document Editor</span>
+                                    </span>
                                 </button>
                                 <button
                                     type="button"
@@ -780,7 +794,10 @@ const AdminStudioPage = () => {
                                         setActiveEditorTab('preview');
                                     }}
                                 >
-                                    👁️ Public Preview
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        <span>Public Preview</span>
+                                    </span>
                                 </button>
                             </div>
 
@@ -792,7 +809,7 @@ const AdminStudioPage = () => {
                         {/* Error Alert */}
                         {formError && (
                             <div className="editor-error-alert">
-                                <span>⚠️ {formError}</span>
+                                <span>{formError}</span>
                             </div>
                         )}
 
@@ -832,8 +849,8 @@ const AdminStudioPage = () => {
                                                 onChange={e => setFormData(prev => ({ ...prev, status: e.target.value }))}
                                                 className="meta-compact-select"
                                             >
-                                                <option value="published">🟢 Published</option>
-                                                <option value="draft">🟡 Draft</option>
+                                                <option value="published">Published</option>
+                                                <option value="draft">Draft</option>
                                             </select>
                                         </div>
                                     </div>
@@ -928,7 +945,10 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn ribbon-dropdown-trigger"
                                             title="Styles & Headings"
                                         >
-                                            <span>Paragraph Style ▾</span>
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                <span>Paragraph Style</span>
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                            </span>
                                         </button>
 
                                         {showHeadingMenu && (
@@ -991,7 +1011,10 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Font Color"
                                         >
-                                            <span style={{ borderBottom: '3px solid #d97706', paddingBottom: '1px' }}>A</span> ▾
+                                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                                <span style={{ borderBottom: '3px solid #d97706', paddingBottom: '1px' }}>A</span>
+                                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                            </span>
                                         </button>
 
                                         {showColorMenu && (
@@ -1021,7 +1044,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Highlight Color (Marker)"
                                         >
-                                            🖍️ ▾
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
                                         </button>
 
                                         {showHighlightMenu && (
@@ -1132,7 +1155,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn ribbon-btn-accent"
                                             title="Insert Table"
                                         >
-                                            📊 Table ▾
+                                            Table
                                         </button>
 
                                         {showTableMenu && (
@@ -1152,7 +1175,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Insert Tip Callout Box"
                                         >
-                                            💡 Tip
+                                            Tip
                                         </button>
 
                                         <button
@@ -1161,7 +1184,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Insert Warning Callout Box"
                                         >
-                                            ⚠️ Warning
+                                            Warning
                                         </button>
 
                                         <button
@@ -1170,7 +1193,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Insert Link"
                                         >
-                                            🔗 Link
+                                            Link
                                         </button>
 
                                         <button
@@ -1179,7 +1202,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Insert Image URL"
                                         >
-                                            🖼️ Image
+                                            Image
                                         </button>
 
                                         <button
@@ -1188,7 +1211,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Insert Divider Line"
                                         >
-                                            ➖ Line
+                                            Divider
                                         </button>
 
                                         <button
@@ -1197,7 +1220,7 @@ const AdminStudioPage = () => {
                                             className="ribbon-btn"
                                             title="Clear Formatting"
                                         >
-                                            🧹
+                                            Clear
                                         </button>
                                     </div>
                                 </div>
@@ -1256,7 +1279,7 @@ const AdminStudioPage = () => {
                             /* 6. LIVE PUBLIC PREVIEW TAB (Exact Website Simulation) */
                             <div className="editor-preview-container">
                                 <div className="preview-banner">
-                                    <span>👁️ Viewing live simulation of how this article will appear to visitors on <strong>beefund.in/blog/{formData.slug || 'slug'}</strong></span>
+                                    <span>Viewing live simulation of how this article will appear to visitors on <strong>beefund.in/blog/{formData.slug || 'slug'}</strong></span>
                                 </div>
 
                                 <div className="preview-paper">
@@ -1325,7 +1348,13 @@ const AdminStudioPage = () => {
             {promptDialog && (
                 <div className="studio-confirm-overlay" onClick={() => setPromptDialog(null)}>
                     <div className="studio-confirm-card" onClick={e => e.stopPropagation()}>
-                        <div className="confirm-icon">{promptDialog.type === 'link' ? '🔗' : '🖼️'}</div>
+                        <div className="confirm-icon">
+                            {promptDialog.type === 'link' ? (
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            ) : (
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            )}
+                        </div>
                         <h3>{promptDialog.type === 'link' ? 'Insert Web Link' : 'Insert Image URL'}</h3>
                         <form onSubmit={handlePromptSubmit} className="prompt-form">
                             <div className="prompt-input-group">
@@ -1367,7 +1396,9 @@ const AdminStudioPage = () => {
             {deleteConfirmId && (
                 <div className="studio-confirm-overlay">
                     <div className="studio-confirm-card">
-                        <div className="confirm-icon danger">🗑️</div>
+                        <div className="confirm-icon danger">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </div>
                         <h3>Delete Article?</h3>
                         <p>Are you sure you want to delete this blog post? It will be removed from your website and local storage.</p>
                         <div className="confirm-actions">
@@ -1393,7 +1424,9 @@ const AdminStudioPage = () => {
             {resetConfirmOpen && (
                 <div className="studio-confirm-overlay">
                     <div className="studio-confirm-card">
-                        <div className="confirm-icon warning">⚠️</div>
+                        <div className="confirm-icon warning">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
                         <h3>Reset to Default Articles?</h3>
                         <p>This will restore the original default articles from the JSON data file. Any custom draft or post not exported will be lost.</p>
                         <div className="confirm-actions">
@@ -1421,10 +1454,18 @@ const AdminStudioPage = () => {
                     <div className="studio-sheet-modal-card" onClick={e => e.stopPropagation()}>
                         <div className="studio-sheet-header">
                             <div className="studio-sheet-header-title">
-                                <div className="sheet-logo-badge">📊</div>
+                                <div className="sheet-logo-badge">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                                        <line x1="3" y1="15" x2="21" y2="15"></line>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    </svg>
+                                </div>
                                 <div>
                                     <h3>Google Sheets Live Sync</h3>
-                                    <p>Connect your "Beefund_Articles" sheet directly to the live website</p>
+                                    <p>Connect your spreadsheet directly to the live website</p>
                                 </div>
                             </div>
                             <button className="studio-modal-close" onClick={() => setIsSheetModalOpen(false)}>&times;</button>
@@ -1434,9 +1475,15 @@ const AdminStudioPage = () => {
                             <div className="studio-sheet-status-row">
                                 <span className="status-label">Connection Status:</span>
                                 {sheetUrl ? (
-                                    <span className="status-pill connected">🟢 Connected</span>
+                                    <span className="status-pill connected">
+                                        <span className="status-dot dot-published" style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', marginRight: '6px' }}></span>
+                                        Connected
+                                    </span>
                                 ) : (
-                                    <span className="status-pill disconnected">⚪ Not Connected</span>
+                                    <span className="status-pill disconnected">
+                                        <span className="status-dot dot-draft" style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#94a3b8', marginRight: '6px' }}></span>
+                                        Not Connected
+                                    </span>
                                 )}
                             </div>
 
@@ -1452,92 +1499,171 @@ const AdminStudioPage = () => {
                                 </div>
                             )}
 
+                            {/* LOCK CHECKBOX AND SETUP GUIDE LINK BAR */}
+                            <div className="studio-sheet-lock-bar">
+                                <label className="sheet-lock-checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        checked={isSheetLocked}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setIsSheetLocked(checked);
+                                            try {
+                                                localStorage.setItem('beefund_sheet_locked', checked ? 'true' : 'false');
+                                            } catch (err) {
+                                                console.warn(err);
+                                            }
+                                        }}
+                                    />
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                        {isSheetLocked ? (
+                                            <>
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                                            </>
+                                        )}
+                                    </svg>
+                                    <span style={{ fontWeight: 600 }}>
+                                        {isSheetLocked ? 'Google Sheet Locked (Protected)' : 'Lock Google Sheet Configuration'}
+                                    </span>
+                                </label>
+
+                                <button
+                                    type="button"
+                                    className="setup-guide-link-btn"
+                                    onClick={() => setIsSetupGuideModalOpen(true)}
+                                    title="Open complete Google Sheets setup guide and Apps Script code"
+                                >
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                    </svg>
+                                    <span>Setup Guide & Code</span>
+                                </button>
+                            </div>
+
                             <div className="studio-sheet-input-group">
                                 <label htmlFor="sheet-app-url">Google Apps Script Web App URL:</label>
                                 <input
                                     id="sheet-app-url"
                                     type="url"
-                                    className="studio-input"
+                                    className={`studio-input ${isSheetLocked ? 'input-locked' : ''}`}
                                     placeholder="https://script.google.com/macros/s/AKfycb.../exec"
                                     value={inputSheetUrl}
                                     onChange={(e) => setInputSheetUrl(e.target.value)}
+                                    disabled={isSheetLocked}
                                 />
                                 <span className="input-hint">
-                                    Deploy your Apps Script as a Web App (Execute as: Me, Access: Anyone).
+                                    {isSheetLocked 
+                                        ? 'Configuration is locked to prevent accidental URL wipes. Uncheck lock above to edit.' 
+                                        : 'Deploy your Apps Script as a Web App (Execute as: Me, Access: Anyone).'}
                                 </span>
                             </div>
 
                             <div className="studio-sheet-section-title">
-                                <span>📄 Articles Live Sync</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                <span>Articles Live Sync</span>
                             </div>
                             <div className="studio-sheet-actions-grid">
                                 <button
                                     type="button"
                                     className="studio-btn studio-btn-primary"
-                                    disabled={isSyncing}
+                                    disabled={isSyncing || (isSheetLocked && !sheetUrl)}
                                     onClick={async () => {
-                                        setSheetUrl(inputSheetUrl);
-                                        const res = await fetchFromSheet(inputSheetUrl);
+                                        if (!isSheetLocked) setSheetUrl(inputSheetUrl);
+                                        const res = await fetchFromSheet(inputSheetUrl || sheetUrl);
                                         if (res && res.success) {
                                             setSheetActionNotice(`Saved URL & loaded ${res.count || 0} articles from sheet!`);
                                         }
                                     }}
                                 >
-                                    💾 Save & Pull Articles
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                    </svg>
+                                    <span>Save & Pull Articles</span>
                                 </button>
 
                                 <button
                                     type="button"
                                     className="studio-btn studio-btn-secondary"
-                                    disabled={isSyncing || !inputSheetUrl}
+                                    disabled={isSyncing || (!inputSheetUrl && !sheetUrl)}
                                     onClick={async () => {
-                                        setSheetUrl(inputSheetUrl);
-                                        const res = await pushAllToSheet(inputSheetUrl);
+                                        if (!isSheetLocked) setSheetUrl(inputSheetUrl);
+                                        const res = await pushAllToSheet(inputSheetUrl || sheetUrl);
                                         if (res && res.success) {
                                             setSheetActionNotice(`Pushed ${posts.length} articles to your Google Sheet!`);
                                         }
                                     }}
                                 >
-                                    📤 Push Articles to Sheet
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    <span>Push Articles to Sheet</span>
                                 </button>
                             </div>
 
                             <div className="studio-sheet-section-title" style={{ marginTop: '1.25rem' }}>
-                                <span>💳 Credit Cards Live Sync</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                                </svg>
+                                <span>Credit Cards Live Sync</span>
                             </div>
                             <div className="studio-sheet-actions-grid">
                                 <button
                                     type="button"
                                     className="studio-btn studio-btn-primary"
-                                    disabled={isSyncing || !inputSheetUrl}
+                                    disabled={isSyncing || (!inputSheetUrl && !sheetUrl)}
                                     onClick={async () => {
-                                        setSheetUrl(inputSheetUrl);
-                                        const res = await fetchCardsFromSheet(inputSheetUrl);
+                                        if (!isSheetLocked) setSheetUrl(inputSheetUrl);
+                                        const res = await fetchCardsFromSheet(inputSheetUrl || sheetUrl);
                                         if (res && res.success) {
                                             setSheetActionNotice(`Loaded ${res.count || 0} credit cards from Google Sheet!`);
                                         }
                                     }}
                                 >
-                                    📥 Pull Cards from Sheet
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    <span>Pull Cards from Sheet</span>
                                 </button>
 
                                 <button
                                     type="button"
                                     className="studio-btn studio-btn-secondary"
-                                    disabled={isSyncing || !inputSheetUrl}
+                                    disabled={isSyncing || (!inputSheetUrl && !sheetUrl)}
                                     onClick={async () => {
-                                        setSheetUrl(inputSheetUrl);
-                                        const res = await pushCardsToSheet(inputSheetUrl);
+                                        if (!isSheetLocked) setSheetUrl(inputSheetUrl);
+                                        const res = await pushCardsToSheet(inputSheetUrl || sheetUrl);
                                         if (res && res.success) {
                                             setSheetActionNotice(`Pushed ${cards.length} credit cards to your Google Sheet!`);
                                         }
                                     }}
                                 >
-                                    📤 Push Cards to Sheet
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '5px' }}>
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    <span>Push Cards to Sheet</span>
                                 </button>
                             </div>
 
-                            {sheetUrl && (
+                            {sheetUrl && !isSheetLocked && (
                                 <div className="studio-sheet-disconnect">
                                     <button
                                         type="button"
@@ -1556,6 +1682,12 @@ const AdminStudioPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* SETUP GUIDE MODAL */}
+            <GoogleSheetsSetupGuideModal
+                isOpen={isSetupGuideModalOpen}
+                onClose={() => setIsSetupGuideModalOpen(false)}
+            />
         </div>
     );
 };

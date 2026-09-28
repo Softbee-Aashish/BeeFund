@@ -288,7 +288,7 @@ const PamphletModal = () => {
                                             className={fieldErrors.name ? 'input-has-error' : ''}
                                             required
                                         />
-                                        {fieldErrors.name && <span className="p-field-error">⚠️ {fieldErrors.name}</span>}
+                                        {fieldErrors.name && <span className="p-field-error">{fieldErrors.name}</span>}
                                     </div>
                                     <div className="p-input-group">
                                         <label htmlFor="p-age">Age *</label>
@@ -305,7 +305,7 @@ const PamphletModal = () => {
                                             className={fieldErrors.age ? 'input-has-error' : ''}
                                             required
                                         />
-                                        {fieldErrors.age && <span className="p-field-error">⚠️ {fieldErrors.age}</span>}
+                                        {fieldErrors.age && <span className="p-field-error">{fieldErrors.age}</span>}
                                     </div>
                                 </div>
 
@@ -326,7 +326,7 @@ const PamphletModal = () => {
                                                 required
                                             />
                                         </div>
-                                        {fieldErrors.mobile && <span className="p-field-error">⚠️ {fieldErrors.mobile}</span>}
+                                        {fieldErrors.mobile && <span className="p-field-error">{fieldErrors.mobile}</span>}
                                     </div>
                                     <div className="p-input-group">
                                         <label htmlFor="p-email">Email Address *</label>
@@ -341,7 +341,7 @@ const PamphletModal = () => {
                                             className={fieldErrors.email ? 'input-has-error' : ''}
                                             required
                                         />
-                                        {fieldErrors.email && <span className="p-field-error">⚠️ {fieldErrors.email}</span>}
+                                        {fieldErrors.email && <span className="p-field-error">{fieldErrors.email}</span>}
                                     </div>
                                 </div>
 
@@ -423,7 +423,8 @@ const PamphletModal = () => {
                                         )}
                                     </button>
                                     <span className="p-privacy-note">
-                                        🔒 100% confidential • Zero spam guarantee
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '4px' }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                        100% confidential • Zero spam guarantee
                                     </span>
                                 </div>
                             </form>

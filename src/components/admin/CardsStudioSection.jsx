@@ -5,23 +5,41 @@ import CardEditorModal from './CardEditorModal';
 const getBenefitIconSvg = (iconType) => {
     switch (iconType) {
         case 'travel':
-            return '✈️';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            );
         case 'cashback':
-            return '💰';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            );
         case 'rewards':
-            return '🎁';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+            );
         case 'fuel':
-            return '⛽';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"></path><path d="M15 10h4a2 2 0 0 1 2 2v8"></path><line x1="3" y1="14" x2="15" y2="14"></line></svg>
+            );
         case 'protection':
-            return '🛡️';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            );
         case 'vip':
-            return '⭐';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            );
         case 'shopping':
-            return '🛍️';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            );
         case 'entertainment':
-            return '📱';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            );
         default:
-            return '✨';
+            return (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            );
     }
 };
 
@@ -127,7 +145,7 @@ const CardsStudioSection = () => {
         <section className="cards-studio-section">
             {notification && (
                 <div className="studio-toast-banner">
-                    <span>✨ {notification}</span>
+                    <span>{notification}</span>
                 </div>
             )}
 
@@ -305,7 +323,9 @@ const CardsStudioSection = () => {
                                 <tr>
                                     <td colSpan={8} className="table-empty-cell">
                                         <div className="empty-state-studio">
-                                            <div className="empty-illustration">💳</div>
+                                            <div className="empty-illustration">
+                                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.5"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                                            </div>
                                             <h4>Your Credit Card Catalog is Currently Empty</h4>
                                             <p>No credit cards are listed yet. Add your first credit card with direct application links, or load pre-configured starter templates to customize.</p>
                                             <div className="empty-state-actions">
@@ -387,7 +407,10 @@ const CardsStudioSection = () => {
                                                                 <span className="card-name-text" title={card.name}>{card.name}</span>
                                                                 {card.rating && (
                                                                     <span className="card-rating-pill" title={`Rating: ${card.rating} / 5`}>
-                                                                        ★ {card.rating}
+                                                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                                                            <span>{card.rating}</span>
+                                                                        </span>
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -429,7 +452,7 @@ const CardsStudioSection = () => {
                                                 <td>
                                                     <div className="table-perks-summary">
                                                         <span className="perks-count-badge">
-                                                            🎠 {card.benefits?.length || 0} Perks
+                                                            {card.benefits?.length || 0} Perks
                                                         </span>
                                                         {card.benefits && card.benefits[0] && (
                                                             <div className="perk-preview-item" title={card.benefits[0].desc || card.benefits[0].title}>
@@ -598,7 +621,7 @@ const CardsStudioSection = () => {
                                                                     <span className="drawer-tag">QUICK CARD INSPECTOR</span>
                                                                     <h4>{card.name}</h4>
                                                                     <span className="drawer-status-chip">
-                                                                        {card.status === 'active' ? '🟢 Live on /credit-cards' : '⚪ Hidden Draft'}
+                                                                        {card.status === 'active' ? 'Live on /credit-cards' : 'Hidden Draft'}
                                                                     </span>
                                                                 </div>
                                                                 <div className="drawer-header-actions">
@@ -707,7 +730,10 @@ const CardsStudioSection = () => {
                                                                             <div className="drawer-link-item">
                                                                                 <span className="drawer-label">OFFICIAL SANCTION / MITC PDF</span>
                                                                                 <div className="drawer-doc-box">
-                                                                                    <span>📄 {card.docName || 'Official Terms PDF'}</span>
+                                                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                                                                        <span>{card.docName || 'Official Terms PDF'}</span>
+                                                                                    </span>
                                                                                     <a
                                                                                         href={card.docUrl}
                                                                                         target="_blank"
@@ -762,7 +788,7 @@ const CardsStudioSection = () => {
             {/* Bottom info & reset strip */}
             <div className="studio-bottom-sync-bar">
                 <p>
-                    <strong>💡 Credit Card Management:</strong> All card changes, uploaded images, and apply links save instantly to your browser. Use <strong>"Export JSON"</strong> to download and preserve permanent catalog backups.
+                    <strong>Credit Card Management:</strong> All card changes, uploaded images, and apply links save instantly to your browser. Use <strong>"Export JSON"</strong> to download and preserve permanent catalog backups.
                 </p>
                 <button
                     type="button"
@@ -788,7 +814,9 @@ const CardsStudioSection = () => {
             {deleteConfirmId && (
                 <div className="studio-confirm-overlay" onClick={() => setDeleteConfirmId(null)}>
                     <div className="studio-confirm-card" onClick={e => e.stopPropagation()}>
-                        <div className="confirm-icon">🗑️</div>
+                        <div className="confirm-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </div>
                         <h3>Delete Credit Card?</h3>
                         <p>Are you sure you want to delete this credit card offer? This action will remove it from the catalog and the website.</p>
                         <div className="confirm-actions">
@@ -820,7 +848,9 @@ const CardsStudioSection = () => {
             {resetConfirmOpen && (
                 <div className="studio-confirm-overlay" onClick={() => setResetConfirmOpen(false)}>
                     <div className="studio-confirm-card" onClick={e => e.stopPropagation()}>
-                        <div className="confirm-icon">⚠️</div>
+                        <div className="confirm-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
                         <h3>Reset Cards to Defaults?</h3>
                         <p>This will reload the initial template library of popular bank credit cards into your workspace.</p>
                         <div className="confirm-actions">

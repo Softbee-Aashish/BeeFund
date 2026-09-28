@@ -400,3 +400,5 @@ export const useBlogs = () => {
     return context;
 };
 
+export const useBlog = useBlogs;
+

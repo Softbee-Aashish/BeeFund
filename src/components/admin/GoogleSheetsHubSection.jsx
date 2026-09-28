@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBlogs } from '../../context/BlogContext';
 import { useCards } from '../../context/CardsContext';
+import GoogleSheetsSetupGuideModal from './GoogleSheetsSetupGuideModal';
 
 const APPS_SCRIPT_TEMPLATE = `// ============================================================================
 // BEEFUND LIVE SYNC WEB APP SCRIPT (Google Sheets Backend)
@@ -49,7 +50,6 @@ function handleGetArticles(ss) {
   var data = sheet.getDataRange().getValues();
   if (data.length <= 1) return respondJSON({ success: true, articles: [] });
 
-  var headers = data[0];
   var articles = [];
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
@@ -142,8 +142,8 @@ function respondJSON(obj) {
 const GoogleSheetsHubSection = () => {
     const { 
         posts, sheetUrl, setSheetUrl, isSyncing: isBlogSyncing, 
-        syncStatus: blogSyncStatus, fetchFromSheet, pushAllToSheet 
-    } = useBlog();
+        fetchFromSheet, pushAllToSheet 
+    } = useBlogs();
     const { 
         cards, isSyncing: isCardsSyncing, 
         fetchCardsFromSheet, pushCardsToSheet 
@@ -154,6 +154,14 @@ const GoogleSheetsHubSection = () => {
     const [isTesting, setIsTesting] = useState(false);
     const [copiedScript, setCopiedScript] = useState(false);
     const [isCodeVisible, setIsCodeVisible] = useState(false);
+    const [isSheetLocked, setIsSheetLocked] = useState(() => {
+        try {
+            return localStorage.getItem('beefund_sheet_locked') === 'true';
+        } catch (e) {
+            return false;
+        }
+    });
+    const [isSetupGuideModalOpen, setIsSetupGuideModalOpen] = useState(false);
 
     const isAnySyncing = isBlogSyncing || isCardsSyncing || isTesting;
 
@@ -162,8 +170,21 @@ const GoogleSheetsHubSection = () => {
         setTimeout(() => setActionNotice(null), 5000);
     };
 
+    const handleToggleLock = (checked) => {
+        setIsSheetLocked(checked);
+        try {
+            localStorage.setItem('beefund_sheet_locked', checked ? 'true' : 'false');
+        } catch (err) {
+            console.warn(err);
+        }
+    };
+
     // Save URL action
     const handleSaveUrl = () => {
+        if (isSheetLocked) {
+            showNotice('Google Sheet configuration is locked. Uncheck lock to modify.', 'error');
+            return;
+        }
         const clean = inputUrl.trim();
         setSheetUrl(clean);
         if (clean) {
@@ -187,13 +208,13 @@ const GoogleSheetsHubSection = () => {
             if (!res.ok) throw new Error(`HTTP error ${res.status}`);
             const data = await res.json();
             if (data && data.success) {
-                setSheetUrl(target);
-                showNotice(`🟢 Live Connection Verified! Script returned ${data.articles ? data.articles.length : 0} articles.`, 'success');
+                if (!isSheetLocked) setSheetUrl(target);
+                showNotice(`Live Connection Verified! Script returned ${data.articles ? data.articles.length : 0} articles.`, 'success');
             } else {
                 throw new Error(data?.error || 'Invalid response from Web App');
             }
         } catch (err) {
-            showNotice(`⚠️ Connection Test Failed: ${err.message}. Check Apps Script permissions ("Who has access: Anyone").`, 'error');
+            showNotice(`Connection Test Failed: ${err.message}. Check Apps Script permissions ("Who has access: Anyone").`, 'error');
         } finally {
             setIsTesting(false);
         }
@@ -213,12 +234,12 @@ const GoogleSheetsHubSection = () => {
             showNotice('Please save a Google Sheet URL first.', 'error');
             return;
         }
-        if (inputUrl && inputUrl !== sheetUrl) {
+        if (!isSheetLocked && inputUrl && inputUrl !== sheetUrl) {
             setSheetUrl(inputUrl);
         }
         const res = await fetchFromSheet(inputUrl || sheetUrl);
         if (res && res.success) {
-            showNotice(`📥 Successfully pulled ${res.count || 0} articles from Google Sheet!`);
+            showNotice(`Successfully pulled ${res.count || 0} articles from Google Sheet!`);
         } else {
             showNotice(res?.error || 'Failed to pull articles.', 'error');
         }
@@ -230,12 +251,12 @@ const GoogleSheetsHubSection = () => {
             showNotice('Please save a Google Sheet URL first.', 'error');
             return;
         }
-        if (inputUrl && inputUrl !== sheetUrl) {
+        if (!isSheetLocked && inputUrl && inputUrl !== sheetUrl) {
             setSheetUrl(inputUrl);
         }
         const res = await pushAllToSheet(inputUrl || sheetUrl);
         if (res && res.success) {
-            showNotice(`📤 Successfully pushed ${posts.length} articles to Google Sheet!`);
+            showNotice(`Successfully pushed ${posts.length} articles to Google Sheet!`);
         } else {
             showNotice(res?.error || 'Failed to push articles.', 'error');
         }
@@ -247,12 +268,12 @@ const GoogleSheetsHubSection = () => {
             showNotice('Please save a Google Sheet URL first.', 'error');
             return;
         }
-        if (inputUrl && inputUrl !== sheetUrl) {
+        if (!isSheetLocked && inputUrl && inputUrl !== sheetUrl) {
             setSheetUrl(inputUrl);
         }
         const res = await fetchCardsFromSheet(inputUrl || sheetUrl);
         if (res && res.success) {
-            showNotice(`📥 Successfully pulled ${res.count || 0} credit cards from Google Sheet!`);
+            showNotice(`Successfully pulled ${res.count || 0} credit cards from Google Sheet!`);
         } else {
             showNotice(res?.error || 'Failed to pull credit cards.', 'error');
         }
@@ -264,12 +285,12 @@ const GoogleSheetsHubSection = () => {
             showNotice('Please save a Google Sheet URL first.', 'error');
             return;
         }
-        if (inputUrl && inputUrl !== sheetUrl) {
+        if (!isSheetLocked && inputUrl && inputUrl !== sheetUrl) {
             setSheetUrl(inputUrl);
         }
         const res = await pushCardsToSheet(inputUrl || sheetUrl);
         if (res && res.success) {
-            showNotice(`📤 Successfully pushed ${cards.length} credit cards to Google Sheet!`);
+            showNotice(`Successfully pushed ${cards.length} credit cards to Google Sheet!`);
         } else {
             showNotice(res?.error || 'Failed to push credit cards.', 'error');
         }
@@ -289,7 +310,15 @@ const GoogleSheetsHubSection = () => {
             <div className="gsheet-hero-card">
                 <div className="gsheet-hero-header">
                     <div className="gsheet-hero-brand">
-                        <div className="gsheet-icon-badge">📊</div>
+                        <div className="gsheet-icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="8" y1="13" x2="16" y2="13"></line>
+                                <line x1="8" y1="17" x2="16" y2="17"></line>
+                                <line x1="10" y1="9" x2="10" y2="9"></line>
+                            </svg>
+                        </div>
                         <div>
                             <h2>Google Sheets Live Sync Hub</h2>
                             <p>Seamless two-way cloud synchronization between BeeFund and your Google Sheets database</p>
@@ -300,14 +329,54 @@ const GoogleSheetsHubSection = () => {
                         {sheetUrl ? (
                             <span className="status-badge connected">
                                 <span className="status-ping"></span>
-                                🟢 Connected & Live
+                                Connected &amp; Live
                             </span>
                         ) : (
                             <span className="status-badge disconnected">
-                                ⚪ Not Connected
+                                Not Connected
                             </span>
                         )}
                     </div>
+                </div>
+
+                {/* LOCK CHECKBOX AND SETUP GUIDE LINK BAR */}
+                <div className="studio-sheet-lock-bar" style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
+                    <label className="sheet-lock-checkbox-label">
+                        <input
+                            type="checkbox"
+                            checked={isSheetLocked}
+                            onChange={(e) => handleToggleLock(e.target.checked)}
+                        />
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            {isSheetLocked ? (
+                                <>
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </>
+                            ) : (
+                                <>
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                                </>
+                            )}
+                        </svg>
+                        <span style={{ fontWeight: 600 }}>
+                            {isSheetLocked ? 'Google Sheet Locked (Protected)' : 'Lock Google Sheet Configuration'}
+                        </span>
+                    </label>
+
+                    <button
+                        type="button"
+                        className="setup-guide-link-btn"
+                        onClick={() => setIsSetupGuideModalOpen(true)}
+                        title="Open complete Google Sheets setup guide and Apps Script code"
+                    >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span>Setup Guide &amp; Code</span>
+                    </button>
                 </div>
 
                 {/* URL INPUT & CONFIG */}
@@ -321,9 +390,10 @@ const GoogleSheetsHubSection = () => {
                                 placeholder="https://script.google.com/macros/s/AKfycb.../exec"
                                 value={inputUrl}
                                 onChange={(e) => setInputUrl(e.target.value)}
-                                className="gsheet-input"
+                                className={`gsheet-input ${isSheetLocked ? 'input-locked' : ''}`}
+                                disabled={isSheetLocked}
                             />
-                            {inputUrl && (
+                            {inputUrl && !isSheetLocked && (
                                 <button 
                                     type="button" 
                                     className="url-clear-btn"
@@ -335,7 +405,9 @@ const GoogleSheetsHubSection = () => {
                             )}
                         </div>
                         <span className="url-helper-text">
-                            Deploy your Apps Script as Web App with <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong>.
+                            {isSheetLocked 
+                                ? 'Configuration is locked. URL cannot be changed or cleared while lock is active.' 
+                                : 'Deploy your Apps Script as Web App with Execute as: Me and Who has access: Anyone.'}
                         </span>
                     </div>
 
@@ -344,19 +416,27 @@ const GoogleSheetsHubSection = () => {
                             type="button"
                             className="studio-btn studio-btn-primary"
                             onClick={handleSaveUrl}
-                            disabled={isAnySyncing}
+                            disabled={isAnySyncing || isSheetLocked}
                         >
-                            💾 Save URL
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            <span>Save URL</span>
                         </button>
                         <button
                             type="button"
                             className="studio-btn studio-btn-secondary"
                             onClick={handleTestConnection}
-                            disabled={isAnySyncing || !inputUrl.trim()}
+                            disabled={isAnySyncing || (!inputUrl.trim() && !sheetUrl)}
                         >
-                            {isTesting ? 'Testing...' : '⚡ Test Connection'}
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
+                            <span>{isTesting ? 'Testing...' : 'Test Connection'}</span>
                         </button>
-                        {sheetUrl && (
+                        {sheetUrl && !isSheetLocked && (
                             <button
                                 type="button"
                                 className="studio-btn studio-btn-danger-outline"
@@ -379,9 +459,17 @@ const GoogleSheetsHubSection = () => {
                 <div className="gsheet-sync-station-card">
                     <div className="station-header">
                         <div className="station-title-group">
-                            <span className="station-icon">📄</span>
+                            <span className="station-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </span>
                             <div>
-                                <h3>Blog & News Articles</h3>
+                                <h3>Blog &amp; News Articles</h3>
                                 <p>Sheet Tab: <code>Articles</code></p>
                             </div>
                         </div>
@@ -414,7 +502,12 @@ const GoogleSheetsHubSection = () => {
                                 onClick={handlePullArticles}
                                 disabled={isAnySyncing}
                             >
-                                📥 Pull Articles from Sheet
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span>Pull Articles from Sheet</span>
                             </button>
                             <button
                                 type="button"
@@ -422,7 +515,12 @@ const GoogleSheetsHubSection = () => {
                                 onClick={handlePushArticles}
                                 disabled={isAnySyncing}
                             >
-                                📤 Push Articles to Sheet
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Push Articles to Sheet</span>
                             </button>
                         </div>
                     </div>
@@ -432,7 +530,12 @@ const GoogleSheetsHubSection = () => {
                 <div className="gsheet-sync-station-card">
                     <div className="station-header">
                         <div className="station-title-group">
-                            <span className="station-icon">💳</span>
+                            <span className="station-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                                </svg>
+                            </span>
                             <div>
                                 <h3>Credit Cards Catalog</h3>
                                 <p>Sheet Tab: <code>CreditCards</code></p>
@@ -445,7 +548,7 @@ const GoogleSheetsHubSection = () => {
 
                     <div className="station-body">
                         <p className="station-desc">
-                            Manage and publish your credit card catalog, partner application links, joining & annual fees, benefits, and category filters directly from Google Sheets.
+                            Manage and publish your credit card catalog, partner application links, joining &amp; annual fees, benefits, and category filters directly from Google Sheets.
                         </p>
 
                         <div className="station-fields-preview">
@@ -467,7 +570,12 @@ const GoogleSheetsHubSection = () => {
                                 onClick={handlePullCards}
                                 disabled={isAnySyncing}
                             >
-                                📥 Pull Cards from Sheet
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span>Pull Cards from Sheet</span>
                             </button>
                             <button
                                 type="button"
@@ -475,7 +583,12 @@ const GoogleSheetsHubSection = () => {
                                 onClick={handlePushCards}
                                 disabled={isAnySyncing}
                             >
-                                📤 Push Cards to Sheet
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Push Cards to Sheet</span>
                             </button>
                         </div>
                     </div>
@@ -486,7 +599,13 @@ const GoogleSheetsHubSection = () => {
             <div className="gsheet-guide-card">
                 <div className="guide-header">
                     <div className="guide-title">
-                        <h3>🛠️ Google Apps Script Backend Code (`Code.gs`)</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="16 18 22 12 16 6"></polyline>
+                                <polyline points="8 6 2 12 8 18"></polyline>
+                            </svg>
+                            <h3 style={{ margin: 0 }}>Google Apps Script Backend Code (<code>Code.gs</code>)</h3>
+                        </div>
                         <p>Complete Apps Script code to copy and paste into your Google Sheet's script editor</p>
                     </div>
 
@@ -503,7 +622,17 @@ const GoogleSheetsHubSection = () => {
                             className="studio-btn studio-btn-primary"
                             onClick={handleCopyScript}
                         >
-                            {copiedScript ? '✅ Copied to Clipboard!' : '📋 Copy Script Code'}
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                {copiedScript ? (
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                ) : (
+                                    <>
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </>
+                                )}
+                            </svg>
+                            <span>{copiedScript ? 'Copied to Clipboard!' : 'Copy Script Code'}</span>
                         </button>
                     </div>
                 </div>
@@ -547,6 +676,12 @@ const GoogleSheetsHubSection = () => {
                     </div>
                 )}
             </div>
+
+            {/* SETUP GUIDE MODAL */}
+            <GoogleSheetsSetupGuideModal
+                isOpen={isSetupGuideModalOpen}
+                onClose={() => setIsSetupGuideModalOpen(false)}
+            />
         </div>
     );
 };

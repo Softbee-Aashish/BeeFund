@@ -35,7 +35,10 @@ const Footer = () => {
                             <strong>BeeFund Financial Services</strong> is India’s trusted digital loan partner, debt structuring advisor, and free credit score intelligence platform. Empowering MSMEs and individuals to secure the fastest bank sanctions at the lowest market rates.
                         </p>
                         <div className="footer-trust-badge">
-                            <span>🛡️ 100% RBI Compliant Bureau Soft Pulls</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                <span>100% RBI Compliant Bureau Soft Pulls</span>
+                            </span>
                         </div>
                     </div>
 
