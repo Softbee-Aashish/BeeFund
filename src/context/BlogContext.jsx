@@ -3,13 +3,17 @@ import initialBlogPosts from '../data/blogPosts.json';
 
 const BlogContext = createContext(null);
 const STORAGE_KEY = 'beefund_blogs_v1';
-const SHEET_URL_KEY = 'beefund_articles_sheet_url';
+const PRIMARY_SHEET_KEY = 'beefund_sheet_url';
+const LEGACY_SHEET_KEY = 'beefund_articles_sheet_url';
 
 export const BlogProvider = ({ children }) => {
     // Google Apps Script Web App URL
     const [sheetUrl, setSheetUrlState] = useState(() => {
         try {
-            return localStorage.getItem(SHEET_URL_KEY) || import.meta.env.VITE_ARTICLES_SHEET_URL || '';
+            return localStorage.getItem(PRIMARY_SHEET_KEY) || 
+                   localStorage.getItem(LEGACY_SHEET_KEY) || 
+                   import.meta.env.VITE_GOOGLE_SHEET_URL || 
+                   import.meta.env.VITE_ARTICLES_SHEET_URL || '';
         } catch {
             return '';
         }
@@ -18,19 +22,32 @@ export const BlogProvider = ({ children }) => {
     const [isSyncing, setIsSyncing] = useState(false);
     const [syncStatus, setSyncStatus] = useState({ state: 'idle', message: '', time: null });
 
-    const setSheetUrl = (url) => {
+    const setSheetUrl = useCallback((url) => {
         const clean = (url || '').trim();
         setSheetUrlState(clean);
         try {
             if (clean) {
-                localStorage.setItem(SHEET_URL_KEY, clean);
+                localStorage.setItem(PRIMARY_SHEET_KEY, clean);
+                localStorage.setItem(LEGACY_SHEET_KEY, clean);
             } else {
-                localStorage.removeItem(SHEET_URL_KEY);
+                localStorage.removeItem(PRIMARY_SHEET_KEY);
+                localStorage.removeItem(LEGACY_SHEET_KEY);
             }
         } catch (e) {
             console.error('Failed to save sheet URL:', e);
         }
-    };
+    }, []);
+
+    // Sync across tabs and with CardsContext
+    useEffect(() => {
+        const handleStorage = (e) => {
+            if (e.key === PRIMARY_SHEET_KEY || e.key === LEGACY_SHEET_KEY) {
+                setSheetUrlState(e.newValue || '');
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
+    }, []);
 
     const [posts, setPosts] = useState(() => {
         try {

@@ -30,6 +30,7 @@ const TermsPage = React.lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
 const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 const AdminStudioPage = React.lazy(() => import('./pages/admin/AdminStudioPage'));
+const ArticleEditorPage = React.lazy(() => import('./pages/admin/ArticleEditorPage'));
 
 // Tools
 const ToolsHome = React.lazy(() => import('./pages/tools/ToolsHome'));
@@ -130,6 +131,8 @@ const AppContent = () => {
 
             {/* Stealth Admin Studio Route */}
             <Route path="/admin-studio" element={<AdminStudioPage />} />
+            <Route path="/admin-studio/editor" element={<ArticleEditorPage />} />
+            <Route path="/admin-studio/editor/:id" element={<ArticleEditorPage />} />
 
             {/* Silent decoy redirect: visiting /admin redirects to / to prevent URL sniffing */}
             <Route path="/admin" element={<Navigate to="/" replace />} />

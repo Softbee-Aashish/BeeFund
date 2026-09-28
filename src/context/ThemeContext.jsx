@@ -4,18 +4,43 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
     const [isDark, setIsDark] = useState(() => {
-        // Check localStorage for user preference
-        const saved = localStorage.getItem('beefund-theme');
-        return saved === 'dark';
+        try {
+            const saved = localStorage.getItem('beefund-theme');
+            if (saved !== null) {
+                return saved === 'dark';
+            }
+            if (typeof window !== 'undefined' && window.matchMedia) {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+        } catch (e) {
+            console.warn('Error reading theme preference:', e);
+        }
+        return false;
     });
 
     useEffect(() => {
-        // Apply theme to document root
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        localStorage.setItem('beefund-theme', isDark ? 'dark' : 'light');
+        try {
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('beefund-theme', isDark ? 'dark' : 'light');
+        } catch (e) {
+            console.warn('Error saving theme preference:', e);
+        }
     }, [isDark]);
 
-    const toggleTheme = () => setIsDark(prev => !prev);
+    // Cross-tab theme synchronization
+    useEffect(() => {
+        const handleStorage = (e) => {
+            if (e.key === 'beefund-theme' && e.newValue) {
+                setIsDark(e.newValue === 'dark');
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
+    }, []);
+
+    const toggleTheme = () => {
+        setIsDark(prev => !prev);
+    };
 
     return (
         <ThemeContext.Provider value={{ isDark, toggleTheme }}>
@@ -25,3 +50,4 @@ export const ThemeProvider = ({ children }) => {
 };
 
 export const useTheme = () => useContext(ThemeContext);
+

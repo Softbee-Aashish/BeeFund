@@ -5,6 +5,7 @@ import { useBlogs } from '../../context/BlogContext';
 import { useCards } from '../../context/CardsContext';
 import DarkModeToggle from '../../components/DarkModeToggle';
 import CardsStudioSection from '../../components/admin/CardsStudioSection';
+import GoogleSheetsHubSection from '../../components/admin/GoogleSheetsHubSection';
 import HexagonBackground from '../../components/HexagonBackground';
 import './AdminStudioPage.css';
 
@@ -150,43 +151,14 @@ const AdminStudioPage = () => {
     const publishedCount = posts.filter(p => p.status !== 'draft').length;
     const draftCount = posts.filter(p => p.status === 'draft').length;
 
-    // Open editor for creating
+    // Open editor for creating (dedicated new tab)
     const handleOpenNew = () => {
-        setEditingPostId(null);
-        const initialContent = '<h2>Introduction</h2><p>Provide an engaging overview of this financial topic, market interest rate shifts, and practical borrower takeaways.</p><h2>Key Insights & Comparative Analysis</h2><p>Highlight strategic considerations for businesses and individuals seeking capital in 2026.</p>';
-        setFormData({
-            title: '',
-            slug: '',
-            author: 'BeeFund Financial Editorial Team',
-            date: new Date().toISOString().split('T')[0],
-            category: 'Financial Planning',
-            excerpt: '',
-            content: initialContent,
-            status: 'published'
-        });
-        setFormError('');
-        setActiveEditorTab('edit');
-        setEditorViewMode('word');
-        setIsEditorOpen(true);
+        window.open('/admin-studio/editor', '_blank');
     };
 
-    // Open editor for editing
+    // Open editor for editing (dedicated new tab)
     const handleOpenEdit = (post) => {
-        setEditingPostId(post.id);
-        setFormData({
-            title: post.title,
-            slug: post.slug,
-            author: post.author || 'BeeFund Financial Editorial Team',
-            date: post.date,
-            category: post.category || 'Financial Planning',
-            excerpt: post.excerpt || '',
-            content: post.content || '',
-            status: post.status || 'published'
-        });
-        setFormError('');
-        setActiveEditorTab('edit');
-        setEditorViewMode('word');
-        setIsEditorOpen(true);
+        window.open(`/admin-studio/editor/${post.id}`, '_blank');
     };
 
     // Auto-update slug when title changes in new post mode
@@ -453,9 +425,8 @@ const AdminStudioPage = () => {
 
                     <button 
                         onClick={() => {
+                            setActiveTabSection('gsheet');
                             setInputSheetUrl(sheetUrl);
-                            setSheetActionNotice('');
-                            setIsSheetModalOpen(true);
                         }} 
                         className={`studio-btn ${sheetUrl ? 'studio-btn-success' : 'studio-btn-secondary'}`}
                         title="Connect & live sync articles and cards with Google Sheets"
@@ -536,6 +507,20 @@ const AdminStudioPage = () => {
                     <span className="workspace-tab-badge">{cards.length}</span>
                     <span className="workspace-tab-pill">Live Catalog</span>
                 </button>
+
+                <button
+                    type="button"
+                    className={`workspace-tab-btn ${activeTabSection === 'gsheet' ? 'active' : ''}`}
+                    onClick={() => setActiveTabSection('gsheet')}
+                >
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Google Sheets Hub</span>
+                    <span className={`workspace-tab-badge ${sheetUrl ? 'badge-success' : 'badge-neutral'}`}>
+                        {sheetUrl ? '🟢 Live' : '⚪ Setup'}
+                    </span>
+                </button>
             </div>
 
             {saveSuccessNotice && (
@@ -548,6 +533,8 @@ const AdminStudioPage = () => {
             <main className="studio-main-content">
                 {activeTabSection === 'cards' ? (
                     <CardsStudioSection />
+                ) : activeTabSection === 'gsheet' ? (
+                    <GoogleSheetsHubSection />
                 ) : (
                     <>
                 {/* Stats Bar */}

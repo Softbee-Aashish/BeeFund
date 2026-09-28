@@ -14,7 +14,7 @@ const SESSION_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
 export const AdminAuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         try {
-            const raw = sessionStorage.getItem(AUTH_SESSION_KEY);
+            const raw = sessionStorage.getItem(AUTH_SESSION_KEY) || localStorage.getItem(AUTH_SESSION_KEY);
             if (raw) {
                 const session = JSON.parse(raw);
                 if (session && session.auth && Date.now() - session.timestamp < SESSION_DURATION_MS) {
@@ -104,7 +104,13 @@ export const AdminAuthProvider = ({ children }) => {
                 timestamp: now,
                 role: 'admin'
             };
-            sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(sessionData));
+            const sessionStr = JSON.stringify(sessionData);
+            sessionStorage.setItem(AUTH_SESSION_KEY, sessionStr);
+            try {
+                localStorage.setItem(AUTH_SESSION_KEY, sessionStr);
+            } catch (e) {
+                console.warn('Could not save auth session to localStorage', e);
+            }
             setIsAuthenticated(true);
             setIsLoginModalOpen(false);
 
@@ -138,6 +144,11 @@ export const AdminAuthProvider = ({ children }) => {
 
     const logout = useCallback(() => {
         sessionStorage.removeItem(AUTH_SESSION_KEY);
+        try {
+            localStorage.removeItem(AUTH_SESSION_KEY);
+        } catch (e) {
+            console.warn('Could not remove auth session from localStorage', e);
+        }
         setIsAuthenticated(false);
     }, []);
 

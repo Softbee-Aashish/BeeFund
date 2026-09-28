@@ -5,7 +5,8 @@ import starterCards from '../data/sampleCreditCardsTemplate.json';
 const CardsContext = createContext();
 
 const STORAGE_KEY = 'beefund_credit_cards_v3';
-const SHEET_URL_KEY = 'beefund_sheet_url';
+const PRIMARY_SHEET_KEY = 'beefund_sheet_url';
+const LEGACY_SHEET_KEY = 'beefund_articles_sheet_url';
 
 export const CardsProvider = ({ children }) => {
     // Initialize cards from localStorage or fallback to initialCards
@@ -26,7 +27,14 @@ export const CardsProvider = ({ children }) => {
 
     // Google Sheets integration state (shares with BlogContext)
     const [sheetUrl, setSheetUrlState] = useState(() => {
-        return localStorage.getItem(SHEET_URL_KEY) || import.meta.env.VITE_GOOGLE_SHEET_URL || '';
+        try {
+            return localStorage.getItem(PRIMARY_SHEET_KEY) || 
+                   localStorage.getItem(LEGACY_SHEET_KEY) || 
+                   import.meta.env.VITE_GOOGLE_SHEET_URL || 
+                   import.meta.env.VITE_ARTICLES_SHEET_URL || '';
+        } catch {
+            return '';
+        }
     });
     const [isSyncing, setIsSyncing] = useState(false);
     const [syncStatus, setSyncStatus] = useState(null); // { state: 'idle'|'syncing'|'success'|'error', message, time }
@@ -41,12 +49,30 @@ export const CardsProvider = ({ children }) => {
     }, [cards]);
 
     const setSheetUrl = useCallback((url) => {
-        setSheetUrlState(url);
+        const clean = (url || '').trim();
+        setSheetUrlState(clean);
         try {
-            localStorage.setItem(SHEET_URL_KEY, url);
+            if (clean) {
+                localStorage.setItem(PRIMARY_SHEET_KEY, clean);
+                localStorage.setItem(LEGACY_SHEET_KEY, clean);
+            } else {
+                localStorage.removeItem(PRIMARY_SHEET_KEY);
+                localStorage.removeItem(LEGACY_SHEET_KEY);
+            }
         } catch (e) {
             console.error('Failed to save sheetUrl:', e);
         }
+    }, []);
+
+    // Sync across tabs and with BlogContext
+    useEffect(() => {
+        const handleStorage = (e) => {
+            if (e.key === PRIMARY_SHEET_KEY || e.key === LEGACY_SHEET_KEY) {
+                setSheetUrlState(e.newValue || '');
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
     }, []);
 
     // Filter active cards for public visitors
