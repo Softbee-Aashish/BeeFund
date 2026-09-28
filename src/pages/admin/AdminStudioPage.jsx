@@ -3,6 +3,7 @@ import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import { useBlogs } from '../../context/BlogContext';
 import { useCards } from '../../context/CardsContext';
+import { useTheme } from '../../context/ThemeContext';
 import DarkModeToggle from '../../components/DarkModeToggle';
 import CardsStudioSection from '../../components/admin/CardsStudioSection';
 import GoogleSheetsHubSection from '../../components/admin/GoogleSheetsHubSection';
@@ -54,6 +55,7 @@ const AdminStudioPage = () => {
         sheetUrl, setSheetUrl, isSyncing, syncStatus, fetchFromSheet, pushAllToSheet 
     } = useBlogs();
     const { cards, pushCardsToSheet, fetchCardsFromSheet, exportCardsJson } = useCards();
+    const { isDark, toggleTheme } = useTheme();
 
     // Active Admin Section Tab: 'articles' or 'cards'
     const [activeTabSection, setActiveTabSection] = useState('articles');
@@ -407,7 +409,7 @@ const AdminStudioPage = () => {
     }, [formData.content]);
 
     return (
-        <div className="admin-studio-container">
+        <div className="admin-studio-container" data-theme={isDark ? 'dark' : 'light'}>
             <HexagonBackground opacity={0.03} />
 
             {/* Top Navigation Bar */}

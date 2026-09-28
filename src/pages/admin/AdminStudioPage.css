@@ -3065,7 +3065,8 @@
 /* ========================================================
    LIGHT MODE OVERRIDES FOR ADMIN STUDIO
    ======================================================== */
-[data-theme="light"] .admin-studio-container {
+[data-theme="light"] .admin-studio-container,
+.admin-studio-container[data-theme="light"] {
     background-color: #f8fafc;
     color: #0f172a;
 }

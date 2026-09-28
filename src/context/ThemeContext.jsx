@@ -9,9 +9,8 @@ export const ThemeProvider = ({ children }) => {
             if (saved !== null) {
                 return saved === 'dark';
             }
-            if (typeof window !== 'undefined' && window.matchMedia) {
-                return window.matchMedia('(prefers-color-scheme: dark)').matches;
-            }
+            // Default to Light Mode for professional financial portal experience
+            return false;
         } catch (e) {
             console.warn('Error reading theme preference:', e);
         }
