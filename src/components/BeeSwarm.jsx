@@ -32,7 +32,7 @@ const restoreElement = (el) => {
 // Each bee has its OWN independent schedule
 const createBee = (i) => ({
     x: window.innerWidth / 2 + random(-150, 150),
-    y: random(80, 300),
+    y: random(110, 350),
     vx: random(-1, 1),
     vy: random(-1, 1),
     rotation: random(0, 360),
@@ -204,10 +204,10 @@ const BeeSwarm = () => {
                     vx += Math.cos(wanderAngle) * WANDER_STRENGTH;
                     vy += Math.sin(wanderAngle) * WANDER_STRENGTH;
 
-                    // Soft boundaries
+                    // Soft boundaries — top 90px keeps bees below the fixed header
                     if (x < 60) vx += 0.12;
                     if (x > width - 60) vx -= 0.12;
-                    if (y < 60) vy += 0.12;
+                    if (y < 90) vy += 0.18;
                     if (y > height - 60) vy -= 0.12;
 
                     const speed = Math.sqrt(vx * vx + vy * vy);
@@ -353,7 +353,7 @@ const BeeSwarm = () => {
                     style={{
                         position: 'fixed', left: 0, top: 0,
                         width: '28px', height: '28px',
-                        pointerEvents: 'none', zIndex: 9999,
+                        pointerEvents: 'none', zIndex: 500,
                         opacity: 0,
                         transition: 'opacity 0.6s ease',
                         willChange: 'transform'

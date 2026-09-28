@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -92,6 +92,19 @@ const AdminShortcutListener = () => {
 const AppContent = () => {
   const location = useLocation();
   const isAdminStudio = location.pathname.startsWith('/admin-studio');
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  // BeeLoaderFallback: visible during Suspense; signals loading state via callbacks
+  const BeeLoaderFallback = () => {
+    useEffect(() => {
+      setIsPageLoading(true);
+      return () => {
+        // Suspense fallback unmounts when page finishes loading
+        setIsPageLoading(false);
+      };
+    }, []);
+    return <BeeLoader message="Fast-tracking your loan options..." />;
+  };
 
   return (
     <div className={`app-container ${isAdminStudio ? 'studio-view-active' : ''}`}>
@@ -106,7 +119,7 @@ const AppContent = () => {
       )}
 
       <main className="main-content">
-        <React.Suspense fallback={<BeeLoader message="Fast-tracking your loan options..." />}>
+        <React.Suspense fallback={<BeeLoaderFallback />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/products" element={<LoanProductsPage />} />
@@ -162,7 +175,8 @@ const AppContent = () => {
         </React.Suspense>
       </main>
 
-      {!isAdminStudio && (
+      {/* Footer and bottom widgets are hidden while a page is loading to prevent transparent bleed-through */}
+      {!isAdminStudio && !isPageLoading && (
         <>
           <Footer />
           <WhatsAppWidget />
