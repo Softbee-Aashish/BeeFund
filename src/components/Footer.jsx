@@ -1,15 +1,20 @@
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import './Footer.css';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
-    const { openLoginModal } = useAdminAuth();
+    const { isAuthenticated, openLoginModal } = useAdminAuth();
+    const navigate = useNavigate();
     const clickCountRef = useRef(0);
     const clickTimerRef = useRef(null);
 
     const handleSecretTrigger = () => {
+        if (isAuthenticated) {
+            navigate('/admin-studio');
+            return;
+        }
         clickCountRef.current += 1;
         if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
         if (clickCountRef.current >= 3) {

@@ -60,8 +60,9 @@ export const AdminAuthProvider = ({ children }) => {
     }, [lockoutUntil]);
 
     const openLoginModal = useCallback(() => {
+        if (isAuthenticated) return;
         setIsLoginModalOpen(true);
-    }, []);
+    }, [isAuthenticated]);
 
     const closeLoginModal = useCallback(() => {
         setIsLoginModalOpen(false);

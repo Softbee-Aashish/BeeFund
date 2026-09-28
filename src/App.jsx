@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
@@ -48,23 +48,41 @@ const RepaymentScheduleGenerator = React.lazy(() => import('./pages/tools/Repaym
 
 import './styles/global.css';
 
-// Global keyboard shortcut listener for stealth Admin Gate
+// Stealth Admin Gate keyboard shortcut listener: strictly active ONLY on the /about page
 const AdminShortcutListener = () => {
-  const { openLoginModal } = useAdminAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, openLoginModal } = useAdminAuth();
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Secret triggers: Ctrl + Shift + A  OR  Alt + B
-      if ((e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) ||
-          (e.altKey && (e.key === 'B' || e.key === 'b'))) {
-        e.preventDefault();
-        openLoginModal();
+      const isTriggerKey = 
+        (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) ||
+        (e.altKey && (e.key === 'B' || e.key === 'b'));
+
+      if (!isTriggerKey) return;
+
+      // Gate: strictly ONLY active on the /about page
+      if (location.pathname !== '/about') {
+        return;
       }
+
+      e.preventDefault();
+
+      // If already logged in / in admin dashboard, never prompt to log in again
+      if (isAuthenticated) {
+        navigate('/admin-studio');
+        return;
+      }
+
+      // Otherwise, open the passkey login modal
+      openLoginModal();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [openLoginModal]);
+  }, [location.pathname, isAuthenticated, navigate, openLoginModal]);
 
   return null;
 };

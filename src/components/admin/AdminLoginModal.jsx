@@ -4,7 +4,7 @@ import { useAdminAuth } from '../../context/AdminAuthContext';
 import './AdminLoginModal.css';
 
 const AdminLoginModal = () => {
-    const { isLoginModalOpen, closeLoginModal, login, isLocked, secondsLeftInLockout } = useAdminAuth();
+    const { isAuthenticated, isLoginModalOpen, closeLoginModal, login, isLocked, secondsLeftInLockout } = useAdminAuth();
     const [passkey, setPasskey] = useState('');
     const [honeypot, setHoneypot] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +36,7 @@ const AdminLoginModal = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isLoginModalOpen, closeLoginModal]);
 
-    if (!isLoginModalOpen) return null;
+    if (!isLoginModalOpen || isAuthenticated) return null;
 
     const handleSubmit = (e) => {
         e.preventDefault();
