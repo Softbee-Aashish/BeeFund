@@ -438,6 +438,29 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       allowedHosts: true
+    },
+    build: {
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react-router-dom') || id.includes('react-router')) {
+                return 'vendor-router';
+              }
+              if (id.includes('html2canvas')) {
+                return 'vendor-html2canvas';
+              }
+              if (id.includes('jspdf')) {
+                return 'vendor-jspdf';
+              }
+              if (id.includes('dompurify')) {
+                return 'vendor-dompurify';
+              }
+            }
+          }
+        }
+      }
     }
   };
 });

@@ -9,6 +9,7 @@ import DarkModeToggle from './components/DarkModeToggle';
 import PamphletModal from './components/PamphletModal';
 import CookieConsent from './components/CookieConsent';
 import AdminLoginModal from './components/admin/AdminLoginModal';
+import BeeLoader from './components/BeeLoader';
 import { ThemeProvider } from './context/ThemeContext';
 import { EnquireModalProvider } from './context/EnquireModalContext';
 import { BlogProvider } from './context/BlogContext';
@@ -105,7 +106,7 @@ const AppContent = () => {
       )}
 
       <main className="main-content">
-        <React.Suspense fallback={<div className="loading" style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: 'var(--primary-color)' }}>Loading...</div>}>
+        <React.Suspense fallback={<BeeLoader message="Fast-tracking your loan options..." />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/products" element={<LoanProductsPage />} />

@@ -25,6 +25,8 @@ const ArticleEditorPage = () => {
 
     // Editor modes: 'canvas' (focus writing) | 'split' (writing + live preview) | 'preview' (full live view)
     const [viewMode, setViewMode] = useState('split');
+    // Editor format mode: 'visual' (WYSIWYG Word) | 'code' (HTML source)
+    const [editorMode, setEditorMode] = useState('visual');
     // Settings Drawer
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     // Image Insertion Modal
@@ -32,6 +34,8 @@ const ArticleEditorPage = () => {
     const [imgUrl, setImgUrl] = useState('');
     const [imgCaption, setImgCaption] = useState('');
     const [imgAlt, setImgAlt] = useState('');
+    const [imgAlign, setImgAlign] = useState('left'); // 'left' | 'center' | 'right'
+    const [imgLocalPreview, setImgLocalPreview] = useState('');
     // Link Insertion Modal
     const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
@@ -42,6 +46,7 @@ const ArticleEditorPage = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [lastSavedTime, setLastSavedTime] = useState(null);
 
+    const visualCanvasRef = useRef(null);
     const textareaRef = useRef(null);
     const fileInputRef = useRef(null);
     const featuredImageInputRef = useRef(null);
@@ -144,7 +149,24 @@ const ArticleEditorPage = () => {
         }));
     };
 
-    // Text formatting helpers using selection manipulation in textarea
+    // Synchronize visual contentEditable to state
+    const syncVisualToState = useCallback(() => {
+        if (visualCanvasRef.current) {
+            const html = visualCanvasRef.current.innerHTML;
+            setFormData(prev => ({ ...prev, content: html }));
+        }
+    }, []);
+
+    // Synchronize state content into visual canvas on initial load or mode switch
+    useEffect(() => {
+        if (visualCanvasRef.current && editorMode === 'visual') {
+            if (visualCanvasRef.current.innerHTML !== formData.content) {
+                visualCanvasRef.current.innerHTML = formData.content || '';
+            }
+        }
+    }, [formData.id, editorMode]);
+
+    // Text formatting helpers using selection manipulation in textarea (for code mode fallback)
     const insertFormat = (prefix, suffix = '', defaultText = '') => {
         const textarea = textareaRef.current;
         if (!textarea) return;
@@ -157,14 +179,13 @@ const ArticleEditorPage = () => {
         const newContent = originalText.substring(0, start) + prefix + selectedText + suffix + originalText.substring(end);
         setFormData(prev => ({ ...prev, content: newContent }));
 
-        // Restore focus and selection
         setTimeout(() => {
             textarea.focus();
             textarea.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
         }, 50);
     };
 
-    // Rich Insert Blocks
+    // Rich Insert Blocks for code mode
     const insertBlock = (blockHtml) => {
         const textarea = textareaRef.current;
         if (!textarea) return;
@@ -185,6 +206,97 @@ const ArticleEditorPage = () => {
         }, 50);
     };
 
+    // Universal rich text command execution (Bold, Italic, Underline, Headings, Alignment)
+    const execFormat = (cmd, value = null) => {
+        if (editorMode === 'code') {
+            if (cmd === 'bold') insertFormat('<strong>', '</strong>', 'bold text');
+            else if (cmd === 'italic') insertFormat('<em>', '</em>', 'italic text');
+            else if (cmd === 'underline') insertFormat('<u>', '</u>', 'underlined text');
+            else if (cmd === 'strikeThrough') insertFormat('<del>', '</del>', 'struck text');
+            else if (cmd === 'formatBlock') insertFormat(`<${value}>`, `</${value}>`, 'Heading text');
+            else if (cmd === 'insertUnorderedList') insertBlock('<ul>\n  <li>Key takeaway point</li>\n</ul>');
+            else if (cmd === 'insertOrderedList') insertBlock('<ol>\n  <li>Step 1</li>\n</ol>');
+            return;
+        }
+
+        visualCanvasRef.current?.focus();
+        document.execCommand(cmd, false, value);
+        syncVisualToState();
+    };
+
+    // Insert formatted HTML block into the document (works in both visual and code modes)
+    const insertHtmlAtCursor = (htmlString) => {
+        if (editorMode === 'code') {
+            insertBlock(htmlString);
+            return;
+        }
+
+        visualCanvasRef.current?.focus();
+        document.execCommand('insertHTML', false, htmlString);
+        syncVisualToState();
+    };
+
+    // Insert image with alignment (Float Left, Float Right, Center)
+    const insertImageBlock = (src, caption = '', alt = '', align = imgAlign) => {
+        let alignStyle = '';
+        let figureClass = 'blog-figure';
+
+        if (align === 'left') {
+            figureClass += ' float-left';
+            alignStyle = 'float: left; margin: 0.5rem 1.5rem 1.25rem 0; max-width: 48%;';
+        } else if (align === 'right') {
+            figureClass += ' float-right';
+            alignStyle = 'float: right; margin: 0.5rem 0 1.25rem 1.5rem; max-width: 48%;';
+        } else {
+            figureClass += ' center';
+            alignStyle = 'display: block; margin: 1.75rem auto; text-align: center; max-width: 100%;';
+        }
+
+        const captionHtml = caption.trim() ? `<figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.4rem; font-style: italic; text-align: center;">${caption.trim()}</figcaption>` : '';
+        const imgBlock = `<figure class="${figureClass}" style="${alignStyle}"><img src="${src}" alt="${alt.trim() || caption.trim() || 'Article visual'}" style="width: 100%; height: auto; border-radius: 8px; display: block;" />${captionHtml}</figure><p><br></p>`;
+
+        insertHtmlAtCursor(imgBlock);
+    };
+
+    // Pre-styled financial comparison table (clickable and editable inside visual canvas)
+    const handleInsertComparisonTable = () => {
+        const tableHtml = `
+<table class="financial-comparison-table">
+  <thead>
+    <tr>
+      <th>Feature / Parameter</th>
+      <th>Secured Facility (LAP)</th>
+      <th>Unsecured Facility</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Interest Rate (p.a.)</strong></td>
+      <td>8.50% – 10.50%</td>
+      <td>12.50% – 18.00%</td>
+    </tr>
+    <tr>
+      <td><strong>Collateral / Security</strong></td>
+      <td>Residential / Commercial Property</td>
+      <td>Zero Collateral Required</td>
+    </tr>
+    <tr>
+      <td><strong>Loan Tenure</strong></td>
+      <td>Up to 15 Years</td>
+      <td>1 to 5 Years</td>
+    </tr>
+    <tr>
+      <td><strong>Sanction Speed</strong></td>
+      <td>7 to 10 Working Days</td>
+      <td>24 to 48 Hours</td>
+    </tr>
+  </tbody>
+</table>
+<p><br></p>
+`;
+        insertHtmlAtCursor(tableHtml);
+    };
+
     // File upload handler (convert to base64)
     const handleFileUpload = (e) => {
         const file = e.target.files?.[0];
@@ -198,8 +310,8 @@ const ArticleEditorPage = () => {
         const reader = new FileReader();
         reader.onload = (event) => {
             const base64 = event.target?.result;
-            insertBlock(`<figure class="blog-figure">\n  <img src="${base64}" alt="${file.name.replace(/\.[^/.]+$/, '')}" class="blog-in-content-img" />\n  <figcaption>${file.name.replace(/\.[^/.]+$/, '')}</figcaption>\n</figure>`);
-            showToast('Image inserted into article!');
+            insertImageBlock(base64, file.name.replace(/\.[^/.]+$/, ''), file.name.replace(/\.[^/.]+$/, ''), imgAlign);
+            showToast('Image inserted with selected alignment!');
         };
         reader.readAsDataURL(file);
         e.target.value = '';
@@ -467,13 +579,53 @@ const ArticleEditorPage = () => {
             {/* STICKY EDITORIAL FORMATTING RIBBON */}
             <div className="editorial-ribbon">
                 <div className="ribbon-inner">
+                    {/* Visual vs HTML Code Mode Toggle */}
+                    <div className="editor-mode-toggle-group">
+                        <button
+                            type="button"
+                            className={`editor-mode-toggle-btn ${editorMode === 'visual' ? 'active' : ''}`}
+                            onClick={() => {
+                                setEditorMode('visual');
+                                setTimeout(() => {
+                                    if (visualCanvasRef.current) {
+                                        visualCanvasRef.current.innerHTML = formData.content || '';
+                                    }
+                                }, 50);
+                            }}
+                            title="Normal visual editing like Microsoft Word / Google Docs"
+                        >
+                            Visual Editor
+                        </button>
+                        <button
+                            type="button"
+                            className={`editor-mode-toggle-btn ${editorMode === 'code' ? 'active' : ''}`}
+                            onClick={() => {
+                                syncVisualToState();
+                                setEditorMode('code');
+                            }}
+                            title="Direct HTML source code view"
+                        >
+                            HTML Code
+                        </button>
+                    </div>
+
+                    <div className="ribbon-sep"></div>
+
                     {/* Headings */}
                     <div className="ribbon-cluster">
                         <button
                             type="button"
                             className="ribbon-btn"
+                            title="Heading 1 (Major Title)"
+                            onClick={() => execFormat('formatBlock', '<h1>')}
+                        >
+                            <strong>H1</strong>
+                        </button>
+                        <button
+                            type="button"
+                            className="ribbon-btn"
                             title="Heading 2 (Main Section)"
-                            onClick={() => insertFormat('<h2>', '</h2>', 'Section Heading')}
+                            onClick={() => execFormat('formatBlock', '<h2>')}
                         >
                             <strong>H2</strong>
                         </button>
@@ -481,15 +633,15 @@ const ArticleEditorPage = () => {
                             type="button"
                             className="ribbon-btn"
                             title="Heading 3 (Subsection)"
-                            onClick={() => insertFormat('<h3>', '</h3>', 'Subsection Heading')}
+                            onClick={() => execFormat('formatBlock', '<h3>')}
                         >
                             <strong>H3</strong>
                         </button>
                         <button
                             type="button"
                             className="ribbon-btn"
-                            title="Paragraph Lead"
-                            onClick={() => insertFormat('<p>', '</p>', 'Paragraph text')}
+                            title="Normal Paragraph"
+                            onClick={() => execFormat('formatBlock', '<p>')}
                         >
                             ¶
                         </button>
@@ -503,7 +655,7 @@ const ArticleEditorPage = () => {
                             type="button"
                             className="ribbon-btn"
                             title="Bold (Ctrl+B)"
-                            onClick={() => insertFormat('<strong>', '</strong>', 'bold text')}
+                            onClick={() => execFormat('bold')}
                         >
                             <strong>B</strong>
                         </button>
@@ -511,23 +663,31 @@ const ArticleEditorPage = () => {
                             type="button"
                             className="ribbon-btn"
                             title="Italic (Ctrl+I)"
-                            onClick={() => insertFormat('<em>', '</em>', 'italic text')}
+                            onClick={() => execFormat('italic')}
                         >
                             <em>I</em>
                         </button>
                         <button
                             type="button"
                             className="ribbon-btn"
+                            title="Underline (Ctrl+U)"
+                            onClick={() => execFormat('underline')}
+                        >
+                            <span style={{ textDecoration: 'underline', fontWeight: 600 }}>U</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="ribbon-btn"
                             title="Strikethrough"
-                            onClick={() => insertFormat('<del>', '</del>', 'struck text')}
+                            onClick={() => execFormat('strikeThrough')}
                         >
                             <s>S</s>
                         </button>
                         <button
                             type="button"
                             className="ribbon-btn"
-                            title="Inline Code"
-                            onClick={() => insertFormat('<code>', '</code>', 'code')}
+                            title="Inline Code / Preformatted"
+                            onClick={() => execFormat('formatBlock', '<pre>')}
                         >
                             &lt;/&gt;
                         </button>
@@ -546,13 +706,43 @@ const ArticleEditorPage = () => {
 
                     <div className="ribbon-sep"></div>
 
+                    {/* Text Alignment */}
+                    <div className="ribbon-cluster">
+                        <button
+                            type="button"
+                            className="ribbon-btn"
+                            title="Align Left"
+                            onClick={() => execFormat('justifyLeft')}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+                        </button>
+                        <button
+                            type="button"
+                            className="ribbon-btn"
+                            title="Align Center"
+                            onClick={() => execFormat('justifyCenter')}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                        </button>
+                        <button
+                            type="button"
+                            className="ribbon-btn"
+                            title="Align Right"
+                            onClick={() => execFormat('justifyRight')}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
+                        </button>
+                    </div>
+
+                    <div className="ribbon-sep"></div>
+
                     {/* Lists & Quotes */}
                     <div className="ribbon-cluster">
                         <button
                             type="button"
                             className="ribbon-btn"
                             title="Bullet List"
-                            onClick={() => insertBlock('<ul>\n  <li>Key takeaway point one</li>\n  <li>Key takeaway point two</li>\n  <li>Key takeaway point three</li>\n</ul>')}
+                            onClick={() => execFormat('insertUnorderedList')}
                         >
                             • List
                         </button>
@@ -560,7 +750,7 @@ const ArticleEditorPage = () => {
                             type="button"
                             className="ribbon-btn"
                             title="Numbered Steps List"
-                            onClick={() => insertBlock('<ol>\n  <li>Step 1: Check your credit eligibility</li>\n  <li>Step 2: Compare interest rates and processing fees</li>\n  <li>Step 3: Submit digital documentation</li>\n</ol>')}
+                            onClick={() => execFormat('insertOrderedList')}
                         >
                             1. List
                         </button>
@@ -568,7 +758,7 @@ const ArticleEditorPage = () => {
                             type="button"
                             className="ribbon-btn"
                             title="Blockquote / Pull Quote"
-                            onClick={() => insertBlock('<blockquote>\n  "Financial discipline and early compounding are the two greatest drivers of long-term wealth creation in India."\n</blockquote>')}
+                            onClick={() => execFormat('formatBlock', '<blockquote>')}
                         >
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path></svg>
@@ -579,7 +769,7 @@ const ArticleEditorPage = () => {
                             type="button"
                             className="ribbon-btn"
                             title="Horizontal Divider"
-                            onClick={() => insertBlock('<hr />')}
+                            onClick={() => insertHtmlAtCursor('<hr />')}
                         >
                             — Divider
                         </button>
@@ -587,33 +777,29 @@ const ArticleEditorPage = () => {
 
                     <div className="ribbon-sep"></div>
 
-                    {/* Newsroom Rich Elements */}
+                    {/* Rich Visual Elements */}
                     <div className="ribbon-cluster">
                         {/* Callout Box */}
-                        <div className="ribbon-dropdown-wrapper">
-                            <button
-                                type="button"
-                                className="ribbon-btn ribbon-btn-dropdown"
-                                title="Insert Informational Callout Box"
-                                onClick={() => {
-                                    insertBlock('<div class="editorial-callout tip">\n  <div class="callout-title">Pro Tip</div>\n  <p>Maintaining a credit utilization ratio below 30% boosts your credit score significantly faster than simply paying the minimum amount due.</p>\n</div>');
-                                }}
-                            >
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                    <span>Callout Box</span>
-                                </span>
-                            </button>
-                        </div>
-
-                        {/* Financial Comparison Table */}
                         <button
                             type="button"
                             className="ribbon-btn"
-                            title="Insert Financial Comparison Table"
+                            title="Insert Visual Callout Box"
                             onClick={() => {
-                                insertBlock('<table class="table table-bordered">\n  <thead>\n    <tr>\n      <th>Feature / Parameter</th>\n      <th>Option A (e.g. Secured)</th>\n      <th>Option B (e.g. Unsecured)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td><strong>Interest Rate</strong></td>\n      <td>8.5% – 10.5% p.a.</td>\n      <td>12.5% – 18.0% p.a.</td>\n    </tr>\n    <tr>\n      <td><strong>Collateral</strong></td>\n      <td>Property or Fixed Deposit</td>\n      <td>None Required</td>\n    </tr>\n    <tr>\n      <td><strong>Sanction Speed</strong></td>\n      <td>7 to 10 Working Days</td>\n      <td>24 to 48 Hours</td>\n    </tr>\n  </tbody>\n</table>');
+                                insertHtmlAtCursor('<div class="editorial-callout-box"><strong>Important Note:</strong> Type your highlight note or regulatory insight here...</div><p><br></p>');
                             }}
+                        >
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                <span>Callout</span>
+                            </span>
+                        </button>
+
+                        {/* Interactive Comparison Table */}
+                        <button
+                            type="button"
+                            className="ribbon-btn"
+                            title="Insert Financial Comparison Table (Click cells to edit visually)"
+                            onClick={handleInsertComparisonTable}
                         >
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
@@ -621,25 +807,18 @@ const ArticleEditorPage = () => {
                             </span>
                         </button>
 
-                        {/* Image Upload / URL */}
+                        {/* Image Upload / URL with Side Alignment */}
                         <button
                             type="button"
                             className="ribbon-btn"
-                            title="Insert Image (Upload or URL)"
+                            title="Insert Image (Upload or URL with Float Left / Right text wrap)"
                             onClick={() => setIsImageModalOpen(true)}
                         >
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                <span>Image</span>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                <span>Image & Wrap</span>
                             </span>
                         </button>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            style={{ display: 'none' }}
-                            accept="image/*"
-                            onChange={handleFileUpload}
-                        />
 
                         {/* Key Takeaways Box */}
                         <button
@@ -647,7 +826,7 @@ const ArticleEditorPage = () => {
                             className="ribbon-btn"
                             title="Insert Key Takeaways Box"
                             onClick={() => {
-                                insertBlock('<div class="key-takeaways-box">\n  <h4>Key Takeaways</h4>\n  <ul>\n    <li>Verify all hidden charges including processing fees and foreclosure penalties.</li>\n    <li>Keep your Debt-to-Income (DTI) ratio under 40% for the best interest concessions.</li>\n    <li>Audit your CIBIL TransUnion report every quarter for reporting discrepancies.</li>\n  </ul>\n</div>');
+                                insertHtmlAtCursor('<div class="key-takeaways-box"><h4>Key Takeaways</h4><ul><li>Verify all hidden charges including processing fees and foreclosure penalties.</li><li>Keep your Debt-to-Income (DTI) ratio under 40% for the best interest concessions.</li><li>Audit your CIBIL TransUnion report every quarter for reporting discrepancies.</li></ul></div><p><br></p>');
                             }}
                         >
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
@@ -710,15 +889,27 @@ const ArticleEditorPage = () => {
 
                                 {/* Content Writing Area */}
                                 <div className="content-editor-wrapper">
-                                    <textarea
-                                        ref={textareaRef}
-                                        className="editorial-content-textarea"
-                                        placeholder="Write your article story here... You can use standard HTML tags or the toolbar above for headings, bullet points, financial comparison tables, callouts, and images."
-                                        value={formData.content}
-                                        onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                                        onKeyDown={handleKeyDown}
-                                        spellCheck="true"
-                                    />
+                                    {editorMode === 'visual' ? (
+                                        <div
+                                            ref={visualCanvasRef}
+                                            contentEditable
+                                            className="editorial-visual-canvas"
+                                            onInput={syncVisualToState}
+                                            onBlur={syncVisualToState}
+                                            onKeyDown={handleKeyDown}
+                                            spellCheck="true"
+                                        />
+                                    ) : (
+                                        <textarea
+                                            ref={textareaRef}
+                                            className="editorial-content-textarea"
+                                            placeholder="Write your article HTML source code here..."
+                                            value={formData.content}
+                                            onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                                            onKeyDown={handleKeyDown}
+                                            spellCheck="true"
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -952,21 +1143,88 @@ const ArticleEditorPage = () => {
                         <div className="modal-header">
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                <h3 style={{ margin: 0 }}>Insert Image</h3>
+                                <h3 style={{ margin: 0 }}>Insert Image with Side Alignment</h3>
                             </div>
                             <button type="button" className="modal-close-btn" onClick={() => setIsImageModalOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
+                            {/* Alignment Selector */}
+                            <div className="drawer-form-group">
+                                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Image Placement & Text Wrap:</label>
+                                <div className="alignment-picker">
+                                    <button
+                                        type="button"
+                                        className={`align-choice-btn ${imgAlign === 'left' ? 'active' : ''}`}
+                                        onClick={() => setImgAlign('left')}
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="8" height="8" rx="1"/><line x1="14" y1="6" x2="21" y2="6"/><line x1="14" y1="10" x2="21" y2="10"/><line x1="3" y1="16" x2="21" y2="16"/><line x1="3" y1="20" x2="21" y2="20"/></svg>
+                                        <span>Float Left (Wrap Right)</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`align-choice-btn ${imgAlign === 'center' ? 'active' : ''}`}
+                                        onClick={() => setImgAlign('center')}
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="4" width="14" height="10" rx="1"/><line x1="3" y1="17" x2="21" y2="17"/><line x1="5" y1="21" x2="19" y2="21"/></svg>
+                                        <span>Center / Full</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`align-choice-btn ${imgAlign === 'right' ? 'active' : ''}`}
+                                        onClick={() => setImgAlign('right')}
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="13" y="5" width="8" height="8" rx="1"/><line x1="3" y1="6" x2="10" y2="6"/><line x1="3" y1="10" x2="10" y2="10"/><line x1="3" y1="16" x2="21" y2="16"/><line x1="3" y1="20" x2="21" y2="20"/></svg>
+                                        <span>Float Right (Wrap Left)</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div className="drawer-form-group">
                                 <label>Image URL:</label>
                                 <input
                                     type="url"
                                     className="drawer-input"
-                                    placeholder="https://images.unsplash.com/..."
+                                    placeholder="https://images.unsplash.com/... or paste image link"
                                     value={imgUrl}
-                                    onChange={e => setImgUrl(e.target.value)}
+                                    onChange={e => {
+                                        setImgUrl(e.target.value);
+                                        setImgLocalPreview(e.target.value);
+                                    }}
                                 />
                             </div>
+
+                            <div className="modal-or-divider"><span>OR UPLOAD LOCAL IMAGE</span></div>
+
+                            <div className="drawer-form-group">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="drawer-input"
+                                    onChange={e => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        if (file.size > 2 * 1024 * 1024) {
+                                            alert('Image exceeds 2MB limit.');
+                                            return;
+                                        }
+                                        const reader = new FileReader();
+                                        reader.onload = ev => {
+                                            const base64 = ev.target?.result;
+                                            setImgUrl(base64);
+                                            setImgLocalPreview(base64);
+                                            if (!imgCaption) setImgCaption(file.name.replace(/\.[^/.]+$/, ''));
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }}
+                                />
+                            </div>
+
+                            {imgLocalPreview && (
+                                <div className="image-preview-box">
+                                    <img src={imgLocalPreview} alt="Preview" />
+                                </div>
+                            )}
+
                             <div className="drawer-form-group">
                                 <label>Caption / Figure Title:</label>
                                 <input
@@ -982,22 +1240,11 @@ const ArticleEditorPage = () => {
                                 <input
                                     type="text"
                                     className="drawer-input"
-                                    placeholder="Brief image description"
+                                    placeholder="Brief image description for search engines"
                                     value={imgAlt}
                                     onChange={e => setImgAlt(e.target.value)}
                                 />
                             </div>
-                            <div className="modal-or-divider"><span>OR UPLOAD LOCAL IMAGE</span></div>
-                            <button
-                                type="button"
-                                className="btn-suite-secondary btn-block"
-                                onClick={() => {
-                                    fileInputRef.current?.click();
-                                    setIsImageModalOpen(false);
-                                }}
-                            >
-                                Choose Local Image File (Max 2MB)
-                            </button>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn-suite-secondary" onClick={() => setIsImageModalOpen(false)}>Cancel</button>
@@ -1006,13 +1253,13 @@ const ArticleEditorPage = () => {
                                 className="btn-suite-primary"
                                 disabled={!imgUrl.trim()}
                                 onClick={() => {
-                                    const captionHtml = imgCaption.trim() ? `\n  <figcaption>${imgCaption.trim()}</figcaption>` : '';
-                                    insertBlock(`<figure class="blog-figure">\n  <img src="${imgUrl.trim()}" alt="${imgAlt.trim() || imgCaption.trim()}" class="blog-in-content-img" />${captionHtml}\n</figure>`);
+                                    insertImageBlock(imgUrl.trim(), imgCaption, imgAlt, imgAlign);
                                     setIsImageModalOpen(false);
                                     setImgUrl('');
+                                    setImgLocalPreview('');
                                     setImgCaption('');
                                     setImgAlt('');
-                                    showToast('Image inserted!');
+                                    showToast('Image inserted with selected alignment!');
                                 }}
                             >
                                 Insert Image

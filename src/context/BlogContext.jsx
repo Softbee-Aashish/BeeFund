@@ -38,16 +38,59 @@ export const BlogProvider = ({ children }) => {
         }
     }, []);
 
+    // Helper to guarantee post schema integrity
+    const normalizePost = useCallback((p, idx = 0) => ({
+        id: p.id !== undefined && p.id !== null ? (Number(p.id) || p.id) : (idx + 1),
+        title: p.title || 'Untitled Financial Guide',
+        slug: p.slug || 'article',
+        author: p.author || 'BeeFund Financial Editorial Team',
+        date: p.date || new Date().toISOString().split('T')[0],
+        category: p.category || 'Financial Planning',
+        excerpt: p.excerpt || '',
+        content: p.content || '',
+        featuredImage: p.featuredImage || '',
+        status: p.status === 'draft' ? 'draft' : 'published',
+        updatedAt: p.updatedAt || p.date || new Date().toISOString().split('T')[0]
+    }), []);
+
     // Sync across tabs and with CardsContext
     useEffect(() => {
         const handleStorage = (e) => {
             if (e.key === PRIMARY_SHEET_KEY || e.key === LEGACY_SHEET_KEY) {
                 setSheetUrlState(e.newValue || '');
+            } else if (e.key === STORAGE_KEY && e.newValue) {
+                try {
+                    const parsed = JSON.parse(e.newValue);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setPosts(parsed.map(normalizePost));
+                    }
+                } catch (err) {
+                    console.error('Failed to sync posts across tabs:', err);
+                }
             }
         };
+
+        const handleFocus = () => {
+            try {
+                const latest = localStorage.getItem(STORAGE_KEY);
+                if (latest) {
+                    const parsed = JSON.parse(latest);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setPosts(parsed.map(normalizePost));
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to sync on window focus:', err);
+            }
+        };
+
         window.addEventListener('storage', handleStorage);
-        return () => window.removeEventListener('storage', handleStorage);
-    }, []);
+        window.addEventListener('focus', handleFocus);
+        return () => {
+            window.removeEventListener('storage', handleStorage);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [normalizePost]);
 
     const [posts, setPosts] = useState(() => {
         try {
@@ -55,25 +98,46 @@ export const BlogProvider = ({ children }) => {
             if (saved) {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed) && parsed.length > 0) {
-                    return parsed;
+                    return parsed.map((p, idx) => ({
+                        id: p.id !== undefined && p.id !== null ? (Number(p.id) || p.id) : (idx + 1),
+                        title: p.title || 'Untitled Financial Guide',
+                        slug: p.slug || 'article',
+                        author: p.author || 'BeeFund Financial Editorial Team',
+                        date: p.date || new Date().toISOString().split('T')[0],
+                        category: p.category || 'Financial Planning',
+                        excerpt: p.excerpt || '',
+                        content: p.content || '',
+                        featuredImage: p.featuredImage || '',
+                        status: p.status === 'draft' ? 'draft' : 'published',
+                        updatedAt: p.updatedAt || p.date || new Date().toISOString().split('T')[0]
+                    }));
                 }
             }
         } catch (e) {
             console.error('Failed to parse blogs from localStorage:', e);
         }
         // Normalize initial posts with status and timestamp if missing
-        return initialBlogPosts.map(p => ({
-            ...p,
-            status: p.status || 'published',
+        return initialBlogPosts.map((p, idx) => ({
+            id: p.id !== undefined && p.id !== null ? (Number(p.id) || p.id) : (idx + 1),
+            title: p.title || 'Untitled Financial Guide',
+            slug: p.slug || 'article',
+            author: p.author || 'BeeFund Financial Editorial Team',
+            date: p.date || new Date().toISOString().split('T')[0],
             category: p.category || 'Financial Planning',
-            updatedAt: p.updatedAt || p.date
+            excerpt: p.excerpt || '',
+            content: p.content || '',
+            featuredImage: p.featuredImage || '',
+            status: p.status === 'draft' ? 'draft' : 'published',
+            updatedAt: p.updatedAt || p.date || new Date().toISOString().split('T')[0]
         }));
     });
 
     // Save to localStorage whenever posts change
     useEffect(() => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+            if (Array.isArray(posts) && posts.length > 0) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+            }
         } catch (e) {
             console.error('Failed to save blogs to localStorage:', e);
         }
@@ -314,18 +378,14 @@ export const BlogProvider = ({ children }) => {
 
     // Reset back to initial default blog posts
     const resetToDefaults = () => {
-        const resetData = initialBlogPosts.map(p => ({
-            ...p,
-            status: 'published',
-            category: p.category || 'Financial Planning',
-            updatedAt: p.date
-        }));
+        const resetData = initialBlogPosts.map(normalizePost);
         setPosts(resetData);
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(resetData));
         } catch (e) {
             console.error(e);
         }
+        return resetData;
     };
 
     // Export current posts as JSON file download

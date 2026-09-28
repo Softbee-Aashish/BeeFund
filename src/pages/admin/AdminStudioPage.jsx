@@ -141,17 +141,19 @@ const AdminStudioPage = () => {
 
     // Filtered posts calculation
     const filteredPosts = useMemo(() => {
+        const q = (searchQuery || '').toLowerCase().trim();
         return posts.filter(post => {
-            const matchesSearch = 
-                post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (post.excerpt && post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (post.author && post.author.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (post.category && post.category.toLowerCase().includes(searchQuery.toLowerCase()));
+            const matchesSearch = !q ||
+                ((post.title || '').toLowerCase().includes(q)) ||
+                ((post.excerpt || '').toLowerCase().includes(q)) ||
+                ((post.author || '').toLowerCase().includes(q)) ||
+                ((post.category || '').toLowerCase().includes(q));
             
+            const postStatus = post.status || 'published';
             const matchesStatus = 
                 statusFilter === 'all' || 
-                (statusFilter === 'published' && post.status !== 'draft') || 
-                (statusFilter === 'draft' && post.status === 'draft');
+                (statusFilter === 'published' && postStatus !== 'draft') || 
+                (statusFilter === 'draft' && postStatus === 'draft');
 
             return matchesSearch && matchesStatus;
         });
@@ -657,10 +659,21 @@ const AdminStudioPage = () => {
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                             </div>
                             <h3>No articles found</h3>
-                            <p>No matching blog posts based on your search or filter.</p>
-                            <button onClick={handleOpenNew} className="studio-btn studio-btn-primary mt-3">
-                                Create Your First Article
-                            </button>
+                            <p>{posts.length === 0 ? 'Your article catalog is currently empty.' : 'No matching blog posts based on your search or filter.'}</p>
+                            {posts.length === 0 ? (
+                                <div style={{ display: 'flex', gap: '10px', marginTop: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                    <button onClick={resetToDefaults} className="studio-btn studio-btn-secondary">
+                                        Restore Default 6 Articles
+                                    </button>
+                                    <button onClick={handleOpenNew} className="studio-btn studio-btn-primary">
+                                        Create New Article
+                                    </button>
+                                </div>
+                            ) : (
+                                <button onClick={handleOpenNew} className="studio-btn studio-btn-primary mt-3">
+                                    Create New Article
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <div className="studio-table-responsive">

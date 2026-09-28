@@ -26,6 +26,68 @@ const BlogPostPage = () => {
     // If logged in as admin, allow viewing draft posts
     const post = getPostBySlug(slug, isAuthenticated);
 
+    // Dynamic SEO Meta & JSON-LD Article Schema
+    useEffect(() => {
+        if (!post) return;
+
+        const originalTitle = document.title;
+        document.title = `${post.title} | BeeFund Financial Blog`;
+
+        let metaDesc = document.querySelector('meta[name="description"]');
+        const originalDesc = metaDesc ? metaDesc.getAttribute('content') : '';
+        if (metaDesc && post.summary) {
+            metaDesc.setAttribute('content', post.summary);
+        }
+
+        const scriptId = 'blog-post-article-schema';
+        let script = document.getElementById(scriptId);
+        if (!script) {
+            script = document.createElement('script');
+            script.id = scriptId;
+            script.type = 'application/ld+json';
+            document.head.appendChild(script);
+        }
+
+        const articleSchema = {
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            'headline': post.title,
+            'description': post.summary || post.title,
+            'image': post.image ? [post.image] : ['https://beefund.in/logo.png'],
+            'datePublished': post.date || new Date().toISOString().split('T')[0],
+            'dateModified': post.updatedAt || post.date || new Date().toISOString().split('T')[0],
+            'author': {
+                '@type': 'Person',
+                'name': post.author || 'BeeFund Research Team'
+            },
+            'publisher': {
+                '@type': 'Organization',
+                'name': 'BeeFund Financial Services',
+                'logo': {
+                    '@type': 'ImageObject',
+                    'url': 'https://beefund.in/logo.png'
+                }
+            },
+            'mainEntityOfPage': {
+                '@type': 'WebPage',
+                '@id': `https://beefund.in/blog/${post.slug}`
+            }
+        };
+
+        script.text = JSON.stringify(articleSchema);
+
+        return () => {
+            document.title = originalTitle;
+            if (metaDesc && originalDesc) {
+                metaDesc.setAttribute('content', originalDesc);
+            }
+            const existingScript = document.getElementById(scriptId);
+            if (existingScript) {
+                existingScript.remove();
+            }
+        };
+    }, [post]);
+
     // Track scroll reading progress
     useEffect(() => {
         const handleScroll = () => {
