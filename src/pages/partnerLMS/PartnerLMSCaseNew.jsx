@@ -22,6 +22,8 @@ import Step8SecurityDetails from './steps/Step8SecurityDetails';
 import Step9PastEstimates from './steps/Step9PastEstimates';
 import Step10StrategicPlan from './steps/Step10StrategicPlan';
 import Step11Annexures from './steps/Step11Annexures';
+import ValidationErrorModal from './components/ValidationErrorModal';
+import { validateStep } from './lmsValidator';
 
 import './PartnerLMSCaseNew.css';
 
@@ -186,6 +188,8 @@ const PartnerLMSCaseNew = () => {
     });
 
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
+    const [validationErrors, setValidationErrors] = useState([]);
     const [currentStep, setCurrentStep] = useState(1);
 
     // Compute tailored steps
@@ -245,10 +249,30 @@ const PartnerLMSCaseNew = () => {
     const currentStepObj = steps[currentStep - 1] || steps[0];
 
     const handleNext = () => {
+        const validation = validateStep(currentStepObj.key, formData, loanConfig);
+        if (!validation.isValid) {
+            setValidationErrors(validation.errors);
+            setIsValidationModalOpen(true);
+            return;
+        }
+
         if (currentStep < steps.length) {
             setCurrentStep(currentStep + 1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+    };
+
+    const handleStepClick = (targetStepId) => {
+        if (targetStepId > currentStep) {
+            const validation = validateStep(currentStepObj.key, formData, loanConfig);
+            if (!validation.isValid) {
+                setValidationErrors(validation.errors);
+                setIsValidationModalOpen(true);
+                return;
+            }
+        }
+        setCurrentStep(targetStepId);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleBack = () => {
@@ -259,6 +283,13 @@ const PartnerLMSCaseNew = () => {
     };
 
     const handleSubmitCase = () => {
+        const validation = validateStep(currentStepObj.key, formData, loanConfig);
+        if (!validation.isValid) {
+            setValidationErrors(validation.errors);
+            setIsValidationModalOpen(true);
+            return;
+        }
+
         const created = createCase(formData);
         navigate(`/partnerLMS/case/${created.id}`);
     };
@@ -362,7 +393,7 @@ const PartnerLMSCaseNew = () => {
                             <li
                                 key={step.id}
                                 className={`step-nav-item ${currentStep === step.id ? 'active' : ''} ${currentStep > step.id ? 'completed' : ''}`}
-                                onClick={() => setCurrentStep(step.id)}
+                                onClick={() => handleStepClick(step.id)}
                             >
                                 <span className="step-num-circle">
                                     {currentStep > step.id ? '✓' : step.id}
@@ -403,6 +434,13 @@ const PartnerLMSCaseNew = () => {
                 isOpen={isCategoryModalOpen}
                 onClose={() => setIsCategoryModalOpen(false)}
                 onSelectCategory={handleSwitchCategory}
+            />
+
+            {/* Validation Restriction Alert Modal */}
+            <ValidationErrorModal
+                isOpen={isValidationModalOpen}
+                errors={validationErrors}
+                onClose={() => setIsValidationModalOpen(false)}
             />
         </div>
     );
