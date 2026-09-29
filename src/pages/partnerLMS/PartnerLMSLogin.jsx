@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePartnerLMS } from './PartnerLMSAuthContext';
 import { PARTNER_LMS_CREDENTIALS } from './lmsData';
+import PartnerThemeToggle from './components/PartnerThemeToggle';
 import './PartnerLMSLogin.css';
 
 const PartnerLMSLogin = () => {
@@ -104,6 +105,7 @@ const PartnerLMSLogin = () => {
                     </div>
 
                     <div className="portal-header-actions">
+                        <PartnerThemeToggle />
                         <Link to="/" className="btn-return-main">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                             <span>Back to BeeFund.in</span>

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePartnerLMS } from './PartnerLMSAuthContext';
 import LeadCategoryModal from './LeadCategoryModal';
+import PartnerThemeToggle from './components/PartnerThemeToggle';
 import './PartnerLMSDashboard.css';
 
 const STATUS_BADGES = {
@@ -77,6 +78,9 @@ const PartnerLMSDashboard = () => {
                     </div>
 
                     <div className="lms-nav-right">
+                        {/* Light / Dark Mode Toggle */}
+                        <PartnerThemeToggle />
+
                         {/* Wallet Balance Widget */}
                         <div className="wallet-widget" onClick={() => setIsWalletModalOpen(true)}>
                             <div className="wallet-icon-box">

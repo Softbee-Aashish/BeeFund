@@ -23,6 +23,7 @@ import Step9PastEstimates from './steps/Step9PastEstimates';
 import Step10StrategicPlan from './steps/Step10StrategicPlan';
 import Step11Annexures from './steps/Step11Annexures';
 import ValidationErrorModal from './components/ValidationErrorModal';
+import PartnerThemeToggle from './components/PartnerThemeToggle';
 import { validateStep } from './lmsValidator';
 
 import './PartnerLMSCaseNew.css';
@@ -365,6 +366,7 @@ const PartnerLMSCaseNew = () => {
                     </div>
 
                     <div className="wizard-top-actions">
+                        <PartnerThemeToggle />
                         <button type="button" onClick={handleBack} disabled={currentStep === 1} className="btn-wiz-nav">
                             ← Previous
                         </button>

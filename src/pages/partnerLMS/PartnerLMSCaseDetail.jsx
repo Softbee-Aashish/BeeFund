@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { usePartnerLMS } from './PartnerLMSAuthContext';
+import PartnerThemeToggle from './components/PartnerThemeToggle';
 import './PartnerLMSCaseDetail.css';
 
 const PartnerLMSCaseDetail = () => {
@@ -113,6 +114,7 @@ const PartnerLMSCaseDetail = () => {
                     </div>
 
                     <div className="case-header-right">
+                        <PartnerThemeToggle />
                         <div className="loan-stat-box">
                             <span className="lbl">Requested Loan</span>
                             <span className="val-cyan">{caseData.loanAmountFormatted}</span>

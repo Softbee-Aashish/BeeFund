@@ -334,3 +334,113 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
+
+/* ==========================================================================
+   LIGHT MODE STYLING FOR LEAD CATEGORY MODAL
+   ========================================================================== */
+[data-theme="light"] .lead-modal-overlay {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+[data-theme="light"] .lead-modal-content {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+    color: #0f172a;
+}
+
+[data-theme="light"] .lead-modal-header {
+    background: #f8fafc;
+    border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .lead-modal-header h2 {
+    color: #0f172a;
+}
+
+[data-theme="light"] .lead-modal-header p {
+    color: #64748b;
+}
+
+[data-theme="light"] .btn-lead-modal-close {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
+[data-theme="light"] .btn-lead-modal-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] .category-card {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+[data-theme="light"] .category-card:hover {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+[data-theme="light"] .category-card.selected {
+    background: #fffbeb;
+    border-color: #f59e0b;
+}
+
+[data-theme="light"] .category-name {
+    color: #0f172a;
+}
+
+[data-theme="light"] .category-desc {
+    color: #64748b;
+}
+
+[data-theme="light"] .category-tag {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+[data-theme="light"] .niche-tab-btn {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+[data-theme="light"] .niche-tab-btn:hover {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+[data-theme="light"] .niche-tab-btn.active {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+}
+
+[data-theme="light"] .lead-modal-label {
+    color: #334155;
+}
+
+[data-theme="light"] .lead-modal-input {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+[data-theme="light"] .lead-modal-footer {
+    background: #f8fafc;
+    border-top-color: #e2e8f0;
+}
+
+[data-theme="light"] .btn-lead-cancel {
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
+[data-theme="light"] .btn-lead-cancel:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+

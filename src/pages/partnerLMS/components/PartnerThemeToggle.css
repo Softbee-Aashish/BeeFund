@@ -1,0 +1,68 @@
+/* Institutional Theme Toggle for Partner LMS */
+.btn-lms-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: inherit;
+    border: 1px solid transparent;
+}
+
+.toggle-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dark Mode Appearance (When currently dark) */
+.btn-lms-theme-toggle.is-dark {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.btn-lms-theme-toggle.is-dark:hover {
+    background: #334155;
+    color: #fbbf24;
+    border-color: #f59e0b;
+}
+
+.btn-lms-theme-toggle.is-dark svg {
+    color: #fbbf24;
+}
+
+/* Light Mode Appearance (When currently light) */
+.btn-lms-theme-toggle.is-light {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #334155;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.btn-lms-theme-toggle.is-light:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.btn-lms-theme-toggle.is-light svg {
+    color: #475569;
+}
+
+.toggle-theme-label {
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .toggle-theme-label {
+        display: none;
+    }
+    .btn-lms-theme-toggle {
+        padding: 0.45rem;
+    }
+}

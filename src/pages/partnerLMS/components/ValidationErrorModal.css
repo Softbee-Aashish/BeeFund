@@ -202,3 +202,80 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
 }
+
+/* ==========================================================================
+   LIGHT MODE STYLING FOR VALIDATION ERROR MODAL
+   ========================================================================== */
+[data-theme="light"] .validation-modal-overlay {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+[data-theme="light"] .validation-modal-content {
+    background: #ffffff;
+    border-color: #ef4444;
+    box-shadow: 0 25px 60px rgba(220, 38, 38, 0.15), 0 10px 30px rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}
+
+[data-theme="light"] .validation-modal-header {
+    background: #fef2f2;
+    border-bottom-color: #fecaca;
+}
+
+[data-theme="light"] .validation-modal-header h3 {
+    color: #991b1b;
+}
+
+[data-theme="light"] .validation-modal-header p {
+    color: #7f1d1d;
+}
+
+[data-theme="light"] .btn-validation-close {
+    background: #ffffff;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+[data-theme="light"] .btn-validation-close:hover {
+    background: #fee2e2;
+}
+
+[data-theme="light"] .validation-err-card {
+    background: #fff5f5;
+    border-color: #fecaca;
+    border-left-color: #ef4444;
+}
+
+[data-theme="light"] .err-field-name {
+    color: #b91c1c;
+}
+
+[data-theme="light"] .err-entered-val {
+    color: #64748b;
+}
+
+[data-theme="light"] .err-entered-val code {
+    background: #ffffff;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+[data-theme="light"] .err-message-text {
+    color: #1e293b;
+}
+
+[data-theme="light"] .err-valid-example {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+[data-theme="light"] .err-valid-example strong {
+    color: #15803d;
+}
+
+[data-theme="light"] .validation-modal-footer {
+    background: #f8fafc;
+    border-top-color: #e2e8f0;
+}
+

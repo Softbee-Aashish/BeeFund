@@ -590,3 +590,225 @@
 
 .amt-cr { color: #34d399; }
 .amt-dr { color: #f87171; }
+
+/* ==========================================================================
+   LIGHT MODE STYLING FOR PARTNER LMS DASHBOARD
+   ========================================================================== */
+[data-theme="light"] .lms-dashboard-root {
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+[data-theme="light"] .lms-dash-nav {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .lms-logo-group {
+    color: #0f172a;
+}
+
+[data-theme="light"] .facilitator-pill {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+[data-theme="light"] .facilitator-pill strong {
+    color: #d97706;
+}
+
+[data-theme="light"] .pill-dot {
+    color: #94a3b8;
+}
+
+[data-theme="light"] .wallet-widget {
+    background: #ffffff;
+    border-color: #fde68a;
+    box-shadow: 0 1px 4px rgba(245, 158, 11, 0.1);
+}
+
+[data-theme="light"] .wallet-widget:hover {
+    background: #fffdf5;
+    border-color: #f59e0b;
+}
+
+[data-theme="light"] .wallet-title {
+    color: #64748b;
+}
+
+[data-theme="light"] .wallet-amount {
+    color: #b45309;
+}
+
+[data-theme="light"] .btn-lms-logout {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+[data-theme="light"] .btn-lms-logout:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+[data-theme="light"] .stat-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .stat-label {
+    color: #64748b;
+}
+
+[data-theme="light"] .stat-value {
+    color: #0f172a;
+}
+
+[data-theme="light"] .stat-hint {
+    color: #94a3b8;
+}
+
+[data-theme="light"] .stat-action-card {
+    background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+    border-color: #fcd34d;
+}
+
+[data-theme="light"] .lms-search-input-wrap {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .lms-search-input-wrap input {
+    color: #0f172a;
+}
+
+[data-theme="light"] .lms-search-input-wrap input::placeholder {
+    color: #94a3b8;
+}
+
+[data-theme="light"] .lms-select-filter {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #1e293b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .lms-cases-table-wrap {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .lms-cases-table th {
+    background: #f8fafc;
+    color: #475569;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .lms-cases-table td {
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] .lms-cases-table tr:hover td {
+    background: #fffbeb;
+}
+
+[data-theme="light"] .case-id-txt {
+    color: #b45309;
+}
+
+[data-theme="light"] .enterprise-name-txt {
+    color: #0f172a;
+}
+
+[data-theme="light"] .enterprise-meta-txt {
+    color: #64748b;
+}
+
+[data-theme="light"] .loan-amount-txt {
+    color: #0284c7;
+}
+
+[data-theme="light"] .project-cost-txt {
+    color: #1e293b;
+}
+
+[data-theme="light"] .lender-name-txt {
+    color: #334155;
+}
+
+[data-theme="light"] .case-scorecard-pill {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+
+[data-theme="light"] .btn-open-command {
+    background: #fef3c7;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+[data-theme="light"] .btn-open-command:hover {
+    background: #f59e0b;
+    color: #0f172a;
+}
+
+/* Modal Light Mode */
+[data-theme="light"] .lms-modal-backdrop {
+    background: rgba(15, 23, 42, 0.45);
+}
+
+[data-theme="light"] .lms-modal-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+    color: #0f172a;
+}
+
+[data-theme="light"] .modal-header {
+    border-bottom-color: #e2e8f0;
+    background: #f8fafc;
+}
+
+[data-theme="light"] .wallet-balance-banner {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+[data-theme="light"] .wallet-balance-banner span {
+    color: #78350f;
+}
+
+[data-theme="light"] .wallet-balance-banner h2 {
+    color: #b45309;
+}
+
+[data-theme="light"] .topup-box label {
+    color: #334155;
+}
+
+[data-theme="light"] .topup-input-flex input {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+[data-theme="light"] .ledger-history-section h4 {
+    color: #1e293b;
+}
+
+[data-theme="light"] .ledger-item-row {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+[data-theme="light"] .ledger-desc {
+    color: #1e293b;
+}
+
