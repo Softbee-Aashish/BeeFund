@@ -51,8 +51,8 @@ const Step11Annexures = ({ formData, updateFormData }) => {
                 <h4>Borrower & Channel Partner Declarations</h4>
                 <div className="declaration-scroll-box">
                     <p>• I/We hereby certify that all information furnished above in this Financial Assistance Application & Project Report are true and correct to the best of my/our knowledge and belief.</p>
-                    <p>• I/We have no objection if SIDBI / Target Banks furnish the information submitted by me/us to CIBIL / RBI / Credit Information Bureaus for evaluating financial assistance.</p>
-                    <p>• I/We are not involved in any illegal production, weapon/munition trade, coal-related restricted activities, or hazardous chemical manufacture violating environmental conventions.</p>
+                    <p>• I/We have no objection if Lending Banks and Financial Institutions furnish the information submitted by me/us to CIBIL / RBI / Credit Information Bureaus for evaluating financial assistance.</p>
+                    <p>• I/We are not involved in any illegal production, restricted activities, or willful default lists maintained by RBI / statutory authorities.</p>
                     <p>• I/We understand that this application is submitted electronically through the BeeFund Partner LMS platform.</p>
                 </div>
 

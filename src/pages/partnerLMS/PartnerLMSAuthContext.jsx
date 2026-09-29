@@ -29,7 +29,7 @@ export const PartnerLMSAuthProvider = ({ children }) => {
             id: 'TXN-002',
             type: 'DEBIT',
             amount: 50,
-            description: 'CIBIL Bureau Pull - Ambesten Packagings',
+            description: 'CIBIL Bureau Pull - Apex Precision Polymers LLP',
             date: '2026-09-29 02:15 PM',
             balanceAfter: 9950
         },
@@ -37,7 +37,7 @@ export const PartnerLMSAuthProvider = ({ children }) => {
             id: 'TXN-003',
             type: 'DEBIT',
             amount: 90,
-            description: 'Bank Statement Analysis (2 Accounts, 12M) - Ambesten',
+            description: 'Bank Statement Analysis (2 Accounts, 12M) - Apex Polymers',
             date: '2026-09-29 02:20 PM',
             balanceAfter: 9860
         }
@@ -203,7 +203,8 @@ export const PartnerLMSAuthProvider = ({ children }) => {
             topUpWallet,
             getCaseById,
             createCase,
-            updateCase
+            updateCase,
+            setPartnerProfile
         }}>
             {children}
         </PartnerLMSAuthContext.Provider>

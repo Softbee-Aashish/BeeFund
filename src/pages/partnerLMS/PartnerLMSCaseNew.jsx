@@ -10,48 +10,48 @@ import Step6ProjectCost from './steps/Step6ProjectCost';
 import Step7FacilityDetails from './steps/Step7FacilityDetails';
 import Step8SecurityDetails from './steps/Step8SecurityDetails';
 import Step9PastEstimates from './steps/Step9PastEstimates';
-import Step10GreenFinance from './steps/Step10GreenFinance';
+import Step10StrategicPlan from './steps/Step10StrategicPlan';
 import Step11Annexures from './steps/Step11Annexures';
 import './PartnerLMSCaseNew.css';
 
 const STEPS = [
-    { id: 1, label: 'Applicant Basic Information' },
-    { id: 2, label: 'GST Information' },
-    { id: 3, label: 'ITR Statement Upload' },
-    { id: 4, label: 'Bank Statement Upload' },
-    { id: 5, label: 'Promoters Details' },
+    { id: 1, label: 'Applicant Basic Information & KYC' },
+    { id: 2, label: 'GST Turnover & Compliance' },
+    { id: 3, label: 'ITR Returns & Tax Profiling' },
+    { id: 4, label: 'Bank Statement Analyzer (BSA)' },
+    { id: 5, label: 'Promoters & Shareholding' },
     { id: 6, label: 'Project Cost & Means of Finance' },
-    { id: 7, label: 'Facility Details' },
-    { id: 8, label: 'Security Details' },
-    { id: 9, label: 'Past Performance & Governance' },
-    { id: 10, label: '4E / Green Finance & IFC' },
-    { id: 11, label: 'Annexures & Declarations' }
+    { id: 7, label: 'Facility Details & Sizing' },
+    { id: 8, label: 'Security & Asset Hypothecation' },
+    { id: 9, label: 'Past Performance & Financials' },
+    { id: 10, label: 'Strategic Plan & Execution Targets' },
+    { id: 11, label: 'Annexures & Facilitator Sign-Off' }
 ];
 
 const PartnerLMSCaseNew = () => {
     const navigate = useNavigate();
-    const { isAuthenticated, createCase, partnerProfile } = usePartnerLMS();
+    const { isAuthenticated, createCase } = usePartnerLMS();
     const [currentStep, setCurrentStep] = useState(1);
 
     // Master Form State
     const [formData, setFormData] = useState({
-        enterpriseName: 'AMBESTEN PACKAGINGS',
+        enterpriseName: 'APEX PRECISION POLYMERS LLP',
         constitution: 'Partnership',
         pan: 'ABNFA3331Q',
         yearsOfOperation: 'Enterprise having 3 years ITR or more',
         industry: 'Manufacturing',
         msmeCategory: 'SMALL',
         udyamNo: 'UDYAM-UP-29-0013890',
-        registeredOffice: 'BASEMENT 116 NAVYUG MARKET, GHAZIABAD, UTTAR PRADESH',
+        registeredOffice: 'Industrial Complex Phase 1, Ghaziabad, Uttar Pradesh',
         pincode: '201001',
         cityState: 'Ghaziabad, Uttar Pradesh',
-        factoryAddressProposed: 'KHASRA NUMBER 313 RAVAN URF BADGAON TEHSIL KHEKDA BADGAON ROAD NEAR NATIONAL PERIPHERAL EXPRESSWAY, DISTRICT BAGHPAT',
-        targetLender: 'SIDBI New Delhi Branch',
-        loanType: 'Rupee Term Loan (Project Finance)',
-        loanAmountFormatted: '₹27.00 Cr',
-        projectCostFormatted: '₹36.00 Cr',
-        termLoanLakhs: 2700.0,
-        projectCostLakhs: 3600.0
+        factoryAddressProposed: 'Plot 45, Ecotech Industrial Park, Greater Noida, Uttar Pradesh',
+        targetLender: 'State Bank of India (MSME Desk)',
+        loanType: 'Rupee Term Loan (Plant & Machinery)',
+        loanAmountFormatted: '₹3.75 Cr',
+        projectCostFormatted: '₹5.00 Cr',
+        termLoanLakhs: 375.0,
+        projectCostLakhs: 500.0
     });
 
     const updateFormData = (fields) => {
@@ -92,7 +92,7 @@ const PartnerLMSCaseNew = () => {
                         <span className="sep-pipe">|</span>
                         <div className="case-title-meta">
                             <strong>{formData.enterpriseName || 'New Case Proposal'}</strong>
-                            <span className="case-limit-badge">Limit: ₹1L to ₹10000L</span>
+                            <span className="case-limit-badge">Limit: ₹10L to ₹5000L</span>
                         </div>
                     </div>
 
@@ -118,7 +118,7 @@ const PartnerLMSCaseNew = () => {
                 {/* Left Steps Navigation */}
                 <aside className="wizard-sidebar">
                     <div className="sidebar-header">
-                        <span>11-STEP PROPOSAL MATRIX</span>
+                        <span>UNDERWRITING MATRIX</span>
                     </div>
                     <ul className="wizard-steps-list">
                         {STEPS.map(step => (
@@ -147,7 +147,7 @@ const PartnerLMSCaseNew = () => {
                     {currentStep === 7 && <Step7FacilityDetails formData={formData} updateFormData={updateFormData} />}
                     {currentStep === 8 && <Step8SecurityDetails formData={formData} updateFormData={updateFormData} />}
                     {currentStep === 9 && <Step9PastEstimates formData={formData} updateFormData={updateFormData} />}
-                    {currentStep === 10 && <Step10GreenFinance formData={formData} updateFormData={updateFormData} />}
+                    {currentStep === 10 && <Step10StrategicPlan formData={formData} updateFormData={updateFormData} />}
                     {currentStep === 11 && <Step11Annexures formData={formData} updateFormData={updateFormData} />}
 
                     {/* Bottom Action Bar */}

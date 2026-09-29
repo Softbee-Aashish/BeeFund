@@ -16,8 +16,8 @@ const PartnerLMSLanding = () => {
                         <span className="text-gradient">DSAs, CAs & Channel Partners</span>
                     </h1>
                     <p className="lms-hero-subtitle">
-                        Structure, underwrite, and log bank-grade Project Loans (₹1L to ₹100Cr), Working Capital Facilities,
-                        and MSME proposals with automated CIBIL Soft-Pulls, Multi-Bank BSA, and instant SIDBI/Bank Report generation.
+                        Structure, underwrite, and log bank-grade Project Loans (₹10L to ₹50Cr), Working Capital Facilities,
+                        and MSME proposals with automated CIBIL Soft-Pulls, Multi-Bank BSA, and instant Bank Report generation.
                     </p>
 
                     <div className="lms-hero-actions">
@@ -25,20 +25,20 @@ const PartnerLMSLanding = () => {
                             Enter Partner LMS Portal
                         </Link>
                         <Link to="/partnerLMS/login" className="btn-lms-secondary">
-                            View Live Pilot Demo (Ambesten ₹27 Cr Case)
+                            View Live Pilot Demo (Apex Polymers ₹3.75 Cr Case)
                         </Link>
                     </div>
 
                     {/* Stats Strip */}
                     <div className="lms-stats-strip">
                         <div className="lms-stat-box">
-                            <span className="stat-num">₹1L – ₹100Cr</span>
+                            <span className="stat-num">₹10L – ₹50Cr</span>
                             <span className="stat-desc">Loan Sizing Coverage</span>
                         </div>
                         <div className="stat-sep"></div>
                         <div className="lms-stat-box">
-                            <span className="stat-num">11-Step</span>
-                            <span className="stat-desc">SIDBI-Grade Underwriting</span>
+                            <span className="stat-num">10-Step</span>
+                            <span className="stat-desc">Institutional Underwriting</span>
                         </div>
                         <div className="stat-sep"></div>
                         <div className="lms-stat-box">

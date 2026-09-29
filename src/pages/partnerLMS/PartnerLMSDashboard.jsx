@@ -59,7 +59,7 @@ const PartnerLMSDashboard = () => {
                 <div className="lms-dash-nav-inner">
                     <div className="lms-nav-left">
                         <Link to="/partnerLMS" className="lms-logo-group">
-                            <span className="logo-badge-sidbi">सिडबी / BANK GRADE</span>
+                            <span className="logo-badge-inst">INSTITUTIONAL GRADE</span>
                             <span className="logo-txt-main">BEEFUND <strong>PARTNER LMS</strong></span>
                         </Link>
                         <div className="facilitator-pill">
@@ -103,13 +103,13 @@ const PartnerLMSDashboard = () => {
                     <div className="stat-card">
                         <div className="stat-label">Portfolio Sizing Volume</div>
                         <div className="stat-value">{partnerProfile.disbursedVolume}</div>
-                        <div className="stat-hint text-green">Avg Ticket: ₹18.5 Cr (MSME)</div>
+                        <div className="stat-hint text-green">Avg Ticket: ₹3.5 Cr (MSME)</div>
                     </div>
 
                     <div className="stat-card">
                         <div className="stat-label">Underwriting Approval Ratio</div>
                         <div className="stat-value text-gold">{partnerProfile.sanctionRatio}</div>
-                        <div className="stat-hint">Across SIDBI & 24 PSU/Private Banks</div>
+                        <div className="stat-hint">Across 25+ Commercial & Nationalized Banks</div>
                     </div>
 
                     <div className="stat-card stat-action-card">
@@ -117,7 +117,7 @@ const PartnerLMSDashboard = () => {
                             <span className="plus-sym">+</span>
                             <span>Create New Credit Case</span>
                         </Link>
-                        <div className="stat-hint">11-Step SIDBI & Project Finance Wizard</div>
+                        <div className="stat-hint">10-Step Institutional Underwriting Wizard</div>
                     </div>
                 </div>
 

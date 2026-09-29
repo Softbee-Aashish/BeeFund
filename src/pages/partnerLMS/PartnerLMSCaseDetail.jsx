@@ -79,7 +79,7 @@ const PartnerLMSCaseDetail = () => {
     };
 
     const handleExportPDF = () => {
-        setExportNotice('Generating Institutional 14-Page SIDBI / Bank Proposal Dossier PDF...');
+        setExportNotice('Generating Institutional Bank Proposal Dossier PDF...');
         setTimeout(() => {
             setExportNotice('✓ Dossier exported successfully: ' + caseData.enterpriseName.replace(/\s+/g, '_') + '_Credit_Proposal.pdf');
             setTimeout(() => setExportNotice(''), 4000);
@@ -363,16 +363,16 @@ const PartnerLMSCaseDetail = () => {
                                         <td><strong>₹300.00 L</strong></td>
                                     </tr>
                                     <tr>
-                                        <td>Term Loan from SIDBI</td>
+                                        <td>Term Loan from Commercial Bank / Lender</td>
                                         <td>₹0.00 L</td>
-                                        <td>₹2700.00 L</td>
-                                        <td><strong>₹2700.00 L</strong></td>
+                                        <td>₹{(caseData.loanAmountLakhs || 375).toFixed(2)} L</td>
+                                        <td><strong>₹{(caseData.loanAmountLakhs || 375).toFixed(2)} L</strong></td>
                                     </tr>
                                     <tr className="total-highlight">
                                         <td><strong>TOTAL MEANS OF FINANCE</strong></td>
-                                        <td><strong>₹900.00 L</strong></td>
-                                        <td><strong>₹2700.00 L</strong></td>
-                                        <td><strong className="text-gold">₹3600.00 L (₹36.00 Cr)</strong></td>
+                                        <td><strong>₹{((caseData.projectCostLakhs || 500) - (caseData.loanAmountLakhs || 375)).toFixed(2)} L</strong></td>
+                                        <td><strong>₹{(caseData.loanAmountLakhs || 375).toFixed(2)} L</strong></td>
+                                        <td><strong className="text-gold">₹{(caseData.projectCostLakhs || 500).toFixed(2)} L ({caseData.projectCostFormatted || '₹5.00 Cr'})</strong></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -385,12 +385,12 @@ const PartnerLMSCaseDetail = () => {
                     <div className="scorecard-tab-layout">
                         <div className="scorecard-hero-box">
                             <div className="scorecard-number-circle">
-                                <span className="score-num">88</span>
+                                <span className="score-num">{caseData.scorecard || 88}</span>
                                 <span className="score-max">/ 100</span>
                             </div>
                             <div className="scorecard-verdict">
                                 <h3>Tier-1 Bankable Credit Profile (Sanction Recommended)</h3>
-                                <p>Strong equity backing (₹900L already deployed), unblemished 758 CIBIL score, zero cheque bounces, and prime industrial land collateral.</p>
+                                <p>Strong equity backing, unblemished {caseData.cibilScore || 758} CIBIL score, zero cheque bounces, and prime industrial asset hypothecation.</p>
                             </div>
                         </div>
 
@@ -398,7 +398,7 @@ const PartnerLMSCaseDetail = () => {
                             <div className="score-pillar-row">
                                 <div className="pillar-info">
                                     <span className="pillar-name">1. CIBIL Bureau & DPD History</span>
-                                    <span className="pillar-desc">758 CIR score, zero past 36M delays, 0 written-off records</span>
+                                    <span className="pillar-desc">{caseData.cibilScore || 758} CIR score, zero past 36M delays, 0 written-off records</span>
                                 </div>
                                 <div className="pillar-score text-green">30 / 30 Pts</div>
                             </div>
@@ -406,7 +406,7 @@ const PartnerLMSCaseDetail = () => {
                             <div className="score-pillar-row">
                                 <div className="pillar-info">
                                     <span className="pillar-name">2. Debt Service & FOIR Capacity</span>
-                                    <span className="pillar-desc">Projected DSCR of 1.74x under 108M amortisation tenure</span>
+                                    <span className="pillar-desc">Projected DSCR of 1.95x - 2.15x under structured amortisation tenure</span>
                                 </div>
                                 <div className="pillar-score text-green">20 / 20 Pts</div>
                             </div>
@@ -414,7 +414,7 @@ const PartnerLMSCaseDetail = () => {
                             <div className="score-pillar-row">
                                 <div className="pillar-info">
                                     <span className="pillar-name">3. Banking Cash Flow & Average Bank Balance</span>
-                                    <span className="pillar-desc">₹116.7L ABB, healthy payroll credits, zero inward returns</span>
+                                    <span className="pillar-desc">Healthy operational ABB, active clearing turnover, zero inward returns</span>
                                 </div>
                                 <div className="pillar-score text-green">18 / 20 Pts</div>
                             </div>
@@ -422,7 +422,7 @@ const PartnerLMSCaseDetail = () => {
                             <div className="score-pillar-row">
                                 <div className="pillar-info">
                                     <span className="pillar-name">4. Declared vs Verified Turnover Match</span>
-                                    <span className="pillar-desc">₹32.49 Cr sales matches ITR and GSTR-3B filings exactly</span>
+                                    <span className="pillar-desc">Declared sales matches ITR and GSTR-3B filings with 98.4% consistency</span>
                                 </div>
                                 <div className="pillar-score text-green">15 / 15 Pts</div>
                             </div>
@@ -430,7 +430,7 @@ const PartnerLMSCaseDetail = () => {
                             <div className="score-pillar-row">
                                 <div className="pillar-info">
                                     <span className="pillar-name">5. Statutory & Corporate Governance</span>
-                                    <span className="pillar-desc">Zero disputed arrears, SPCB valid consent, non-disputed status</span>
+                                    <span className="pillar-desc">Zero disputed arrears, non-wilful defaulter status, clean MCA filings</span>
                                 </div>
                                 <div className="pillar-score text-green">5 / 5 Pts</div>
                             </div>
@@ -443,8 +443,8 @@ const PartnerLMSCaseDetail = () => {
                     <div className="dossier-tab-layout">
                         <div className="dossier-export-actions">
                             <div className="dossier-card">
-                                <h4>14-Page Institutional SIDBI / Bank Proposal Dossier (PDF)</h4>
-                                <p>Comprehensive credit proposal containing Enterprise Profile, Project Sizing, Means of Finance, 4 Guarantors Net Worth (₹23.81 Cr), Security 1st Charge, Financial Estimates, and Facilitator E-Signature.</p>
+                                <h4>Institutional Bank Proposal Dossier (PDF)</h4>
+                                <p>Comprehensive credit proposal containing Enterprise Profile, Project Sizing, Means of Finance, Promoters Net Worth, Primary & Collateral Security 1st Charge, Financial Estimates, and Facilitator E-Signature.</p>
                                 <button type="button" onClick={handleExportPDF} className="btn-export-pdf">
                                     Download Complete Bank Proposal Dossier (.PDF)
                                 </button>

@@ -3,9 +3,9 @@ import React from 'react';
 const Step6ProjectCost = ({ formData, updateFormData }) => {
     // Project Cost Items (in ₹ Lakhs)
     const costItems = formData.projectCostItems || [
-        { id: 1, particular: 'Land including Development', incurred: 600.0, toIncur: 0.0 },
-        { id: 2, particular: 'Building & other Civil Works', incurred: 200.0, toIncur: 800.0 },
-        { id: 3, particular: 'Plant & Machinery - Indigenous', incurred: 100.0, toIncur: 1900.0 },
+        { id: 1, particular: 'Land including Development', incurred: 85.0, toIncur: 0.0 },
+        { id: 2, particular: 'Building & other Civil Works', incurred: 40.0, toIncur: 75.0 },
+        { id: 3, particular: 'Plant & Machinery - Indigenous', incurred: 25.0, toIncur: 275.0 },
         { id: 4, particular: 'Plant & Machinery - Imported', incurred: 0.0, toIncur: 0.0 },
         { id: 5, particular: 'Miscellaneous Fixed Assets (Spares, Tools, Testing)', incurred: 0.0, toIncur: 0.0 },
         { id: 6, particular: 'Preliminary & Pre-operative Expenses', incurred: 0.0, toIncur: 0.0 },
@@ -15,10 +15,10 @@ const Step6ProjectCost = ({ formData, updateFormData }) => {
 
     // Means of Finance (in ₹ Lakhs)
     const meansItems = formData.meansItems || [
-        { id: 1, particular: 'Additional Capital (Share/Partners/Proprietor Capital)', raised: 600.0, proposed: 0.0 },
+        { id: 1, particular: 'Additional Capital (Share/Partners/Proprietor Capital)', raised: 85.0, proposed: 0.0 },
         { id: 2, particular: 'Internal Cash Accruals', raised: 0.0, proposed: 0.0 },
-        { id: 3, particular: 'Interest-free Unsecured Loans', raised: 300.0, proposed: 0.0 },
-        { id: 4, particular: 'Term Loan proposed from SIDBI / Bank', raised: 0.0, proposed: 2700.0 }
+        { id: 3, particular: 'Interest-free Unsecured Loans', raised: 40.0, proposed: 0.0 },
+        { id: 4, particular: 'Term Loan proposed from Commercial Bank / Lender', raised: 0.0, proposed: 375.0 }
     ];
 
     const updateCost = (index, field, value) => {

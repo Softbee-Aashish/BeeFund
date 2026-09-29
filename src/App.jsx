@@ -100,8 +100,8 @@ const AdminShortcutListener = () => {
 const AppContent = () => {
   const location = useLocation();
   const isAdminStudio = location.pathname.startsWith('/admin-studio');
-  const isPartnerLMSWorkspace = location.pathname.startsWith('/partnerLMS/dashboard') || location.pathname.startsWith('/partnerLMS/case');
-  const isDedicatedWorkspace = isAdminStudio || isPartnerLMSWorkspace;
+  const isPartnerLMS = location.pathname.startsWith('/partnerLMS');
+  const isDedicatedWorkspace = isAdminStudio || isPartnerLMS;
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   // BeeLoaderFallback: visible during Suspense; signals loading state via callbacks
@@ -117,7 +117,7 @@ const AppContent = () => {
   };
 
   return (
-    <div className={`app-container ${isAdminStudio ? 'studio-view-active' : ''} ${isPartnerLMSWorkspace ? 'partner-lms-workspace-active' : ''}`}>
+    <div className={`app-container ${isAdminStudio ? 'studio-view-active' : ''} ${isPartnerLMS ? 'partner-lms-workspace-active' : ''}`}>
       <AdminShortcutListener />
       <AdminLoginModal />
 

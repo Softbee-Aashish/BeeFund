@@ -15,7 +15,7 @@ const Step1BasicInfo = ({ formData, updateFormData }) => {
                         type="text"
                         value={formData.enterpriseName || ''}
                         onChange={(e) => updateFormData({ enterpriseName: e.target.value })}
-                        placeholder="e.g. AMBESTEN PACKAGINGS"
+                        placeholder="e.g. APEX PRECISION POLYMERS LLP"
                         required
                     />
                 </div>
@@ -88,7 +88,7 @@ const Step1BasicInfo = ({ formData, updateFormData }) => {
                         type="text"
                         value={formData.registeredOffice || ''}
                         onChange={(e) => updateFormData({ registeredOffice: e.target.value })}
-                        placeholder="e.g. BASEMENT 116 NAVYUG MARKET, GHAZIABAD, UTTAR PRADESH"
+                        placeholder="e.g. Industrial Complex Phase 1, Ghaziabad, Uttar Pradesh"
                     />
                 </div>
 
@@ -112,12 +112,12 @@ const Step1BasicInfo = ({ formData, updateFormData }) => {
                 </div>
 
                 <div className="form-field col-2">
-                    <label>Factory Address (Proposed Site / Expansion Land) *</label>
+                    <label>Factory Address (Proposed Site / Operating Land) *</label>
                     <textarea
                         rows="2"
                         value={formData.factoryAddressProposed || ''}
                         onChange={(e) => updateFormData({ factoryAddressProposed: e.target.value })}
-                        placeholder="e.g. KHASRA NUMBER 313 RAVAN URF BADGAON TEHSIL KHEKDA BADGAON ROAD NEAR NATIONAL PERIPHERAL EXPRESSWAY, DISTRICT BAGHPAT"
+                        placeholder="e.g. Plot 45, Ecotech Industrial Park, Greater Noida, Uttar Pradesh"
                     />
                 </div>
 
@@ -132,16 +132,17 @@ const Step1BasicInfo = ({ formData, updateFormData }) => {
                 </div>
 
                 <div className="form-field">
-                    <label>Target Bank / SIDBI Branch *</label>
+                    <label>Target Bank / Lending Desk *</label>
                     <select
-                        value={formData.targetLender || 'SIDBI New Delhi Branch'}
+                        value={formData.targetLender || 'State Bank of India (MSME Desk)'}
                         onChange={(e) => updateFormData({ targetLender: e.target.value })}
                     >
-                        <option value="SIDBI New Delhi Branch">SIDBI New Delhi Branch (Direct Scheme)</option>
-                        <option value="State Bank of India (MSME Cell)">State Bank of India (MSME Cell)</option>
-                        <option value="Punjab National Bank">Punjab National Bank</option>
+                        <option value="State Bank of India (MSME Desk)">State Bank of India (MSME Desk)</option>
+                        <option value="Punjab National Bank">Punjab National Bank (Commercial Desk)</option>
                         <option value="HDFC Bank (Commercial Banking)">HDFC Bank (Commercial Banking)</option>
                         <option value="Bank of Baroda">Bank of Baroda</option>
+                        <option value="ICICI Bank (SME Division)">ICICI Bank (SME Division)</option>
+                        <option value="Axis Bank">Axis Bank Commercial</option>
                     </select>
                 </div>
             </div>

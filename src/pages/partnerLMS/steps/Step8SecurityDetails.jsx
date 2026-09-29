@@ -2,15 +2,14 @@ import React from 'react';
 
 const Step8SecurityDetails = ({ formData, updateFormData }) => {
     const securities = formData.securities || [
-        { id: 1, type: 'Land', owner: 'AMBESTEN PACKAGINGS', relation: 'PARTNERSHIP', nature: 'Primary', marketValue: 600.0, chargeType: 'Nil', chargeOffered: '1st' },
-        { id: 2, type: 'Cash Collateral (FDR)', owner: 'AMBESTEN PACKAGINGS', relation: 'PARTNERSHIP', nature: 'Collateral', marketValue: 300.0, chargeType: 'Nil', chargeOffered: '1st' }
+        { id: 1, type: 'Industrial Land & Building', owner: 'APEX PRECISION POLYMERS LLP', relation: 'PARTNERSHIP', nature: 'Primary', marketValue: 180.0, chargeType: 'Nil', chargeOffered: '1st' },
+        { id: 2, type: 'Cash Collateral (FDR)', owner: 'APEX PRECISION POLYMERS LLP', relation: 'PARTNERSHIP', nature: 'Collateral', marketValue: 45.0, chargeType: 'Nil', chargeOffered: '1st' }
     ];
 
     const guarantors = formData.guarantors || [
-        { id: 1, name: 'ROHIT SHISHODIA', pan: 'BTRPS0101H', netWorth: 550.0 },
-        { id: 2, name: 'SHIVANI MITTAL', pan: 'ASUPA1336P', netWorth: 445.0 },
-        { id: 3, name: 'HARSHIT GARG', pan: 'BESPG1392G', netWorth: 648.0 },
-        { id: 4, name: 'PRANSHUL MITTAL', pan: 'ANIPM1001A', netWorth: 738.0 }
+        { id: 1, name: 'ROHIT SHISHODIA', pan: 'BTRPS0101H', netWorth: 285.0 },
+        { id: 2, name: 'SHIVANI MITTAL', pan: 'ASUPA1336P', netWorth: 215.0 },
+        { id: 3, name: 'HARSHIT GARG', pan: 'BESPG1392G', netWorth: 320.0 }
     ];
 
     const updateSecurity = (index, field, value) => {
