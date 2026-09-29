@@ -1,25 +1,48 @@
 import React from 'react';
 import { usePartnerLMS } from '../PartnerLMSAuthContext';
 
+const getProductAnnexures = (loanCat, niche) => {
+    if (niche === 'SALARIED') {
+        return [
+            { id: 1, name: 'Annexure 1 - PAN & Masked Aadhaar of Primary Applicant', status: 'Uploaded & Verified' },
+            { id: 2, name: 'Annexure 2 - Last 3 Months Salary Slips (with Net Credits)', status: 'Uploaded & Verified' },
+            { id: 3, name: 'Annexure 3 - Last 2 Years Form-16 (Part A & B)', status: 'Uploaded & Verified' },
+            { id: 4, name: 'Annexure 4 - Last 6 Months Salary Bank Account Statement', status: 'Uploaded & Verified' },
+            { id: 5, name: 'Annexure 5 - Property Valuation / Vehicle Quotation Document', status: 'Uploaded & Verified' },
+            { id: 6, name: 'Annexure 6 - Facilitator Digital Submission Verification', status: 'Uploaded & Verified' }
+        ];
+    } else if (niche === 'SEP') {
+        return [
+            { id: 1, name: 'Annexure 1 - Professional Degree Certificate & Council Registration (MCI/ICAI/COA)', status: 'Uploaded & Verified' },
+            { id: 2, name: 'Annexure 2 - Professional Applicant & Co-Borrower KYC (PAN, Aadhaar)', status: 'Uploaded & Verified' },
+            { id: 3, name: 'Annexure 3 - Last 3 Years Professional ITR & Computation of Income', status: 'Uploaded & Verified' },
+            { id: 4, name: 'Annexure 4 - Last 12 Months Professional Current & Savings Banking', status: 'Uploaded & Verified' },
+            { id: 5, name: 'Annexure 5 - Property Title Deeds / Clinic Premise Ownership Proof', status: 'Uploaded & Verified' },
+            { id: 6, name: 'Annexure 6 - Facilitator Verification Certificate', status: 'Uploaded & Verified' }
+        ];
+    } else {
+        return [
+            { id: 1, name: 'Annexure 1 - Enterprise KYC (PAN, GSTIN, MSME Udyam Certificate)', status: 'Uploaded & Verified' },
+            { id: 2, name: 'Annexure 2 - Promoters & Key Guarantors KYC & Shareholding Chart', status: 'Uploaded & Verified' },
+            { id: 3, name: 'Annexure 3 - Last 3 Years Annual Audited Financials & CA Attestation', status: 'Uploaded & Verified' },
+            { id: 4, name: 'Annexure 4 - Last 12 Months Bank Statements (All Operational Accounts)', status: 'Uploaded & Verified' },
+            { id: 5, name: 'Annexure 5 - Stock Statement / Machinery Proforma / Property Chain Deeds', status: 'Uploaded & Verified' },
+            { id: 6, name: 'Annexure 6 - Authorised Signatory Mandate for E-Signing', status: 'Uploaded & Verified' }
+        ];
+    }
+};
+
 const Step11Annexures = ({ formData, updateFormData }) => {
     const { partnerProfile } = usePartnerLMS();
 
-    const annexures = formData.annexures || [
-        { id: 1, name: 'Annexure 1 - Proof of KYC of Promoters & Guarantors', status: 'Uploaded & Verified' },
-        { id: 2, name: 'Annexure 2 - Proof of KYC of Applicant Enterprise (PAN, GST)', status: 'Uploaded & Verified' },
-        { id: 3, name: 'Annexure 3 - Last 3 Years Annual Audited Accounts', status: 'Uploaded & Verified' },
-        { id: 4, name: 'Annexure 4 - Partnership Deed / MOA & AOA', status: 'Uploaded & Verified' },
-        { id: 5, name: 'Annexure 5 - List of Existing & Proposed Shareholding Pattern', status: 'Uploaded & Verified' },
-        { id: 6, name: 'Annexure 6 - MSME Udyam Registration Certificate', status: 'Uploaded & Verified' },
-        { id: 7, name: 'Annexure 7 - Authorised Signatory Resolution for E-Signing', status: 'Uploaded & Verified' }
-    ];
+    const annexures = formData.annexures || getProductAnnexures(formData.loanCategoryCode, formData.borrowerNiche);
 
     const isDeclared = formData.isDeclared || true;
 
     return (
         <div className="lms-step-container">
             <div className="step-header">
-                <h3>Step 11: Annexures, Statutory Declarations & Facilitator E-Sign</h3>
+                <h3>Step: Mandatory Annexures Dossier & Facilitator E-Sign</h3>
                 <p>Verify attached dossier annexures, confirm statutory borrower declarations, and log case submission timestamp.</p>
             </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePartnerLMS } from './PartnerLMSAuthContext';
+import LeadCategoryModal from './LeadCategoryModal';
 import './PartnerLMSDashboard.css';
 
 const STATUS_BADGES = {
@@ -27,6 +28,7 @@ const PartnerLMSDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+    const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
     const [topUpAmount, setTopUpAmount] = useState(500);
 
     // Filter cases
@@ -50,6 +52,11 @@ const PartnerLMSDashboard = () => {
     const handleTopUp = () => {
         topUpWallet(Number(topUpAmount), `Institutional Wallet Allocation - ₹${topUpAmount}`);
         setIsWalletModalOpen(false);
+    };
+
+    const handleLaunchNewCase = (config) => {
+        setIsLeadModalOpen(false);
+        navigate('/partnerLMS/case/new', { state: config });
     };
 
     return (
@@ -113,11 +120,11 @@ const PartnerLMSDashboard = () => {
                     </div>
 
                     <div className="stat-card stat-action-card">
-                        <Link to="/partnerLMS/case/new" className="btn-new-case">
+                        <button type="button" onClick={() => setIsLeadModalOpen(true)} className="btn-new-case">
                             <span className="plus-sym">+</span>
                             <span>Create New Credit Case</span>
-                        </Link>
-                        <div className="stat-hint">10-Step Institutional Underwriting Wizard</div>
+                        </button>
+                        <div className="stat-hint">Product-Specific Dynamic Wizard</div>
                     </div>
                 </div>
 
@@ -273,6 +280,13 @@ const PartnerLMSDashboard = () => {
                     </div>
                 </div>
             )}
+
+            {/* Lead Category & Niche Selection Modal */}
+            <LeadCategoryModal
+                isOpen={isLeadModalOpen}
+                onClose={() => setIsLeadModalOpen(false)}
+                onSelectCategory={handleLaunchNewCase}
+            />
         </div>
     );
 };
