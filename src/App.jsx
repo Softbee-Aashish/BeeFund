@@ -15,6 +15,7 @@ import { EnquireModalProvider } from './context/EnquireModalContext';
 import { BlogProvider } from './context/BlogContext';
 import { CardsProvider } from './context/CardsContext';
 import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
+import { PartnerLMSAuthProvider } from './pages/partnerLMS/PartnerLMSAuthContext';
 
 // Pages
 const HomePage = React.lazy(() => import('./pages/HomePage'));
@@ -32,6 +33,13 @@ const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
 const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 const AdminStudioPage = React.lazy(() => import('./pages/admin/AdminStudioPage'));
 const ArticleEditorPage = React.lazy(() => import('./pages/admin/ArticleEditorPage'));
+
+// Partner LMS (Institutional Underwriting Portal)
+const PartnerLMSLanding = React.lazy(() => import('./pages/partnerLMS/PartnerLMSLanding'));
+const PartnerLMSLogin = React.lazy(() => import('./pages/partnerLMS/PartnerLMSLogin'));
+const PartnerLMSDashboard = React.lazy(() => import('./pages/partnerLMS/PartnerLMSDashboard'));
+const PartnerLMSCaseNew = React.lazy(() => import('./pages/partnerLMS/PartnerLMSCaseNew'));
+const PartnerLMSCaseDetail = React.lazy(() => import('./pages/partnerLMS/PartnerLMSCaseDetail'));
 
 // Tools
 const ToolsHome = React.lazy(() => import('./pages/tools/ToolsHome'));
@@ -92,6 +100,8 @@ const AdminShortcutListener = () => {
 const AppContent = () => {
   const location = useLocation();
   const isAdminStudio = location.pathname.startsWith('/admin-studio');
+  const isPartnerLMSWorkspace = location.pathname.startsWith('/partnerLMS/dashboard') || location.pathname.startsWith('/partnerLMS/case');
+  const isDedicatedWorkspace = isAdminStudio || isPartnerLMSWorkspace;
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   // BeeLoaderFallback: visible during Suspense; signals loading state via callbacks
@@ -107,11 +117,11 @@ const AppContent = () => {
   };
 
   return (
-    <div className={`app-container ${isAdminStudio ? 'studio-view-active' : ''}`}>
+    <div className={`app-container ${isAdminStudio ? 'studio-view-active' : ''} ${isPartnerLMSWorkspace ? 'partner-lms-workspace-active' : ''}`}>
       <AdminShortcutListener />
       <AdminLoginModal />
 
-      {!isAdminStudio && (
+      {!isDedicatedWorkspace && (
         <>
           <BeeSwarm />
           <Header />
@@ -149,6 +159,13 @@ const AppContent = () => {
             {/* Dedicated Credit Cards Showcase */}
             <Route path="/credit-cards" element={<CreditCardsPage />} />
             <Route path="/cards" element={<CreditCardsPage />} />
+
+            {/* Partner LMS (Institutional Underwriting & Case Login) */}
+            <Route path="/partnerLMS" element={<PartnerLMSLanding />} />
+            <Route path="/partnerLMS/login" element={<PartnerLMSLogin />} />
+            <Route path="/partnerLMS/dashboard" element={<PartnerLMSDashboard />} />
+            <Route path="/partnerLMS/case/new" element={<PartnerLMSCaseNew />} />
+            <Route path="/partnerLMS/case/:id" element={<PartnerLMSCaseDetail />} />
             
             {/* Company & Support */}
             <Route path="/contact" element={<ContactPage />} />
@@ -175,8 +192,8 @@ const AppContent = () => {
         </React.Suspense>
       </main>
 
-      {/* Footer and bottom widgets are hidden while a page is loading to prevent transparent bleed-through */}
-      {!isAdminStudio && !isPageLoading && (
+      {/* Footer and bottom widgets are hidden while a page is loading or inside dedicated workspaces */}
+      {!isDedicatedWorkspace && !isPageLoading && (
         <>
           <Footer />
           <WhatsAppWidget />
@@ -196,11 +213,13 @@ function App() {
       <BlogProvider>
         <CardsProvider>
           <AdminAuthProvider>
-            <EnquireModalProvider>
-              <Router>
-                <AppContent />
-              </Router>
-            </EnquireModalProvider>
+            <PartnerLMSAuthProvider>
+              <EnquireModalProvider>
+                <Router>
+                  <AppContent />
+                </Router>
+              </EnquireModalProvider>
+            </PartnerLMSAuthProvider>
           </AdminAuthProvider>
         </CardsProvider>
       </BlogProvider>

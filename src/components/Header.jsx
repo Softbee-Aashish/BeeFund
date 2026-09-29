@@ -314,6 +314,12 @@ const Header = () => {
 
                 <div className="header-actions">
                     <div className="header-cta">
+                        <Link
+                            to="/partnerLMS"
+                            className="btn-partner-lms"
+                        >
+                            partnerLMS
+                        </Link>
                         <button
                             type="button"
                             onClick={() => openEnquiryModal({ source: 'Header CTA' })}
@@ -478,6 +484,11 @@ const Header = () => {
                         <li>
                             <Link to="/about" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname === '/about' ? 'active' : ''}`}>
                                 <span>About BeeFund</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/partnerLMS" onClick={closeMobileMenu} className={`mobile-nav-link ${location.pathname.startsWith('/partnerLMS') ? 'active' : ''}`}>
+                                <span>partnerLMS (DSA Portal)</span>
                             </Link>
                         </li>
                         <li>
