@@ -268,3 +268,75 @@
     color: #94a3b8;
     font-family: monospace;
 }
+
+/* ==========================================================================
+   LIGHT MODE STYLING FOR ADMIN LOGIN MODAL
+   ========================================================================== */
+[data-theme="light"] .admin-modal-overlay {
+    background: rgba(15, 23, 42, 0.55);
+}
+
+[data-theme="light"] .admin-modal-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 30px rgba(245, 158, 11, 0.08);
+    color: #0f172a;
+}
+
+[data-theme="light"] .admin-modal-close {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
+[data-theme="light"] .admin-modal-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] .admin-modal-title {
+    color: #0f172a;
+}
+
+[data-theme="light"] .admin-modal-subtitle {
+    color: #64748b;
+}
+
+[data-theme="light"] .admin-input-label {
+    color: #334155;
+}
+
+[data-theme="light"] .admin-input-field {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+[data-theme="light"] .admin-pw-toggle {
+    color: #94a3b8;
+}
+
+[data-theme="light"] .admin-pw-toggle:hover {
+    color: #0f172a;
+}
+
+[data-theme="light"] .admin-btn-cancel {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+
+[data-theme="light"] .admin-btn-cancel:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] .admin-modal-footer-hint {
+    color: #64748b;
+}
+
+[data-theme="light"] .admin-modal-footer-hint code {
+    background: #f1f5f9;
+    color: #b45309;
+}
+
