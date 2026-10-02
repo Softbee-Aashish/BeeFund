@@ -124,11 +124,11 @@ const PartnerLMSDashboard = () => {
                     </div>
 
                     <div className="stat-card stat-action-card">
-                        <button type="button" onClick={() => setIsLeadModalOpen(true)} className="btn-new-case">
+                        <button type="button" onClick={() => navigate('/partnerLMS/case/new')} className="btn-new-case">
                             <span className="plus-sym">+</span>
                             <span>Create New Credit Case</span>
                         </button>
-                        <div className="stat-hint">Product-Specific Dynamic Wizard</div>
+                        <div className="stat-hint">Universal KYC & Dynamic Sizing Wizard</div>
                     </div>
                 </div>
 

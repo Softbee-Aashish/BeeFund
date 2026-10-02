@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { usePartnerLMS } from './PartnerLMSAuthContext';
-import LeadCategoryModal, { LOAN_PRODUCT_CONFIGS } from './LeadCategoryModal';
+import { LOAN_PRODUCTS, BORROWER_NICHES, ENTITY_TYPES } from './masterDocMatrix';
 
 // Step Component Imports
+import StepUniversalKYC from './steps/StepUniversalKYC';
+import Step2ProductFacility from './steps/Step2ProductFacility';
+import StepDynamicDocVault from './steps/StepDynamicDocVault';
+import StepBillDiscounting from './steps/StepBillDiscounting';
 import Step1BasicInfo from './steps/Step1BasicInfo';
 import StepPersonalKYC from './steps/StepPersonalKYC';
 import StepSalariedIncome from './steps/StepSalariedIncome';
@@ -28,147 +32,139 @@ import { validateStep } from './lmsValidator';
 
 import './PartnerLMSCaseNew.css';
 
-// Dynamic Step Generator based on Loan Product & Niche
-export const getTailoredSteps = (loanType, borrowerNiche) => {
-    switch (loanType) {
-        case 'UNSECURED_BUSINESS':
-            return [
-                { id: 1, key: 'basic_info', label: 'Enterprise Profile & Applicant KYC' },
-                { id: 2, key: 'promoters', label: 'Promoters / Signatory & CIBIL Profile' },
-                { id: 3, key: 'gst', label: 'GST Turnover & Filing Regularity' },
-                { id: 4, key: 'bank_upload', label: '12-Month Banking Statement Analyzer' },
-                { id: 5, key: 'itr', label: '2-3 Year ITR & Financial Statements' },
-                { id: 6, key: 'facility', label: 'Loan Sizing & EMI Debt Obligations' },
-                { id: 7, key: 'annexures', label: 'Statutory Declarations & E-Sign' }
-            ];
+/**
+ * Dynamic Step Generator based on 9 Master Loan Products x Entity Type x Loan Sizing
+ */
+export const getTailoredSteps = (productType = 'BL', entityType = 'PROPRIETORSHIP', borrowerNiche = 'SENP') => {
+    const isSalaried = entityType === 'INDIVIDUAL_SALARIED' || borrowerNiche === 'SALARIED';
 
-        case 'WORKING_CAPITAL':
-            return [
-                { id: 1, key: 'basic_info', label: 'Enterprise Profile & Udyam KYC' },
-                { id: 2, key: 'promoters', label: 'Promoters & Management Shareholding' },
-                { id: 3, key: 'gst', label: 'GST Turnover & ITC Reconciliation' },
-                { id: 4, key: 'bank_upload', label: 'Current Account 12M Bank Statement' },
-                { id: 5, key: 'wc_stock', label: 'Stock, Book Debts & Drawing Power' },
-                { id: 6, key: 'financials', label: 'Past Performance & Operating Estimates' },
-                { id: 7, key: 'facility', label: 'OD / CC Limit Sizing & Sub-Limits' },
-                { id: 8, key: 'security', label: 'Stock Hypothecation & Collateral Security' },
-                { id: 9, key: 'annexures', label: 'Annexures & Facilitator E-Sign' }
-            ];
+    // Universal Base Steps for every case
+    const baseSteps = [
+        { key: 'universal_kyc', label: '1. Applicant & Promoter KYC' },
+        { key: 'product_facility', label: '2. Loan Facility & Product Sizing' }
+    ];
 
-        case 'MACHINERY_TERM':
-            return [
-                { id: 1, key: 'basic_info', label: 'Enterprise Profile & Factory Location' },
-                { id: 2, key: 'promoters', label: 'Promoters & Management Profile' },
-                { id: 3, key: 'machinery', label: 'Machinery Specifications & Supplier Quotations' },
-                { id: 4, key: 'capex_means', label: 'Cost of Capex & Means of Finance' },
-                { id: 5, key: 'bank_upload', label: '12M Bank Statement & GST Filings' },
-                { id: 6, key: 'strategic_plan', label: 'Operating DSCR Projections & Execution Plan' },
-                { id: 7, key: 'security', label: 'Machinery Hypothecation & Collateral' },
-                { id: 8, key: 'annexures', label: 'Annexures & Facilitator Sign-Off' }
-            ];
+    let middleSteps = [];
 
-        case 'PROJECT_FINANCE':
-            return [
-                { id: 1, key: 'basic_info', label: 'Enterprise Profile & Project Sizing' },
-                { id: 2, key: 'promoters', label: 'Promoters KYC & Shareholding Pattern' },
-                { id: 3, key: 'project_cost', label: 'Full Project Cost & Means of Finance' },
-                { id: 4, key: 'bank_upload', label: 'Multi-Bank Statement Analysis' },
-                { id: 5, key: 'gst', label: 'GST Turnover & ITR Verification' },
-                { id: 6, key: 'financials', label: 'Financial Track Record & CMA Projections' },
-                { id: 7, key: 'security', label: 'Primary & Collateral Security Matrix' },
-                { id: 8, key: 'strategic_plan', label: 'Milestone Execution & DCCO Roadmap' },
-                { id: 9, key: 'annexures', label: 'Annexures, Statutory Declarations & Sign' }
-            ];
-
-        case 'HOME_LAP':
-            if (borrowerNiche === 'SALARIED') {
-                return [
-                    { id: 1, key: 'personal_kyc', label: 'Applicant & Co-Applicant Personal KYC' },
-                    { id: 2, key: 'salaried_income', label: 'Employer Details & Monthly Salary Profile' },
-                    { id: 3, key: 'bank_upload', label: 'Salary Account 6-Month Bank Statement' },
-                    { id: 4, key: 'property', label: 'Property Identification & Legal Valuation' },
-                    { id: 5, key: 'facility', label: 'Home Loan / LAP Sizing & FOIR Calculation' },
-                    { id: 6, key: 'annexures', label: 'Borrower Declarations & E-Sign' }
-                ];
-            } else if (borrowerNiche === 'SEP') {
-                return [
-                    { id: 1, key: 'personal_kyc', label: 'Professional Applicant KYC & Identity' },
-                    { id: 2, key: 'professional_profile', label: 'Medical / CA / Legal Council Credentials' },
-                    { id: 3, key: 'itr', label: '3-Year Professional ITR & Gross Receipts' },
-                    { id: 4, key: 'bank_upload', label: '12-Month Professional & Savings Banking' },
-                    { id: 5, key: 'property', label: 'Property Collateral Title Deeds & Valuation' },
-                    { id: 6, key: 'facility', label: 'Facility Sizing, LTV & Debt Obligations' },
-                    { id: 7, key: 'annexures', label: 'Declarations & Facilitator E-Sign' }
+    switch (productType) {
+        case 'HL':
+            if (isSalaried) {
+                middleSteps = [
+                    { key: 'salaried_income', label: '3. Salary Income & Employer Profile' },
+                    { key: 'bank_upload', label: '4. Salary Account Bank Statements' },
+                    { key: 'property', label: '5. Property Identification & Title Deeds' },
+                    { key: 'facility', label: '6. Home Loan Sizing & FOIR' }
                 ];
             } else {
-                // SENP (Self Employed Non-Professional)
-                return [
-                    { id: 1, key: 'basic_info', label: 'Business Enterprise & Applicant KYC' },
-                    { id: 2, key: 'gst', label: 'GST Turnover & Compliance Profile' },
-                    { id: 3, key: 'itr', label: '3-Year Business ITR & Computation' },
-                    { id: 4, key: 'bank_upload', label: '12-Month Business Current Account Banking' },
-                    { id: 5, key: 'property', label: 'Mortgage Property Valuation & Sanction Plan' },
-                    { id: 6, key: 'facility', label: 'Loan Sizing, LTV & Existing Debt Burden' },
-                    { id: 7, key: 'annexures', label: 'Declarations & Facilitator E-Sign' }
+                middleSteps = [
+                    { key: 'gst', label: '3. GST Turnover & Compliance' },
+                    { key: 'itr', label: '4. 3-Year ITR & Financial Statements' },
+                    { key: 'bank_upload', label: '5. 12M Operating Bank Statement' },
+                    { key: 'property', label: '6. Property Title Deeds & Valuation' },
+                    { key: 'facility', label: '7. Home Loan Sizing & Repayment' }
                 ];
             }
+            break;
 
-        case 'AUTO_CV':
-            if (borrowerNiche === 'SALARIED') {
-                return [
-                    { id: 1, key: 'personal_kyc', label: 'Applicant KYC & Residence Proof' },
-                    { id: 2, key: 'salaried_income', label: 'Employer & Net Monthly Salary Profile' },
-                    { id: 3, key: 'bank_upload', label: 'Salary Account 6-Month Bank Statement' },
-                    { id: 4, key: 'vehicle', label: 'Vehicle Model, Dealer Quotation & Down Payment' },
-                    { id: 5, key: 'facility', label: 'Auto Loan Sizing & EMI Repayment Match' },
-                    { id: 6, key: 'annexures', label: 'Declarations & E-Sign' }
-                ];
-            } else {
-                // Commercial Vehicle / Fleet / SENP
-                return [
-                    { id: 1, key: 'basic_info', label: 'Transport Firm / Enterprise KYC' },
-                    { id: 2, key: 'vehicle', label: 'Commercial Vehicle Specifications & Fleet Profile' },
-                    { id: 3, key: 'bank_upload', label: '12-Month Operational Bank Statement' },
-                    { id: 4, key: 'gst', label: 'GST Turnover & Tax Filings' },
-                    { id: 5, key: 'facility', label: 'Vehicle Loan Sizing & Route Cash Flow Match' },
-                    { id: 6, key: 'annexures', label: 'Declarations & Facilitator E-Sign' }
-                ];
-            }
+        case 'LAP':
+            middleSteps = [
+                { key: 'gst', label: '3. GST Turnover & ITC Reconciliation' },
+                { key: 'itr', label: '4. 2–3 Year Audited Financials & ITR' },
+                { key: 'bank_upload', label: '5. 12-Month Banking Statement Analyzer' },
+                { key: 'property', label: '6. Mortgage Property Valuation & Legal EC' },
+                { key: 'security', label: '7. Collateral Security & Guarantees' },
+                { key: 'facility', label: '8. LAP Sizing, LTV & Debt Burden' }
+            ];
+            break;
 
-        case 'PERSONAL_GOLD':
-            if (borrowerNiche === 'SALARIED') {
-                return [
-                    { id: 1, key: 'personal_kyc', label: 'Borrower KYC & Identification' },
-                    { id: 2, key: 'salaried_income', label: 'Employer & Monthly Salary Verification' },
-                    { id: 3, key: 'bank_upload', label: '3-6 Month Salary Bank Statement' },
-                    { id: 4, key: 'facility', label: 'Personal Loan Sizing, Tenure & FOIR' },
-                    { id: 5, key: 'annexures', label: 'Borrower Declarations & E-Sign' }
-                ];
-            } else {
-                return [
-                    { id: 1, key: 'personal_kyc', label: 'Borrower & Business/Professional KYC' },
-                    { id: 2, key: 'itr', label: '2-Year ITR & Income Computation' },
-                    { id: 3, key: 'bank_upload', label: '6-12 Month Bank Statement' },
-                    { id: 4, key: 'facility', label: 'Loan Sizing & Debt Burden' },
-                    { id: 5, key: 'annexures', label: 'Declarations & Facilitator E-Sign' }
-                ];
-            }
+        case 'ML':
+            middleSteps = [
+                { key: 'machinery', label: '3. Machinery Specifications & Supplier Quotations' },
+                { key: 'capex_means', label: '4. Cost of Capex & Means of Finance' },
+                { key: 'gst', label: '5. GST Turnover & Compliance' },
+                { key: 'bank_upload', label: '6. 12M Operating Bank Statement' },
+                { key: 'financials', label: '7. Operating DSCR & 5-Year Projections' },
+                { key: 'security', label: '8. Machinery Hypothecation & Security' }
+            ];
+            break;
+
+        case 'BL':
+            middleSteps = [
+                { key: 'gst', label: '3. GST Turnover & Regularity' },
+                { key: 'bank_upload', label: '4. 12-Month Banking Statement Analyzer' },
+                { key: 'itr', label: '5. 2–3 Year ITR & Financial Statements' },
+                { key: 'facility', label: '6. Loan Sizing & EMI Obligations' }
+            ];
+            break;
+
+        case 'PL':
+            middleSteps = [
+                { key: 'salaried_income', label: '3. Employer Profile & Monthly Payslips' },
+                { key: 'bank_upload', label: '4. 6-Month Salary Bank Statement' },
+                { key: 'facility', label: '5. Personal Loan Sizing & Net FOIR' }
+            ];
+            break;
+
+        case 'AL':
+            middleSteps = [
+                { key: 'vehicle', label: '3. Vehicle Model & Dealer Proforma Invoice' },
+                isSalaried ? { key: 'salaried_income', label: '4. Salary Income Verification' } : { key: 'gst', label: '4. GST & Business Financials' },
+                { key: 'bank_upload', label: '5. 6–12 Month Bank Statement' },
+                { key: 'facility', label: '6. Auto Loan Sizing & Repayment Tenure' }
+            ];
+            break;
+
+        case 'PROJECT':
+            middleSteps = [
+                { key: 'project_cost', label: '3. Detailed Project Cost & Means of Finance' },
+                { key: 'gst', label: '4. GST Turnover & Invoicing Track' },
+                { key: 'bank_upload', label: '5. Multi-Bank Cash Flow Analyzer' },
+                { key: 'financials', label: '6. Past Performance & CMA Projections' },
+                { key: 'security', label: '7. Primary & Collateral Security Matrix' },
+                { key: 'strategic_plan', label: '8. Milestone Execution, TEV & DCCO Roadmap' }
+            ];
+            break;
+
+        case 'OD_CC':
+            middleSteps = [
+                { key: 'wc_stock', label: '3. Stock, Book Debts & Tandon MPBF' },
+                { key: 'gst', label: '4. GST Turnover & ITC Reconciliation' },
+                { key: 'bank_upload', label: '5. 12M Current Account Banking' },
+                { key: 'financials', label: '6. Audited Financials & Operating Estimates' },
+                { key: 'facility', label: '7. OD / CC Limit Sizing & Sub-Limits' },
+                { key: 'security', label: '8. Stock Hypothecation & Collateral' }
+            ];
+            break;
+
+        case 'BILL_DISCOUNTING':
+            middleSteps = [
+                { key: 'bill_discounting', label: '3. Commercial Invoices, PO & POD Details' },
+                { key: 'gst', label: '4. GSTR-1 Invoicing Reconciliation' },
+                { key: 'bank_upload', label: '5. 12M Banking & Credit Inflows' },
+                { key: 'financials', label: '6. Financial Track Record & ITR' }
+            ];
+            break;
 
         default:
-            return [
-                { id: 1, key: 'basic_info', label: 'Applicant Basic Information & KYC' },
-                { id: 2, key: 'gst', label: 'GST Turnover & Compliance' },
-                { id: 3, key: 'itr', label: 'ITR Returns & Tax Profiling' },
-                { id: 4, key: 'bank_upload', label: 'Bank Statement Analyzer (BSA)' },
-                { id: 5, key: 'promoters', label: 'Promoters & Shareholding' },
-                { id: 6, key: 'project_cost', label: 'Project Cost & Means of Finance' },
-                { id: 7, key: 'facility', label: 'Facility Details & Sizing' },
-                { id: 8, key: 'security', label: 'Security & Asset Hypothecation' },
-                { id: 9, key: 'financials', label: 'Past Performance & Financials' },
-                { id: 10, key: 'strategic_plan', label: 'Strategic Plan & Execution Targets' },
-                { id: 11, key: 'annexures', label: 'Annexures & Facilitator Sign-Off' }
+            middleSteps = [
+                { key: 'gst', label: '3. GST Turnover & Compliance' },
+                { key: 'bank_upload', label: '4. 12M Bank Statement Analysis' },
+                { key: 'itr', label: '5. ITR & Financial Statements' },
+                { key: 'facility', label: '6. Loan Sizing & Debt Burden' }
             ];
     }
+
+    const finalSteps = [
+        { key: 'doc_vault', label: 'Master Document Vault & Traffic Lights' },
+        { key: 'annexures', label: 'Statutory Declarations & E-Sign' }
+    ];
+
+    const allSteps = [...baseSteps, ...middleSteps, ...finalSteps];
+    return allSteps.map((step, idx) => ({
+        ...step,
+        id: idx + 1,
+        label: step.label.startsWith(`${idx + 1}.`) ? step.label : `${idx + 1}. ${step.label}`
+    }));
 };
 
 const PartnerLMSCaseNew = () => {
@@ -176,78 +172,80 @@ const PartnerLMSCaseNew = () => {
     const location = useLocation();
     const { isAuthenticated, createCase } = usePartnerLMS();
 
-    // Configuration from navigation state or defaults
+    // Default configuration: begins directly with Universal KYC
     const [loanConfig, setLoanConfig] = useState(() => {
-        const state = location.state;
+        const state = location.state || {};
         return {
-            loanType: state?.loanType || 'UNSECURED_BUSINESS',
-            loanTypeTitle: state?.loanTypeTitle || 'Unsecured Business Loan (BL)',
-            borrowerNiche: state?.borrowerNiche || 'BUSINESS_ENTITY',
-            borrowerName: state?.borrowerName || 'Apex Precision Polymers LLP',
-            estimatedAmountLakhs: state?.estimatedAmountLakhs || 50.0
+            loanProduct: state.loanProduct || state.loanType || 'BL',
+            entityType: state.entityType || 'PROPRIETORSHIP',
+            borrowerNiche: state.borrowerNiche || 'SENP',
+            loanAmountLakhs: state.loanAmountLakhs || 50.0
         };
     });
 
-    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [currentStep, setCurrentStep] = useState(1);
     const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState([]);
-    const [currentStep, setCurrentStep] = useState(1);
-
-    // Compute tailored steps
-    const steps = getTailoredSteps(loanConfig.loanType, loanConfig.borrowerNiche);
 
     // Master Form State
     const [formData, setFormData] = useState({
-        enterpriseName: loanConfig.borrowerName,
-        applicantName: loanConfig.borrowerName,
+        enterpriseName: '',
+        applicantName: '',
+        entityType: loanConfig.entityType,
+        loanProduct: loanConfig.loanProduct,
         constitution: 'Partnership',
-        pan: 'ABNFA3331Q',
+        pan: '',
+        aadhaarNo: '',
+        udyamNo: '',
         yearsOfOperation: 'Enterprise having 3 years ITR or more',
-        industry: 'Manufacturing',
-        msmeCategory: 'SMALL',
-        udyamNo: 'UDYAM-UP-29-0013890',
-        registeredOffice: 'Industrial Complex Phase 1, Ghaziabad, Uttar Pradesh',
-        pincode: '201001',
-        cityState: 'Ghaziabad, Uttar Pradesh',
-        factoryAddressProposed: 'Plot 45, Ecotech Industrial Park, Greater Noida, Uttar Pradesh',
+        industry: 'Manufacturing & Processing',
+        msmeCategory: 'MICRO / SMALL',
         targetLender: 'State Bank of India (MSME Desk)',
-        loanType: loanConfig.loanTypeTitle,
-        loanCategoryCode: loanConfig.loanType,
+        loanAmountLakhs: loanConfig.loanAmountLakhs,
+        loanAmountFormatted: '₹50.00 Lakhs',
+        loanTenureMonths: 60,
         borrowerNiche: loanConfig.borrowerNiche,
-        loanAmountFormatted: `₹${(loanConfig.estimatedAmountLakhs / 100).toFixed(2)} Cr`,
-        projectCostFormatted: `₹${((loanConfig.estimatedAmountLakhs * 1.33) / 100).toFixed(2)} Cr`,
-        termLoanLakhs: loanConfig.estimatedAmountLakhs,
-        loanAmountLakhs: loanConfig.estimatedAmountLakhs,
-        projectCostLakhs: loanConfig.estimatedAmountLakhs * 1.33
+        registeredOffice: '',
+        residentialAddress: '',
+        cityState: 'New Delhi, Delhi',
+        pincode: '110001',
+        contactMobile: '',
+        contactEmail: '',
+        loanPurpose: 'Business expansion & working capital procurement',
+        promoters: [
+            { id: 1, name: '', pan: '', aadhaar: '', shareholding: 100, cibil: 758, netWorthLakhs: 150.0, designation: 'Managing Director / Partner' }
+        ],
+        documentStatuses: {}
     });
 
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/partnerLMS/login');
+        }
+    }, [isAuthenticated, navigate]);
+
     const updateFormData = (fields) => {
-        setFormData(prev => ({ ...prev, ...fields }));
+        setFormData(prev => {
+            const next = { ...prev, ...fields };
+            // Update loanConfig if loanProduct, entityType or borrowerNiche changes
+            if (fields.loanProduct || fields.entityType || fields.borrowerNiche || fields.loanAmountLakhs) {
+                setLoanConfig(c => ({
+                    ...c,
+                    loanProduct: fields.loanProduct || c.loanProduct,
+                    entityType: fields.entityType || c.entityType,
+                    borrowerNiche: fields.borrowerNiche || c.borrowerNiche,
+                    loanAmountLakhs: fields.loanAmountLakhs || c.loanAmountLakhs
+                }));
+            }
+            return next;
+        });
     };
 
-    const handleSwitchCategory = (newConfig) => {
-        setLoanConfig(newConfig);
-        setIsCategoryModalOpen(false);
-        setCurrentStep(1);
-        setFormData(prev => ({
-            ...prev,
-            enterpriseName: newConfig.borrowerName || prev.enterpriseName,
-            applicantName: newConfig.borrowerName || prev.applicantName,
-            loanType: newConfig.loanTypeTitle,
-            loanCategoryCode: newConfig.loanType,
-            borrowerNiche: newConfig.borrowerNiche,
-            loanAmountLakhs: newConfig.estimatedAmountLakhs,
-            termLoanLakhs: newConfig.estimatedAmountLakhs,
-            loanAmountFormatted: `₹${(newConfig.estimatedAmountLakhs / 100).toFixed(2)} Cr`
-        }));
-    };
-
-    if (!isAuthenticated) {
-        navigate('/partnerLMS/login');
-        return null;
-    }
-
+    // Calculate dynamic steps
+    const steps = getTailoredSteps(formData.loanProduct || 'BL', formData.entityType || 'PROPRIETORSHIP', formData.borrowerNiche || 'SENP');
     const currentStepObj = steps[currentStep - 1] || steps[0];
+
+    const currentProductMeta = LOAN_PRODUCTS.find(p => p.id === (formData.loanProduct || 'BL')) || LOAN_PRODUCTS[3];
 
     const handleNext = () => {
         const validation = validateStep(currentStepObj.key, formData, loanConfig);
@@ -298,6 +296,14 @@ const PartnerLMSCaseNew = () => {
     // Render step component dynamically
     const renderStepContent = (stepKey) => {
         switch (stepKey) {
+            case 'universal_kyc':
+                return <StepUniversalKYC formData={formData} updateFormData={updateFormData} />;
+            case 'product_facility':
+                return <Step2ProductFacility formData={formData} updateFormData={updateFormData} />;
+            case 'bill_discounting':
+                return <StepBillDiscounting formData={formData} updateFormData={updateFormData} />;
+            case 'doc_vault':
+                return <StepDynamicDocVault formData={formData} updateFormData={updateFormData} />;
             case 'basic_info':
                 return <Step1BasicInfo formData={formData} updateFormData={updateFormData} />;
             case 'personal_kyc':
@@ -336,7 +342,7 @@ const PartnerLMSCaseNew = () => {
             case 'annexures':
                 return <Step11Annexures formData={formData} updateFormData={updateFormData} />;
             default:
-                return <Step1BasicInfo formData={formData} updateFormData={updateFormData} />;
+                return <StepUniversalKYC formData={formData} updateFormData={updateFormData} />;
         }
     };
 
@@ -349,19 +355,9 @@ const PartnerLMSCaseNew = () => {
                         <Link to="/partnerLMS/dashboard" className="btn-back-dash">← Back to Dashboard</Link>
                         <span className="sep-pipe">|</span>
                         <div className="case-title-meta">
-                            <strong>{formData.enterpriseName || formData.applicantName || 'New Case Proposal'}</strong>
-                            <span className="case-limit-badge">{loanConfig.loanTypeTitle}</span>
-                            {loanConfig.borrowerNiche !== 'BUSINESS_ENTITY' && (
-                                <span className="niche-active-pill">{loanConfig.borrowerNiche}</span>
-                            )}
-                            <button
-                                type="button"
-                                onClick={() => setIsCategoryModalOpen(true)}
-                                className="btn-switch-product-gate"
-                                title="Change Loan Product or Niche"
-                            >
-                                ⇄ Switch Product
-                            </button>
+                            <strong>{formData.enterpriseName || formData.applicantName || 'New Credit Proposal'}</strong>
+                            <span className="case-limit-badge">{currentProductMeta.name}</span>
+                            <span className="niche-active-pill">{formData.entityType}</span>
                         </div>
                     </div>
 
@@ -388,7 +384,7 @@ const PartnerLMSCaseNew = () => {
                 {/* Left Steps Navigation */}
                 <aside className="wizard-sidebar">
                     <div className="sidebar-header">
-                        <span>{steps.length}-STEP UNDERWRITING FLOW</span>
+                        <span>{steps.length}-STEP DYNAMIC INGESTION FLOW</span>
                     </div>
                     <ul className="wizard-steps-list">
                         {steps.map(step => (
@@ -410,39 +406,35 @@ const PartnerLMSCaseNew = () => {
                 <main className="wizard-main-canvas">
                     {renderStepContent(currentStepObj.key)}
 
-                    {/* Bottom Action Bar */}
+                    {/* Bottom Step Actions */}
                     <div className="wizard-bottom-bar">
-                        <button type="button" onClick={handleBack} disabled={currentStep === 1} className="btn-wiz-nav">
-                            ← Previous Step
-                        </button>
                         <div className="bottom-save-info">
-                            <span>Auto-saved to Partner Drafts • Step {currentStep} of {steps.length}</span>
+                            <span>Step {currentStep} of {steps.length}: <strong>{currentStepObj.label}</strong></span>
                         </div>
-                        {currentStep < steps.length ? (
-                            <button type="button" onClick={handleNext} className="btn-wiz-next">
-                                Save & Continue →
+                        <div className="wizard-top-actions">
+                            <button type="button" onClick={handleBack} disabled={currentStep === 1} className="btn-wiz-nav">
+                                ← Back
                             </button>
-                        ) : (
-                            <button type="button" onClick={handleSubmitCase} className="btn-wiz-submit">
-                                ✓ Complete & Submit Case to LMS
-                            </button>
-                        )}
+                            {currentStep < steps.length ? (
+                                <button type="button" onClick={handleNext} className="btn-wiz-next">
+                                    Save & Continue →
+                                </button>
+                            ) : (
+                                <button type="button" onClick={handleSubmitCase} className="btn-wiz-submit">
+                                    ✓ Submit Case Proposal
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </main>
             </div>
 
-            {/* Switch Product / Niche Modal */}
-            <LeadCategoryModal
-                isOpen={isCategoryModalOpen}
-                onClose={() => setIsCategoryModalOpen(false)}
-                onSelectCategory={handleSwitchCategory}
-            />
-
-            {/* Validation Restriction Alert Modal */}
+            {/* Validation Error Modal */}
             <ValidationErrorModal
                 isOpen={isValidationModalOpen}
-                errors={validationErrors}
                 onClose={() => setIsValidationModalOpen(false)}
+                errors={validationErrors}
+                stepTitle={currentStepObj.label}
             />
         </div>
     );

@@ -16,6 +16,7 @@ export const validateStep = (stepKey, formData, loanConfig) => {
     const errors = [];
 
     switch (stepKey) {
+        case 'universal_kyc':
         case 'basic_info': {
             const name = formData.enterpriseName || formData.applicantName || '';
             if (!name.trim() || name.trim().length < 3) {
@@ -30,40 +31,56 @@ export const validateStep = (stepKey, formData, loanConfig) => {
             const pan = (formData.pan || '').trim().toUpperCase();
             if (!pan || !REGEX_PATTERNS.PAN.test(pan)) {
                 errors.push({
-                    field: 'Enterprise PAN Number',
+                    field: 'Applicant PAN Number',
                     value: pan || '(Empty)',
                     message: 'PAN must be exactly 10 alphanumeric characters (5 uppercase letters, 4 digits, 1 uppercase letter).',
                     example: 'e.g. ABNFA3331Q or ABCDE1234F'
                 });
             }
 
-            const pincode = (formData.pincode || '').trim();
-            if (!pincode || !REGEX_PATTERNS.PINCODE.test(pincode)) {
+            const mobile = (formData.contactMobile || '').trim();
+            if (mobile && !REGEX_PATTERNS.MOBILE.test(mobile)) {
                 errors.push({
-                    field: 'Registered Pincode',
-                    value: pincode || '(Empty)',
-                    message: 'Pincode must be a valid 6-digit Indian postal code (starting with 1-9).',
-                    example: 'e.g. 201001, 110001, 400001'
+                    field: 'Mobile Number',
+                    value: mobile,
+                    message: 'Mobile number must be a valid 10-digit Indian phone number.',
+                    example: 'e.g. 9871221173'
                 });
             }
 
-            const address = (formData.registeredOffice || '').trim();
-            if (!address || address.length < 5) {
+            const email = (formData.contactEmail || '').trim();
+            if (email && !REGEX_PATTERNS.EMAIL.test(email)) {
                 errors.push({
-                    field: 'Registered Office / Operating Address',
-                    value: address || '(Empty)',
-                    message: 'Please provide complete registered office address.',
-                    example: 'e.g. Industrial Complex Phase 1, Ghaziabad, Uttar Pradesh'
+                    field: 'Email Address',
+                    value: email,
+                    message: 'Email address must follow standard format (user@domain.com).',
+                    example: 'e.g. director@apexpolymers.in'
                 });
             }
+            break;
+        }
 
-            const udyam = (formData.udyamNo || '').trim();
-            if (udyam && !REGEX_PATTERNS.UDYAM.test(udyam)) {
+        case 'product_facility': {
+            const loanAmount = parseFloat(formData.loanAmountLakhs) || 0;
+            if (loanAmount <= 0) {
                 errors.push({
-                    field: 'MSME Udyam Registration No.',
-                    value: udyam,
-                    message: 'Udyam number must follow the format: UDYAM-XX-00-0000000.',
-                    example: 'e.g. UDYAM-UP-29-0013890'
+                    field: 'Requested Loan Amount (₹ in Lakhs)',
+                    value: `₹${loanAmount} Lakhs`,
+                    message: 'Please specify a positive requested loan amount.',
+                    example: 'e.g. 50.0 (for ₹50 Lakhs) or 375.0 (for ₹3.75 Cr)'
+                });
+            }
+            break;
+        }
+
+        case 'bill_discounting': {
+            const invoices = formData.invoices || [];
+            if (invoices.length === 0) {
+                errors.push({
+                    field: 'Accepted Commercial Invoices',
+                    value: '0 Invoices',
+                    message: 'At least one commercial invoice is required for bill discounting.',
+                    example: 'Add an invoice with Buyer Name, GSTIN, Invoice Number and Amount'
                 });
             }
             break;

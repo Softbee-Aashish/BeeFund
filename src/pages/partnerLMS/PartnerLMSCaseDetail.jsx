@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { usePartnerLMS } from './PartnerLMSAuthContext';
+import { evaluateCaseDocumentChecklist, MASTER_DOCUMENT_TABLE } from './masterDocMatrix';
+import FinancialSpreadingTab from './components/FinancialSpreadingTab';
+import StressTestingTab from './components/StressTestingTab';
+import DecisionMatrixPanel from './components/DecisionMatrixPanel';
+import RedFlagBellDropdown from './components/RedFlagBellDropdown';
+import TraceabilityDrawer from './components/TraceabilityDrawer';
 import PartnerThemeToggle from './components/PartnerThemeToggle';
 import './PartnerLMSCaseDetail.css';
 
@@ -12,8 +18,116 @@ const PartnerLMSCaseDetail = () => {
     const caseData = getCaseById(id);
 
     // Left Sidebar Navigation state
-    const [activeTab, setActiveTab] = useState('intelligence'); // intelligence | financials | scorecard | dossier | promoters | security
+    const [activeTab, setActiveTab] = useState('spreading'); // vault | spreading | stress_test | intelligence | financials | scorecard | dossier | promoters | security
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [traceabilityDocType, setTraceabilityDocType] = useState(null);
+
+    // Document Vault & Verification Hub States
+    const [trafficFilter, setTrafficFilter] = useState('ALL'); // ALL | GREEN | YELLOW | RED
+    const [docCategoryFilter, setDocCategoryFilter] = useState('ALL');
+    const [docSearchQuery, setDocSearchQuery] = useState('');
+    const [selectedDocPreview, setSelectedDocPreview] = useState(null);
+    const [newQueryDocId, setNewQueryDocId] = useState(null);
+    const [newQueryText, setNewQueryText] = useState('');
+
+    // Dynamic initial documents computation
+    const baseDocs = useMemo(() => {
+        if (!caseData) return [];
+        const evaluated = evaluateCaseDocumentChecklist({
+            productType: caseData.loanType || caseData.productType || 'PROJECT',
+            entityType: caseData.constitution || caseData.entityType || 'PARTNERSHIP',
+            loanAmount: caseData.loanAmount || 20000000,
+            borrowerNiche: caseData.borrowerNiche || 'SENP'
+        });
+
+        // Initialize realistic verification statuses and OCR/API extracts
+        return evaluated.map((doc, idx) => {
+            let status = 'VERIFIED';
+            let source = doc.inputType;
+            let ocrScore = '99.4%';
+            let extractSummary = 'Automated validation successful against regulatory database.';
+
+            if (doc.docId.includes('PAN') || doc.docId.includes('AADHAAR')) {
+                status = 'VERIFIED';
+                source = 'UIDAI & NSDL API';
+                ocrScore = '100% Match';
+                extractSummary = `Verified against NSDL/UIDAI for ${caseData.enterpriseName || 'Applicant'}. Name & DOB matched.`;
+            } else if (doc.docId.includes('GST')) {
+                status = 'VERIFIED';
+                source = 'GSTN Direct API';
+                ocrScore = '99.8%';
+                extractSummary = '12 Months GSTR-3B & GSTR-1 matched. Total Annual Turnover: ₹32.49 Cr.';
+            } else if (doc.docId.includes('BSA') || doc.docId.includes('BANK')) {
+                status = 'VERIFIED';
+                source = 'Account Aggregator (Perfios)';
+                ocrScore = '99.2%';
+                extractSummary = 'SBI & HDFC CA parsed. Avg Monthly Balance: ₹116.70L. Zero Inward bounces.';
+            } else if (doc.docId.includes('ITR') || doc.docId.includes('FINANCIALS')) {
+                status = 'VERIFIED';
+                source = 'ITD e-Filing / PDF OCR';
+                ocrScore = '98.6%';
+                extractSummary = 'Audited FY23, FY24 & FY25 filed. Net Profit Margin: 11.4%. Net Worth: ₹13.60 Cr.';
+            } else if (doc.docId.includes('UDYAM')) {
+                status = 'VERIFIED';
+                source = 'MSME Udyam Portal API';
+                ocrScore = '100% Match';
+                extractSummary = 'Verified MSME Manufacturing Enterprise under Ministry of MSME.';
+            } else if (doc.docId.includes('BOARD') || doc.docId.includes('DEED') || doc.docId.includes('CONSTITUTION')) {
+                status = 'IN_REVIEW';
+                source = 'Direct Upload';
+                ocrScore = '94.0%';
+                extractSummary = 'Uploaded scan awaiting partner signature verification check.';
+            } else if (doc.docId.includes('DPR') || doc.docId.includes('PROJECT')) {
+                status = 'IN_REVIEW';
+                source = 'Direct PDF Ingestion';
+                ocrScore = '96.5%';
+                extractSummary = 'Detailed Project Report (42 Pages) under technical desk review.';
+            } else if (doc.docId.includes('OFFTAKE') || doc.docId.includes('SANCTION')) {
+                status = 'ACTION_REQUIRED';
+                source = 'Pending Upload';
+                ocrScore = 'Pending';
+                extractSummary = 'Document required for credit sanction clearance.';
+            } else {
+                status = idx % 3 === 0 ? 'IN_REVIEW' : 'VERIFIED';
+            }
+
+            return {
+                ...doc,
+                status,
+                source,
+                ocrScore,
+                extractSummary,
+                fileSize: '2.4 MB',
+                uploadedAt: 'Today, 11:42 AM'
+            };
+        });
+    }, [caseData]);
+
+    const [caseDocs, setCaseDocs] = useState(baseDocs);
+
+    // Queries State
+    const [queries, setQueries] = useState([
+        {
+            id: 'QRY-101',
+            docId: 'DOC_ITR_FINANCIALS',
+            docName: '3 Years Audited Financial Statements',
+            author: 'Institutional Credit Desk (SBI)',
+            text: 'Schedule 14 of FY24 Balance Sheet shows ₹45L unsecured loan from directors. Please verify if subordinated to bank debt.',
+            timestamp: 'Yesterday at 04:30 PM',
+            status: 'OPEN',
+            resolutionNote: ''
+        },
+        {
+            id: 'QRY-102',
+            docId: 'DOC_BSA_12M',
+            docName: '12-Month Operating Bank Account Statements',
+            author: 'LMS Automated Rule Engine',
+            text: 'One-off credit of ₹18.5L in HDFC Account on 14-Aug-2025 flagged. Verified as machinery advance refund.',
+            timestamp: 'Today at 09:15 AM',
+            status: 'RESOLVED',
+            resolutionNote: 'Customer provided purchase reversal note with invoice reference. Passed by underwriter.'
+        }
+    ]);
 
     // Credit Intelligence API States
     const [cibilState, setCibilState] = useState({
@@ -122,8 +236,142 @@ const PartnerLMSCaseDetail = () => {
         }, 1000);
     };
 
+    // Document Vault Action Handlers
+    const handleToggleDocStatus = (docId) => {
+        setCaseDocs(prev => prev.map(d => {
+            if (d.docId === docId) {
+                const nextStatus = d.status === 'VERIFIED' ? 'IN_REVIEW' : d.status === 'IN_REVIEW' ? 'ACTION_REQUIRED' : 'VERIFIED';
+                return { ...d, status: nextStatus };
+            }
+            return d;
+        }));
+    };
+
+    const handleSyncDoc = (docId) => {
+        setExportNotice(`Syncing document data with official API / OCR parser...`);
+        setTimeout(() => {
+            setCaseDocs(prev => prev.map(d => {
+                if (d.docId === docId) {
+                    return {
+                        ...d,
+                        status: 'VERIFIED',
+                        ocrScore: '99.9% Match',
+                        uploadedAt: 'Just now (Synced)'
+                    };
+                }
+                return d;
+            }));
+            setExportNotice(`✓ Document ${docId} successfully re-verified and synchronized.`);
+            setTimeout(() => setExportNotice(''), 3500);
+        }, 800);
+    };
+
+    const handleCreateQuery = (e) => {
+        e.preventDefault();
+        if (!newQueryText.trim() || !newQueryDocId) return;
+
+        const targetDoc = caseDocs.find(d => d.docId === newQueryDocId);
+        const newQ = {
+            id: `QRY-${Date.now().toString().slice(-4)}`,
+            docId: newQueryDocId,
+            docName: targetDoc?.docName || 'Uploaded Document',
+            author: partnerProfile?.name ? `${partnerProfile.name} (Credit Partner)` : 'Lead Credit Underwriter',
+            text: newQueryText.trim(),
+            timestamp: 'Just now',
+            status: 'OPEN',
+            resolutionNote: ''
+        };
+
+        setQueries(prev => [newQ, ...prev]);
+        setNewQueryText('');
+        setNewQueryDocId(null);
+        setExportNotice(`✓ Underwriting query logged for ${targetDoc?.docName || 'Document'}.`);
+        setTimeout(() => setExportNotice(''), 3500);
+    };
+
+    const handleResolveQuery = (queryId, resolutionNote) => {
+        setQueries(prev => prev.map(q => {
+            if (q.id === queryId) {
+                return {
+                    ...q,
+                    status: 'RESOLVED',
+                    resolutionNote: resolutionNote || 'Resolved by Credit Analyst during committee review.'
+                };
+            }
+            return q;
+        }));
+        setExportNotice(`✓ Query #${queryId} marked as resolved.`);
+        setTimeout(() => setExportNotice(''), 3500);
+    };
+
+    // Filtered Docs
+    const filteredDocs = caseDocs.filter(doc => {
+        // Traffic status filter
+        if (trafficFilter === 'GREEN' && doc.status !== 'VERIFIED') return false;
+        if (trafficFilter === 'YELLOW' && doc.status !== 'IN_REVIEW') return false;
+        if (trafficFilter === 'RED' && doc.status !== 'ACTION_REQUIRED') return false;
+
+        // Category filter
+        if (docCategoryFilter !== 'ALL' && doc.category !== docCategoryFilter) return false;
+
+        // Search filter
+        if (docSearchQuery.trim()) {
+            const query = docSearchQuery.toLowerCase();
+            const matchName = doc.docName.toLowerCase().includes(query);
+            const matchId = doc.docId.toLowerCase().includes(query);
+            const matchDesc = (doc.description || '').toLowerCase().includes(query);
+            if (!matchName && !matchId && !matchDesc) return false;
+        }
+
+        return true;
+    });
+
+    const verifiedCount = caseDocs.filter(d => d.status === 'VERIFIED').length;
+    const inReviewCount = caseDocs.filter(d => d.status === 'IN_REVIEW').length;
+    const actionReqCount = caseDocs.filter(d => d.status === 'ACTION_REQUIRED').length;
+    const openQueriesCount = queries.filter(q => q.status === 'OPEN').length;
+
     // Nav items definition for Left Sidebar
     const navItems = [
+        {
+            id: 'vault',
+            title: 'Document Vault & Traceability',
+            subtitle: 'Traffic Light Matrix & Queries',
+            badge: `${verifiedCount}/${caseDocs.length} Verified`,
+            badgeType: verifiedCount === caseDocs.length ? 'emerald' : 'gold',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    <polyline points="9 13 12 16 15 13"></polyline>
+                </svg>
+            )
+        },
+        {
+            id: 'spreading',
+            title: 'Financial Spreading & SCoA',
+            subtitle: 'Multi-Year P&L, Truth Serum & Ratios',
+            badge: 'Standardized',
+            badgeType: 'emerald',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+            )
+        },
+        {
+            id: 'stress_test',
+            title: 'Sensitivity & Stress Test',
+            subtitle: 'What-If Sliders & Waterfall',
+            badge: '2.05x Stressed',
+            badgeType: 'gold',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+            )
+        },
         {
             id: 'intelligence',
             title: 'Credit Intelligence Hub',
@@ -163,8 +411,8 @@ const PartnerLMSCaseDetail = () => {
         },
         {
             id: 'dossier',
-            title: 'Proposal Dossier & Export',
-            subtitle: 'PDF, CMA XLSX & Checklist',
+            title: 'Proposal Dossier & CAM',
+            subtitle: 'PDF, CMA XLSX & Committee Memo',
             badge: 'Ready',
             badgeType: 'blue',
             icon: (
@@ -257,10 +505,27 @@ const PartnerLMSCaseDetail = () => {
                             <span className="lbl">Total Project Cost</span>
                             <span className="val-gold">{caseData.projectCostFormatted}</span>
                         </div>
-                        <div className="case-status-chip status-sanctioned">
-                            <span className="status-dot"></span>
-                            <span>{caseData.status || 'Sanction Proposal Ready'}</span>
+                        <div
+                            className="loan-stat-box metric-box-link"
+                            onClick={() => setActiveTab('spreading')}
+                            title="Click to view DSCR Formula & Math"
+                        >
+                            <span className="lbl">DSCR</span>
+                            <span className="val-green">2.05x</span>
                         </div>
+                        <div
+                            className="loan-stat-box metric-box-link"
+                            onClick={() => setActiveTab('spreading')}
+                            title="Click to view TOL/TNW Leverage Math"
+                        >
+                            <span className="lbl">TOL/TNW</span>
+                            <span className="val-green">1.49x</span>
+                        </div>
+                        <RedFlagBellDropdown
+                            onSelectFlag={(flag) => {
+                                if (flag.targetTab) setActiveTab(flag.targetTab);
+                            }}
+                        />
                         <PartnerThemeToggle />
                     </div>
                 </div>
@@ -398,6 +663,583 @@ const PartnerLMSCaseDetail = () => {
 
                 {/* Main Content Area */}
                 <main className="case-content-area">
+                    {/* ========================================================================= */}
+                    {/* TAB 0: MASTER DOCUMENT VAULT & VERIFICATION (TRAFFIC LIGHT SYSTEM)         */}
+                    {/* ========================================================================= */}
+                    {activeTab === 'vault' && (
+                        <div className="tab-pane-content">
+                            {/* Vault Traffic Light KPI Summary */}
+                            <div className="vault-kpi-summary-grid">
+                                <div className="vault-kpi-card verified">
+                                    <div className="kpi-icon-wrap green">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div className="kpi-meta">
+                                        <span className="kpi-lbl">Verified & Validated</span>
+                                        <div className="kpi-number-row">
+                                            <span className="kpi-num text-green">{verifiedCount}</span>
+                                            <span className="kpi-pct">/ {caseDocs.length} Docs</span>
+                                        </div>
+                                        <span className="kpi-sub">100% NSDL, UIDAI & GSTN Matched</span>
+                                    </div>
+                                </div>
+
+                                <div className="vault-kpi-card pending">
+                                    <div className="kpi-icon-wrap yellow">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div className="kpi-meta">
+                                        <span className="kpi-lbl">In Review / Processing</span>
+                                        <div className="kpi-number-row">
+                                            <span className="kpi-num text-gold">{inReviewCount}</span>
+                                            <span className="kpi-pct">Pending Sign-off</span>
+                                        </div>
+                                        <span className="kpi-sub">OCR Extracted; awaiting analyst review</span>
+                                    </div>
+                                </div>
+
+                                <div className="vault-kpi-card missing">
+                                    <div className="kpi-icon-wrap red">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                        </svg>
+                                    </div>
+                                    <div className="kpi-meta">
+                                        <span className="kpi-lbl">Action Required / Missing</span>
+                                        <div className="kpi-number-row">
+                                            <span className="kpi-num text-red">{actionReqCount}</span>
+                                            <span className="kpi-pct">Critical Item</span>
+                                        </div>
+                                        <span className="kpi-sub">Mandatory for sanction sign-off</span>
+                                    </div>
+                                </div>
+
+                                <div className="vault-kpi-card queries">
+                                    <div className="kpi-icon-wrap blue">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div className="kpi-meta">
+                                        <span className="kpi-lbl">Open Underwriter Queries</span>
+                                        <div className="kpi-number-row">
+                                            <span className="kpi-num text-cyan">{openQueriesCount}</span>
+                                            <span className="kpi-pct">Active</span>
+                                        </div>
+                                        <span className="kpi-sub">Total {queries.length} Logged Enquiries</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Underwriting Red Flag & Rule Compliance Monitor */}
+                            <div className="vault-compliance-monitor">
+                                <div className="monitor-header">
+                                    <div className="header-icon-title">
+                                        <div className="monitor-badge-icon">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                                <polyline points="9 12 11 14 15 10"></polyline>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3>Automated Underwriting Red Flag & Cross-Reconciliation Monitor</h3>
+                                            <span className="monitor-sub">Real-time consistency checks between GST, Banking, Bureau, and Income Tax returns</span>
+                                        </div>
+                                    </div>
+                                    <div className="monitor-overall-status pass">
+                                        <span className="pulse-dot"></span>
+                                        <span>ALL CHECKS PASSED (0 Critical Red Flags)</span>
+                                    </div>
+                                </div>
+
+                                <div className="compliance-check-grid">
+                                    <div className="compliance-check-item pass">
+                                        <div className="check-status-col">
+                                            <span className="status-badge-pill green">PASS</span>
+                                        </div>
+                                        <div className="check-body">
+                                            <span className="check-title">GST Sales vs Banking Turnover Variance</span>
+                                            <span className="check-desc">GST Sales ₹32.49 Cr vs Total Bank Inward Credits ₹31.12 Cr. Variance: <strong>4.2%</strong> (Well within institutional ±20% threshold).</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="compliance-check-item pass">
+                                        <div className="check-status-col">
+                                            <span className="status-badge-pill green">PASS</span>
+                                        </div>
+                                        <div className="check-body">
+                                            <span className="check-title">KYC & Regulatory Cross-Match</span>
+                                            <span className="check-desc">Entity PAN, Udyam MSME, and Promoter Aadhaar/DIN match 100% with NSDL and MCA21 master records.</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="compliance-check-item pass">
+                                        <div className="check-status-col">
+                                            <span className="status-badge-pill green">PASS</span>
+                                        </div>
+                                        <div className="check-body">
+                                            <span className="check-title">Financial Rule Sizing (LAP / ML &gt; ₹50L)</span>
+                                            <span className="check-desc">Proposal exceeds ₹50 Lakhs tier; 3 full consecutive years audited ITR & balance sheets uploaded and verified.</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="compliance-check-item pass">
+                                        <div className="check-status-col">
+                                            <span className="status-badge-pill green">PASS</span>
+                                        </div>
+                                        <div className="check-body">
+                                            <span className="check-title">Bureau DPD & SMA Monitor</span>
+                                            <span className="check-desc">Clean 36-month DPD track (000/000) across all co-borrowers and managing partners; zero write-offs or suit filed.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Document Matrix Controls: Traffic Lights, Categories & Search */}
+                            <div className="vault-matrix-card">
+                                <div className="vault-controls-bar">
+                                    <div className="traffic-filter-tabs">
+                                        <button
+                                            type="button"
+                                            className={`btn-traffic-tab ${trafficFilter === 'ALL' ? 'active' : ''}`}
+                                            onClick={() => setTrafficFilter('ALL')}
+                                        >
+                                            <span>All Documents</span>
+                                            <span className="tab-count">{caseDocs.length}</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`btn-traffic-tab green ${trafficFilter === 'GREEN' ? 'active' : ''}`}
+                                            onClick={() => setTrafficFilter('GREEN')}
+                                        >
+                                            <span className="traffic-dot green"></span>
+                                            <span>Verified</span>
+                                            <span className="tab-count">{verifiedCount}</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`btn-traffic-tab yellow ${trafficFilter === 'YELLOW' ? 'active' : ''}`}
+                                            onClick={() => setTrafficFilter('YELLOW')}
+                                        >
+                                            <span className="traffic-dot yellow"></span>
+                                            <span>In Review</span>
+                                            <span className="tab-count">{inReviewCount}</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`btn-traffic-tab red ${trafficFilter === 'RED' ? 'active' : ''}`}
+                                            onClick={() => setTrafficFilter('RED')}
+                                        >
+                                            <span className="traffic-dot red"></span>
+                                            <span>Action Required</span>
+                                            <span className="tab-count">{actionReqCount}</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="vault-search-box">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input
+                                            type="text"
+                                            value={docSearchQuery}
+                                            onChange={(e) => setDocSearchQuery(e.target.value)}
+                                            placeholder="Search by Document Name, ID, or Source..."
+                                        />
+                                        {docSearchQuery && (
+                                            <button type="button" className="clear-search-btn" onClick={() => setDocSearchQuery('')}>×</button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="doc-category-pills">
+                                    {[
+                                        { id: 'ALL', label: 'All Categories' },
+                                        { id: 'IDENTITY_KYC', label: 'Identity & KYC' },
+                                        { id: 'INCOME_TAX', label: 'Income & Tax' },
+                                        { id: 'BANKING', label: 'Banking & Cashflow' },
+                                        { id: 'BUSINESS_LEGAL', label: 'Business & Legal' },
+                                        { id: 'COLLATERAL', label: 'Collateral & Property' },
+                                        { id: 'PRODUCT_SPECIFIC', label: 'Product Specific' }
+                                    ].map(cat => (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            className={`btn-cat-pill ${docCategoryFilter === cat.id ? 'active' : ''}`}
+                                            onClick={() => setDocCategoryFilter(cat.id)}
+                                        >
+                                            {cat.label}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Master Document Verification Table */}
+                                <div className="vault-table-wrapper">
+                                    <table className="vault-matrix-table">
+                                        <thead>
+                                            <tr>
+                                                <th>DOCUMENT ID & NAME</th>
+                                                <th>CATEGORY</th>
+                                                <th>INGESTION SOURCE</th>
+                                                <th>OCR / API MATCH</th>
+                                                <th>TRAFFIC STATUS</th>
+                                                <th>AUDIT / TIMESTAMP</th>
+                                                <th className="text-right">ACTIONS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filteredDocs.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="7" className="vault-table-empty">
+                                                        <div className="empty-state-box">
+                                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                                <circle cx="11" cy="11" r="8"></circle>
+                                                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                                            </svg>
+                                                            <p>No documents found matching your active filter criteria.</p>
+                                                            <button
+                                                                type="button"
+                                                                className="btn-reset-filters"
+                                                                onClick={() => {
+                                                                    setTrafficFilter('ALL');
+                                                                    setDocCategoryFilter('ALL');
+                                                                    setDocSearchQuery('');
+                                                                }}
+                                                            >
+                                                                Reset Filters
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                filteredDocs.map(doc => {
+                                                    const isVerified = doc.status === 'VERIFIED';
+                                                    const isInReview = doc.status === 'IN_REVIEW';
+                                                    const isActionReq = doc.status === 'ACTION_REQUIRED';
+
+                                                    return (
+                                                        <tr key={doc.docId} className={`vault-row ${doc.status.toLowerCase()}`}>
+                                                            <td className="doc-main-cell">
+                                                                <div className="doc-title-row">
+                                                                    <span className="doc-name">{doc.docName}</span>
+                                                                    {doc.isMandatory && (
+                                                                        <span className="mandatory-tag">MANDATORY</span>
+                                                                    )}
+                                                                </div>
+                                                                <div className="doc-meta-row">
+                                                                    <span className="doc-id-pill">{doc.docId}</span>
+                                                                    <span className="doc-desc-snippet">{doc.description}</span>
+                                                                </div>
+                                                                {doc.ruleNotes && doc.ruleNotes.length > 0 && (
+                                                                    <div className="doc-rule-alert">
+                                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                                                        </svg>
+                                                                        <span>{doc.ruleNotes[0]}</span>
+                                                                    </div>
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                <span className="cat-badge">{doc.category.replace('_', ' ')}</span>
+                                                            </td>
+                                                            <td>
+                                                                <div className="source-badge">
+                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                                    </svg>
+                                                                    <span>{doc.source}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <span className={`ocr-badge ${isVerified ? 'match-high' : isInReview ? 'match-med' : 'match-low'}`}>
+                                                                    {doc.ocrScore}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span className={`traffic-status-pill ${doc.status.toLowerCase()}`}>
+                                                                    <span className="status-indicator-dot"></span>
+                                                                    {isVerified ? 'VERIFIED' : isInReview ? 'IN REVIEW' : 'ACTION REQUIRED'}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span className="audit-time">{doc.uploadedAt}</span>
+                                                            </td>
+                                                            <td className="text-right">
+                                                                <div className="action-buttons-group">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn-action-icon preview"
+                                                                        onClick={() => setSelectedDocPreview(doc)}
+                                                                        title="Preview Extracted OCR & Metadata"
+                                                                    >
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                                        </svg>
+                                                                        <span>View</span>
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn-action-icon sync"
+                                                                        onClick={() => handleSyncDoc(doc.docId)}
+                                                                        title="Re-Verify with Regulatory API"
+                                                                    >
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                            <polyline points="23 4 23 10 17 10"></polyline>
+                                                                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                                                        </svg>
+                                                                        <span>Sync</span>
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn-action-icon query"
+                                                                        onClick={() => setNewQueryDocId(doc.docId)}
+                                                                        title="Raise Underwriting Query"
+                                                                    >
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                                                        </svg>
+                                                                        <span>Query</span>
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn-action-icon toggle"
+                                                                        onClick={() => handleToggleDocStatus(doc.docId)}
+                                                                        title="Cycle Verification Status"
+                                                                    >
+                                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                                            <polyline points="12 6 12 12 14 14"></polyline>
+                                                                        </svg>
+                                                                        <span>Status</span>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Credit Officer Document Queries & Resolution Log */}
+                            <div className="vault-queries-section">
+                                <div className="queries-section-header">
+                                    <div className="q-header-left">
+                                        <div className="q-header-icon">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3>Credit Underwriter Query & Resolution Log</h3>
+                                            <span className="q-subtitle">Audit trail of document-specific enquiries between underwriter desk and channel partner</span>
+                                        </div>
+                                    </div>
+                                    <div className="q-header-right">
+                                        <span className="q-open-count">{openQueriesCount} Open Queries</span>
+                                    </div>
+                                </div>
+
+                                <div className="queries-list">
+                                    {queries.map(q => {
+                                        const isOpen = q.status === 'OPEN';
+                                        return (
+                                            <div key={q.id} className={`query-card ${isOpen ? 'open' : 'resolved'}`}>
+                                                <div className="query-card-top">
+                                                    <div className="q-meta-group">
+                                                        <span className={`query-status-badge ${isOpen ? 'open' : 'resolved'}`}>
+                                                            {isOpen ? 'OPEN QUERY' : 'RESOLVED'}
+                                                        </span>
+                                                        <span className="q-doc-target">Doc: <strong>{q.docName}</strong> ({q.docId})</span>
+                                                    </div>
+                                                    <span className="q-timestamp">{q.timestamp}</span>
+                                                </div>
+
+                                                <div className="query-content-box">
+                                                    <div className="q-author-row">
+                                                        <span className="q-author-name">{q.author}:</span>
+                                                    </div>
+                                                    <p className="q-text">{q.text}</p>
+                                                </div>
+
+                                                {q.resolutionNote ? (
+                                                    <div className="query-resolution-box">
+                                                        <div className="res-header">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                            <span>Resolution Record:</span>
+                                                        </div>
+                                                        <p className="res-text">{q.resolutionNote}</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="query-action-footer">
+                                                        <button
+                                                            type="button"
+                                                            className="btn-resolve-query"
+                                                            onClick={() => {
+                                                                const note = prompt('Enter underwriter resolution note:');
+                                                                if (note) handleResolveQuery(q.id, note);
+                                                            }}
+                                                        >
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                            <span>Mark as Resolved</span>
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Document OCR Extracted Data Preview Modal */}
+                            {selectedDocPreview && (
+                                <div className="vault-modal-overlay" onClick={() => setSelectedDocPreview(null)}>
+                                    <div className="vault-modal-card" onClick={(e) => e.stopPropagation()}>
+                                        <div className="modal-header">
+                                            <div className="modal-header-titles">
+                                                <span className="modal-category-tag">{selectedDocPreview.category}</span>
+                                                <h3>{selectedDocPreview.docName}</h3>
+                                                <span className="modal-doc-id">{selectedDocPreview.docId}</span>
+                                            </div>
+                                            <button type="button" className="btn-close-modal" onClick={() => setSelectedDocPreview(null)}>×</button>
+                                        </div>
+
+                                        <div className="modal-body">
+                                            <div className="preview-stat-row">
+                                                <div className="preview-stat">
+                                                    <span className="lbl">Traffic Status</span>
+                                                    <span className={`val status-${selectedDocPreview.status.toLowerCase()}`}>
+                                                        {selectedDocPreview.status}
+                                                    </span>
+                                                </div>
+                                                <div className="preview-stat">
+                                                    <span className="lbl">Ingestion Source</span>
+                                                    <span className="val">{selectedDocPreview.source}</span>
+                                                </div>
+                                                <div className="preview-stat">
+                                                    <span className="lbl">OCR Match Score</span>
+                                                    <span className="val text-green">{selectedDocPreview.ocrScore}</span>
+                                                </div>
+                                                <div className="preview-stat">
+                                                    <span className="lbl">File Size & Audit</span>
+                                                    <span className="val">{selectedDocPreview.fileSize} ({selectedDocPreview.uploadedAt})</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="extracted-data-box">
+                                                <h4>Regulatory & OCR Extracted Summary</h4>
+                                                <p className="extract-text">{selectedDocPreview.extractSummary}</p>
+                                            </div>
+
+                                            <div className="technical-json-box">
+                                                <h4>Ingestion Payload & Cryptographic Proof</h4>
+                                                <pre>
+{JSON.stringify({
+    documentId: selectedDocPreview.docId,
+    verifiedEntity: caseData.enterpriseName || 'Applicant Enterprise',
+    panReference: caseData.pan || 'AAEPK8812M',
+    regulatorySource: selectedDocPreview.source,
+    confidenceIndex: selectedDocPreview.ocrScore,
+    eSignStatus: 'Facilitator & DSC Validated',
+    timestamp: new Date().toISOString()
+}, null, 2)}
+                                                </pre>
+                                            </div>
+                                        </div>
+
+                                        <div className="modal-footer">
+                                            <button type="button" className="btn-modal-close" onClick={() => setSelectedDocPreview(null)}>Close Preview</button>
+                                            <button
+                                                type="button"
+                                                className="btn-modal-verify"
+                                                onClick={() => {
+                                                    handleSyncDoc(selectedDocPreview.docId);
+                                                    setSelectedDocPreview(null);
+                                                }}
+                                            >
+                                                Sync & Re-Verify API
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Raise Query Modal */}
+                            {newQueryDocId && (
+                                <div className="vault-modal-overlay" onClick={() => setNewQueryDocId(null)}>
+                                    <div className="vault-modal-card" onClick={(e) => e.stopPropagation()}>
+                                        <div className="modal-header">
+                                            <div>
+                                                <h3>Raise Underwriting Document Query</h3>
+                                                <span className="modal-doc-id">Target: {newQueryDocId}</span>
+                                            </div>
+                                            <button type="button" className="btn-close-modal" onClick={() => setNewQueryDocId(null)}>×</button>
+                                        </div>
+
+                                        <form onSubmit={handleCreateQuery} className="modal-query-form">
+                                            <div className="form-group">
+                                                <label>Credit Analyst Remarks / Required Rectification:</label>
+                                                <textarea
+                                                    rows="4"
+                                                    value={newQueryText}
+                                                    onChange={(e) => setNewQueryText(e.target.value)}
+                                                    placeholder="Specify the clarification required from the borrower or channel partner (e.g. Schedule missing, mismatch in names, or bank statement gap)..."
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="modal-footer">
+                                                <button type="button" className="btn-modal-close" onClick={() => setNewQueryDocId(null)}>Cancel</button>
+                                                <button type="submit" className="btn-modal-submit-query">Submit Underwriting Query</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* ========================================================================= */}
+                    {/* TAB: FINANCIAL SPREADING (P&L, BALANCE SHEET, TRUTH SERUM & RATIOS)        */}
+                    {/* ========================================================================= */}
+                    {activeTab === 'spreading' && (
+                        <div className="tab-pane-content">
+                            <FinancialSpreadingTab
+                                caseData={caseData}
+                                onOpenTraceability={(docType) => setTraceabilityDocType(docType)}
+                            />
+                        </div>
+                    )}
+
+                    {/* ========================================================================= */}
+                    {/* TAB: SENSITIVITY & WHAT-IF STRESS TESTING ENGINE                          */}
+                    {/* ========================================================================= */}
+                    {activeTab === 'stress_test' && (
+                        <div className="tab-pane-content">
+                            <StressTestingTab caseData={caseData} />
+                        </div>
+                    )}
+
                     {/* ========================================================================= */}
                     {/* TAB 1: CREDIT INTELLIGENCE & BUREAU PANELS                                */}
                     {/* ========================================================================= */}
@@ -1277,8 +2119,28 @@ const PartnerLMSCaseDetail = () => {
                             </div>
                         </div>
                     )}
+
+                    {/* Persistent Credit Decision & Deviation Matrix Cockpit */}
+                    <div className="case-bottom-cockpit-section">
+                        <DecisionMatrixPanel
+                            caseData={caseData}
+                            onAction={(actionType, payload) => {
+                                if (actionType === 'EXPORT_CAM') {
+                                    handleExportPDF();
+                                }
+                            }}
+                        />
+                    </div>
                 </main>
             </div>
+
+            {/* Source Audit Traceability Drawer */}
+            <TraceabilityDrawer
+                isOpen={!!traceabilityDocType}
+                docType={traceabilityDocType}
+                onClose={() => setTraceabilityDocType(null)}
+                caseData={caseData}
+            />
         </div>
     );
 };
