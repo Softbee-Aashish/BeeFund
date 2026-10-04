@@ -405,10 +405,44 @@ const PartnerLMSCaseDetail = () => {
         };
     }, [caseData, projectCostLakhs]);
 
-    // Nav items definition for Left Sidebar (Tailored by Loan Product)
+    const targetLenderName = useMemo(() => {
+        if (caseData?.targetLender) return caseData.targetLender;
+        const pCode = (caseData?.loanProduct || caseData?.loanType || '').toUpperCase();
+        if (isSalaried) return 'HDFC Bank (Retail Mortgage)';
+        if (pCode.includes('PROJECT')) return 'State Bank of India (Project Finance)';
+        if (pCode.includes('ML') || pCode.includes('MACHINERY')) return 'Tata Capital / SIDBI';
+        if (pCode.includes('OD') || pCode.includes('CC') || pCode.includes('WC')) return 'Punjab National Bank (MSME Desk)';
+        if (pCode.includes('LAP') || pCode.includes('PROPERTY')) return 'Axis Bank (Mortgage Desk)';
+        return 'Axis Bank (Commercial Banking)';
+    }, [caseData, isSalaried]);
+
+    // Nav items definition for Left Sidebar (Tailored dynamically by Loan Product)
     const navItems = useMemo(() => {
-        const items = [
-            {
+        const pCode = (caseData?.loanProduct || caseData?.loanType || 'BL').toUpperCase();
+        const isHL = pCode.includes('HL') || pCode.includes('HOME');
+        const isLAP = pCode.includes('LAP') || pCode.includes('PROPERTY');
+        const isML = pCode.includes('ML') || pCode.includes('MACHINERY') || pCode.includes('EQUIPMENT');
+        const isODCC = pCode.includes('OD_CC') || pCode.includes('CASH CREDIT') || pCode.includes('WORKING CAPITAL');
+        const isPL = pCode.includes('PL') || pCode.includes('PERSONAL');
+
+        const items = [];
+
+        // 1. Intelligence Module
+        if (isSalaried || isPL) {
+            items.push({
+                id: 'intelligence',
+                title: 'Salary & Bureau Intel',
+                subtitle: 'CIBIL CIR, Salary BSA & Form 16',
+                badge: 'Verified',
+                badgeType: 'emerald',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                )
+            });
+        } else {
+            items.push({
                 id: 'intelligence',
                 title: 'Credit Intelligence Hub',
                 subtitle: 'CIBIL CIR, Multi-Bank BSA & GST',
@@ -419,12 +453,16 @@ const PartnerLMSCaseDetail = () => {
                         <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                     </svg>
                 )
-            },
-            {
+            });
+        }
+
+        // 2. Financial Spreading & SCoA / FOIR
+        if (isSalaried || isPL) {
+            items.push({
                 id: 'spreading',
-                title: isSalaried ? 'Salary & FOIR Underwriting' : 'Financial Spreading & SCoA',
-                subtitle: isSalaried ? 'Compensation Grid & Loan Sizing' : 'Multi-Year P&L, Truth Serum & Ratios',
-                badge: isSalaried ? 'FOIR Analyzed' : 'Standardized',
+                title: 'Salary & FOIR Underwriting',
+                subtitle: 'Compensation Grid & Loan Sizing',
+                badge: 'FOIR Analyzed',
                 badgeType: 'blue',
                 icon: (
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -433,27 +471,54 @@ const PartnerLMSCaseDetail = () => {
                         <line x1="9" y1="21" x2="9" y2="9"></line>
                     </svg>
                 )
-            },
-            {
-                id: 'stress_test',
-                title: 'Sensitivity & Stress Test',
-                subtitle: 'What-If Sliders & Waterfall',
-                badge: '2.05x Stressed',
-                badgeType: 'gold',
+            });
+        } else {
+            items.push({
+                id: 'spreading',
+                title: 'Financial Spreading & SCoA',
+                subtitle: 'Multi-Year P&L, Truth Serum & Ratios',
+                badge: 'Standardized',
+                badgeType: 'blue',
                 icon: (
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
                     </svg>
                 )
-            }
-        ];
+            });
+        }
 
-        // ONLY add Project Cost & Means if this is actually a Project, Machinery, or Capex/WC Loan
+        // 3. Sensitivity & Stress Testing
+        items.push({
+            id: 'stress_test',
+            title: isSalaried ? 'Rate & EMI Sensitivity' : 'Sensitivity & Stress Test',
+            subtitle: isSalaried ? 'Floating Rate Shock & Tenure' : 'What-If Sliders & Waterfall',
+            badge: isSalaried ? 'Stress Tested' : '2.05x Stressed',
+            badgeType: 'gold',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+            )
+        });
+
+        // 4. Project Cost & Means (Only for Project, Machinery, and Working Capital / Capex)
         if (isProjectOrCapexLoan) {
+            let costTitle = 'Project Cost & Means';
+            let costSub = 'Capex & Financing Sizing';
+            if (isML) {
+                costTitle = 'Machinery Capex & Quotes';
+                costSub = 'Equipment Invoices & Margin';
+            } else if (isODCC) {
+                costTitle = 'Working Capital & MPBF';
+                costSub = 'Stock, Debtors & Limits';
+            }
+
             items.push({
                 id: 'financials',
-                title: 'Project Cost & Means',
-                subtitle: 'Capex & Financing Sizing',
+                title: costTitle,
+                subtitle: costSub,
                 badge: projectCostFormatted,
                 badgeType: 'gold',
                 icon: (
@@ -465,67 +530,76 @@ const PartnerLMSCaseDetail = () => {
             });
         }
 
-        items.push(
-            {
-                id: 'scorecard',
-                title: '0–100 Risk Scorecard',
-                subtitle: 'Multi-Pillar Bankability',
-                badge: `${caseData?.scorecard || 88}/100 Tier-1`,
-                badgeType: 'emerald',
-                icon: (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                )
-            },
-            {
-                id: 'dossier',
-                title: 'Proposal Dossier & CAM',
-                subtitle: 'PDF, CMA XLSX & Committee Memo',
-                badge: 'Ready',
-                badgeType: 'blue',
-                icon: (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                )
-            },
-            {
-                id: 'decision',
-                title: 'Credit Decision & Sanction',
-                subtitle: 'Policy Checklist & Committee Sign-off',
-                badge: '100% Compliant',
-                badgeType: 'emerald',
-                icon: (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="9 11 12 14 22 4"></polyline>
-                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                    </svg>
-                )
-            },
-            {
-                id: 'promoters',
-                title: isSalaried ? 'Borrower & Co-Applicant' : 'Promoters & Governance',
-                subtitle: isSalaried ? 'Identity & Employment Track' : 'Shareholding & Net Worth',
-                badge: 'Verified',
-                badgeType: 'neutral',
-                icon: (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                )
-            },
-            {
+        // 5. 0–100 Risk Scorecard
+        items.push({
+            id: 'scorecard',
+            title: '0–100 Risk Scorecard',
+            subtitle: isSalaried ? 'Multi-Pillar Housing Risk' : 'Multi-Pillar Bankability',
+            badge: `${caseData?.scorecard || 88}/100 Tier-1`,
+            badgeType: 'emerald',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+            )
+        });
+
+        // 6. Proposal Dossier & CAM
+        items.push({
+            id: 'dossier',
+            title: isSalaried ? 'Home Loan CAM Dossier' : 'Proposal Dossier & CAM',
+            subtitle: isSalaried ? 'PDF & Committee Memo' : 'PDF, CMA XLSX & Committee Memo',
+            badge: 'Ready',
+            badgeType: 'blue',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            )
+        });
+
+        // 7. Credit Decision & Sanction Matrix
+        items.push({
+            id: 'decision',
+            title: 'Credit Decision & Sanction',
+            subtitle: 'Policy Checklist & Sign-off',
+            badge: '100% Compliant',
+            badgeType: 'emerald',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+            )
+        });
+
+        // 8. Promoters & Governance / Applicant Profile
+        items.push({
+            id: 'promoters',
+            title: isSalaried ? 'Applicant & Co-Borrower' : 'Promoters & Governance',
+            subtitle: isSalaried ? 'Identity & Employment Track' : 'Shareholding & Net Worth',
+            badge: 'Verified',
+            badgeType: 'neutral',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            )
+        });
+
+        // 9. Security & Collateral
+        if (!isPL) {
+            items.push({
                 id: 'security',
-                title: isSalaried ? 'Property Title & Mortgage' : 'Security & Collateral',
-                subtitle: isSalaried ? 'Sale Deed & Legal Search' : 'Hypothecation & Mortgage',
+                title: isSalaried || isHL || isLAP ? 'Property Title & Mortgage' : isML ? 'Machinery Hypothecation' : 'Security & Collateral',
+                subtitle: isSalaried || isHL || isLAP ? 'Sale Deed, Legal Search & LTV' : isML ? 'Equipment 1st Charge' : 'Hypothecation & Mortgage',
                 badge: '1st Charge',
                 badgeType: 'purple',
                 icon: (
@@ -533,8 +607,8 @@ const PartnerLMSCaseDetail = () => {
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                 )
-            }
-        );
+            });
+        }
 
         return items;
     }, [caseData, isSalaried, isProjectOrCapexLoan, projectCostFormatted]);
@@ -719,12 +793,12 @@ const PartnerLMSCaseDetail = () => {
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                                 </svg>
-                                88/100
+                                {caseData.scorecard || 88}/100
                             </span>
                         </div>
                         <div className="sidebar-target-bank">
                             <span className="target-bank-lbl">Target Lender:</span>
-                            <strong>{caseData.targetLender || 'State Bank of India (MSME Desk)'}</strong>
+                            <strong>{targetLenderName}</strong>
                         </div>
                     </div>
 
