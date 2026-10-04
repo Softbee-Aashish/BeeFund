@@ -4761,3 +4761,284 @@
     border-radius: 6px;
     cursor: pointer;
 }
+
+/* ========================================================================== */
+/* Salaried Individual Underwriting & FOIR / LTV Financial Engine Styles     */
+/* ========================================================================== */
+
+.profile-mode-selector-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--lms-bg-card);
+    border: 1px solid var(--lms-border);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.profile-mode-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.profile-mode-info .badge-mode {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.badge-mode.salaried {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--lms-cyan);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+.badge-mode.corporate {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--lms-gold);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.profile-mode-info h4 {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--lms-text-primary);
+}
+.profile-mode-info p {
+    margin: 2px 0 0 0;
+    font-size: 0.75rem;
+    color: var(--lms-text-secondary);
+}
+.profile-mode-tabs {
+    display: flex;
+    background: var(--lms-bg-surface);
+    border: 1px solid var(--lms-border);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 4px;
+}
+.profile-mode-btn {
+    padding: 0.45rem 0.9rem;
+    border: none;
+    background: transparent;
+    color: var(--lms-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+.profile-mode-btn:hover {
+    color: var(--lms-text-primary);
+}
+.profile-mode-btn.active {
+    background: var(--lms-accent);
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Salaried Underwriting Grid */
+.salaried-underwriting-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+.foir-card, .ltv-card {
+    background: var(--lms-bg-card);
+    border: 1px solid var(--lms-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.foir-card-header, .ltv-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--lms-border-subtle);
+    padding-bottom: 0.75rem;
+}
+.foir-card-header h3, .ltv-card-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--lms-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.foir-kpis-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.foir-kpi-item {
+    background: var(--lms-bg-surface);
+    border: 1px solid var(--lms-border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.foir-kpi-item .lbl {
+    font-size: 0.7rem;
+    color: var(--lms-text-secondary);
+    font-weight: 700;
+}
+.foir-kpi-item .val {
+    font-size: 1.15rem;
+    font-weight: 800;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+}
+.foir-status-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+.foir-status-badge.pass {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--lms-green);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.foir-status-badge.warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--lms-gold);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.foir-status-badge.danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--lms-red);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* FOIR Sliders & Interactive Controls */
+.foir-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+.foir-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.foir-control-group label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--lms-text-secondary);
+    display: flex;
+    justify-content: space-between;
+}
+.foir-control-group input[type="number"],
+.foir-control-group input[type="text"],
+.foir-control-group select {
+    background: var(--lms-bg-surface);
+    border: 1px solid var(--lms-border);
+    border-radius: 6px;
+    color: var(--lms-text-primary);
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+}
+.foir-control-group input[type="number"]:focus,
+.foir-control-group select:focus {
+    outline: none;
+    border-color: var(--lms-accent);
+}
+
+/* Obligations Table */
+.obligations-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--lms-border);
+    border-radius: 8px;
+    background: var(--lms-bg-surface);
+}
+.obligations-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+.obligations-table th {
+    background: var(--lms-bg-card-subtle);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--lms-text-secondary);
+    border-bottom: 1px solid var(--lms-border);
+}
+.obligations-table td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid var(--lms-border-subtle);
+    color: var(--lms-text-primary);
+}
+.btn-del-ob {
+    background: transparent;
+    border: none;
+    color: var(--lms-red);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.btn-del-ob:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+.btn-add-ob {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.35rem 0.75rem;
+    background: var(--lms-bg-surface);
+    border: 1px dashed var(--lms-accent);
+    color: var(--lms-accent);
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+}
+.btn-add-ob:hover {
+    background: var(--lms-accent-subtle);
+}
+
+/* LTV Assessment Grid */
+.ltv-breakdown-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.ltv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0.75rem;
+    background: var(--lms-bg-surface);
+    border: 1px solid var(--lms-border-subtle);
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+.ltv-row.total-row {
+    background: var(--lms-bg-card-subtle);
+    border-color: var(--lms-border);
+    font-weight: 800;
+}
+.ltv-row .l-lbl {
+    color: var(--lms-text-secondary);
+}
+.ltv-row .l-val {
+    font-weight: 800;
+    color: var(--lms-text-primary);
+}
+

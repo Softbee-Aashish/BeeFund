@@ -155,7 +155,6 @@ export const getTailoredSteps = (productType = 'BL', entityType = 'PROPRIETORSHI
     }
 
     const finalSteps = [
-        { key: 'doc_vault', label: 'Master Document Vault & Traffic Lights' },
         { key: 'annexures', label: 'Statutory Declarations & E-Sign' }
     ];
 

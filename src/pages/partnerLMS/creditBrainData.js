@@ -306,3 +306,51 @@ export const calculateStressScenario = ({ salesGrowthPct = 0, ebitdaMarginDelta 
         warnings
     };
 };
+
+// Salaried Individual Multi-Year Income & Tax Spreading Template (Figures in ₹ or ₹ Lakhs)
+export const INITIAL_SALARIED_SPREADING = {
+    years: ['FY23 (Form 16)', 'FY24 (Form 16)', 'FY25 (Latest Slip)', 'FY26 (Projected Increment)'],
+    salaryGrid: [
+        { id: 'basic_pay', label: 'Basic Salary & Dearness Allowance (DA)', values: [65000, 75000, 85000, 95000], editable: true, category: 'earnings' },
+        { id: 'hra', label: 'House Rent Allowance (HRA)', values: [26000, 30000, 34000, 38000], editable: true, category: 'earnings' },
+        { id: 'special_allowance', label: 'Special & Personal Allowances', values: [32000, 38000, 46000, 52000], editable: true, category: 'earnings' },
+        { id: 'variable_pay', label: 'Performance Bonus & Incentives', values: [12000, 15000, 18000, 22000], editable: true, category: 'earnings' },
+        { id: 'gross_salary', label: 'Gross Monthly Compensation (CTC)', values: [135000, 158000, 183000, 207000], calculated: true, category: 'topline' },
+        { id: 'pf_deduction', label: 'Less: Provident Fund (PF) & Statutory Deductions', values: [7800, 9000, 10200, 11400], editable: true, category: 'deduction' },
+        { id: 'prof_tax', label: 'Less: Professional Tax (PT)', values: [200, 200, 200, 200], editable: true, category: 'deduction' },
+        { id: 'tds_deduction', label: 'Less: Income Tax Deduction (TDS / IT)', values: [12000, 14800, 17600, 20400], editable: true, category: 'deduction' },
+        { id: 'net_take_home', label: 'Net In-Hand Monthly Take-Home Salary', values: [115000, 134000, 155000, 175000], calculated: true, category: 'net_income' },
+        { id: 'annual_form16_taxable', label: 'Annual Form 16 Gross Taxable Income (₹ Lakhs)', values: [16.20, 18.96, 21.96, 24.84], calculated: true, unit: 'Lakhs', category: 'annual' }
+    ],
+    defaultObligations: [
+        { id: 'ob1', lender: 'HDFC Bank Ltd', loanType: 'Auto / Car Loan', emiAmount: 18500, tenureLeftMonths: 28, outstandingBalance: 420000 },
+        { id: 'ob2', lender: 'ICICI Bank Ltd', loanType: 'Personal Loan', emiAmount: 6500, tenureLeftMonths: 14, outstandingBalance: 82000 }
+    ],
+    loanAssessment: {
+        propertyAgreementCostLakhs: 95.0,
+        stampDutyRegLakhs: 6.5,
+        valuerMarketValueLakhs: 105.0,
+        requestedLoanLakhs: 75.0,
+        interestRatePct: 8.50,
+        tenureYears: 20
+    }
+};
+
+export const SALARIED_BANKING_12M = {
+    bankName: 'HDFC Bank Ltd (Corporate Salary Account)',
+    accountNumber: '...9482',
+    accountType: 'Salary Savings Account',
+    salaryCreditDates: ['30-Apr', '31-May', '28-Jun', '31-Jul', '30-Aug', '30-Sep', '31-Oct', '29-Nov', '31-Dec', '31-Jan', '28-Feb', '31-Mar'],
+    monthlySalaryCredits: [155000, 155000, 155000, 155000, 155000, 155000, 155000, 155000, 155000, 155000, 155000, 155000],
+    amb: [82400, 91200, 88500, 94600, 102000, 98400, 110500, 106000, 115000, 118400, 122000, 128500],
+    inwardBounces: 0,
+    outwardBounces: 0,
+    salaryNarration: 'SAL/TCS_LTD/NEFT/0984210',
+    summary: {
+        averageNetCredit: 155000,
+        averageBankBalance: 104750,
+        onTimeCreditScore: '100% On-Time (12/12 Cycles)',
+        bounceCount: 0
+    }
+};
+
