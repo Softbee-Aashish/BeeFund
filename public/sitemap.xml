@@ -6,140 +6,246 @@
   <!-- Homepage -->
   <url>
     <loc>https://beefund.in/</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.00</priority>
   </url>
 
-  <!-- Free CIBIL & Credit Score Checker (Target Money Page) -->
+  <!-- Free CIBIL & Credit Score Checker -->
   <url>
     <loc>https://beefund.in/credit-report</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
     <loc>https://beefund.in/credit-score</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.90</priority>
   </url>
 
-  <!-- Loan EMI Calculator -->
-  <url>
-    <loc>https://beefund.in/tools/emi-calculator</loc>
-    <lastmod>2026-09-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
-  </url>
-
-  <!-- Repayment Schedule Generator -->
-  <url>
-    <loc>https://beefund.in/tools/repayment-schedule</loc>
-    <lastmod>2026-09-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
-  </url>
-
-  <!-- OD & CC Calculator -->
-  <url>
-    <loc>https://beefund.in/tools/od-cc-calculator</loc>
-    <lastmod>2026-09-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-
-  <!-- Financial Tools Home -->
+  <!-- Financial Calculators & Interactive Tools -->
   <url>
     <loc>https://beefund.in/tools</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/emi-calculator</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/repayment-schedule</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/od-cc-calculator</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
+  <url>
+    <loc>https://beefund.in/tools/eligibility</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/loan-comparison</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/gst-calculator</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/tax-benefit</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/inflation-impact</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/affordability</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/roi-calculator</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/tools/fixed-vs-floating</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
 
-  <!-- Loan Products Catalog -->
+  <!-- Loan Products & Credit Cards -->
   <url>
     <loc>https://beefund.in/loans</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/products</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/credit-cards</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
-  <!-- Blog & Financial Guides -->
+  <!-- Blog & Authoritative Financial Knowledge Base -->
   <url>
     <loc>https://beefund.in/blog</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.85</priority>
+    <priority>0.90</priority>
   </url>
   <url>
     <loc>https://beefund.in/blog/working-capital-guide</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://beefund.in/blog/mudra-loan-schemes-explained</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://beefund.in/blog/ultimate-loan-tools-seo-guide</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://beefund.in/blog/improve-cibil-score-guide</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://beefund.in/blog/home-loan-tax-benefits-guide</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://beefund.in/blog/secured-vs-unsecured-business-loans</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
-  <!-- Legal Terms & Credit Bureau Data Consent -->
-  <url>
-    <loc>https://beefund.in/terms</loc>
-    <lastmod>2026-09-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.70</priority>
+    <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://beefund.in/privacy</loc>
-    <lastmod>2026-09-18</lastmod>
+    <loc>https://beefund.in/blog/cibil-vs-experian-vs-crif-highmark-guide</loc>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.70</priority>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/loan-against-property-lap-underwriting-handbook</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/machinery-loan-equipment-financing-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/cash-credit-vs-overdraft-facility-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/bill-invoice-discounting-msme-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/dpr-detailed-project-report-bank-loans-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/credit-card-rewards-balance-transfer-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/tandon-committee-mpbf-working-capital-method-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/personal-loan-vs-gold-loan-comparison-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/blog/gstr-2a-vs-3b-reconciliation-guide</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
   </url>
 
-  <!-- Company Information -->
+  <!-- Legal, Editorial & Compliance -->
   <url>
     <loc>https://beefund.in/about</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.70</priority>
+    <priority>0.80</priority>
   </url>
   <url>
     <loc>https://beefund.in/contact</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.70</priority>
+    <priority>0.80</priority>
   </url>
   <url>
-    <loc>https://beefund.in/apply</loc>
-    <lastmod>2026-09-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
+    <loc>https://beefund.in/privacy</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://beefund.in/terms</loc>
+    <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
   </url>
 </urlset>
