@@ -331,128 +331,214 @@ const PartnerLMSCaseDetail = () => {
     const actionReqCount = caseDocs.filter(d => d.status === 'ACTION_REQUIRED').length;
     const openQueriesCount = queries.filter(q => q.status === 'OPEN').length;
 
-    // Nav items definition for Left Sidebar
-    const navItems = [
-        {
-            id: 'intelligence',
-            title: 'Credit Intelligence Hub',
-            subtitle: 'CIBIL CIR, Multi-Bank BSA & GST',
-            badge: '3 Live APIs',
-            badgeType: 'emerald',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                </svg>
-            )
-        },
-        {
-            id: 'spreading',
-            title: 'Financial Spreading & SCoA',
-            subtitle: 'Multi-Year P&L, Truth Serum & Ratios',
-            badge: 'Standardized',
-            badgeType: 'blue',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                    <line x1="9" y1="21" x2="9" y2="9"></line>
-                </svg>
-            )
-        },
-        {
-            id: 'stress_test',
-            title: 'Sensitivity & Stress Test',
-            subtitle: 'What-If Sliders & Waterfall',
-            badge: '2.05x Stressed',
-            badgeType: 'gold',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-            )
-        },
-        {
-            id: 'financials',
-            title: 'Project Cost & Means',
-            subtitle: 'Capex & Financing Sizing',
-            badge: caseData.projectCostFormatted || '₹36.00 Cr',
-            badgeType: 'gold',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-            )
-        },
-        {
-            id: 'scorecard',
-            title: '0–100 Risk Scorecard',
-            subtitle: 'Multi-Pillar Bankability',
-            badge: `${caseData.scorecard || 88}/100 Tier-1`,
-            badgeType: 'emerald',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-            )
-        },
-        {
-            id: 'dossier',
-            title: 'Proposal Dossier & CAM',
-            subtitle: 'PDF, CMA XLSX & Committee Memo',
-            badge: 'Ready',
-            badgeType: 'blue',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-            )
-        },
-        {
-            id: 'decision',
-            title: 'Credit Decision & Sanction',
-            subtitle: 'Policy Checklist & Committee Sign-off',
-            badge: '100% Compliant',
-            badgeType: 'emerald',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 11 12 14 22 4"></polyline>
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                </svg>
-            )
-        },
-        {
-            id: 'promoters',
-            title: 'Promoters & Governance',
-            subtitle: 'Shareholding & Net Worth',
-            badge: 'Verified',
-            badgeType: 'neutral',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-            )
-        },
-        {
-            id: 'security',
-            title: 'Security & Collateral',
-            subtitle: 'Hypothecation & Mortgage',
-            badge: '1st Charge',
-            badgeType: 'purple',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-            )
+    // Applicant Profile Categorization
+    const isSalaried = useMemo(() => {
+        if (!caseData) return false;
+        const eType = (caseData.entityType || caseData.constitution || '').toUpperCase();
+        const niche = (caseData.borrowerNiche || '').toUpperCase();
+        const lProduct = (caseData.loanProduct || caseData.loanType || '').toUpperCase();
+        return (
+            eType === 'INDIVIDUAL_SALARIED' ||
+            niche === 'SALARIED' ||
+            lProduct.includes('SALARIED') ||
+            caseData.salariedDetails != null ||
+            (eType === 'INDIVIDUAL' && (lProduct.includes('HL') || lProduct.includes('HOME') || lProduct.includes('PL') || lProduct.includes('PERSONAL')))
+        );
+    }, [caseData]);
+
+    const isProjectOrCapexLoan = useMemo(() => {
+        if (!caseData) return false;
+        if (isSalaried) return false;
+        const lProduct = (caseData.loanProduct || '').toUpperCase();
+        const lType = (caseData.loanType || '').toUpperCase();
+        return (
+            lProduct === 'PROJECT' ||
+            lProduct === 'ML' ||
+            lProduct === 'OD_CC' ||
+            lType.includes('PROJECT') ||
+            lType.includes('RUPEE TERM') ||
+            lType.includes('TERM LOAN') ||
+            lType.includes('MACHINERY') ||
+            lType.includes('CAPEX') ||
+            lType.includes('WORKING CAPITAL') ||
+            lType.includes('CASH CREDIT') ||
+            lType.includes('INFRASTRUCTURE')
+        );
+    }, [caseData, isSalaried]);
+
+    const projectCostLakhs = useMemo(() => {
+        if (caseData?.projectCostLakhs) return caseData.projectCostLakhs;
+        if (caseData?.loanAmountLakhs) return parseFloat((caseData.loanAmountLakhs * 1.333).toFixed(2));
+        return 500.0;
+    }, [caseData]);
+
+    const projectCostFormatted = useMemo(() => {
+        if (caseData?.projectCostFormatted) return caseData.projectCostFormatted;
+        if (projectCostLakhs >= 100) {
+            return `₹${(projectCostLakhs / 100).toFixed(2)} Cr`;
         }
-    ];
+        return `₹${projectCostLakhs.toFixed(2)} Lakhs`;
+    }, [caseData, projectCostLakhs]);
+
+    const computedProjectBreakdown = useMemo(() => {
+        if (caseData?.projectCostBreakdown) return caseData.projectCostBreakdown;
+        const total = projectCostLakhs;
+        return {
+            land: { incurred: parseFloat((total * 0.17).toFixed(2)), toIncur: 0, total: parseFloat((total * 0.17).toFixed(2)) },
+            building: { incurred: parseFloat((total * 0.08).toFixed(2)), toIncur: parseFloat((total * 0.15).toFixed(2)), total: parseFloat((total * 0.23).toFixed(2)) },
+            machinery: { incurred: parseFloat((total * 0.05).toFixed(2)), toIncur: parseFloat((total * 0.55).toFixed(2)), total: parseFloat((total * 0.60).toFixed(2)) },
+            total: { incurred: parseFloat((total * 0.30).toFixed(2)), toIncur: parseFloat((total * 0.70).toFixed(2)), total: total }
+        };
+    }, [caseData, projectCostLakhs]);
+
+    const computedMeansOfFinance = useMemo(() => {
+        if (caseData?.meansOfFinance) return caseData.meansOfFinance;
+        const loanAmt = caseData?.loanAmountLakhs || parseFloat((projectCostLakhs * 0.75).toFixed(2));
+        const equity = parseFloat((projectCostLakhs - loanAmt).toFixed(2));
+        const promoter = parseFloat((equity * 0.70).toFixed(2));
+        const unsecured = parseFloat((equity * 0.30).toFixed(2));
+        return {
+            promoterCapital: { raised: promoter, proposed: 0, total: promoter },
+            unsecuredLoans: { raised: unsecured, proposed: 0, total: unsecured },
+            termLoan: { raised: 0, proposed: loanAmt, total: loanAmt },
+            total: { raised: equity, proposed: loanAmt, total: projectCostLakhs }
+        };
+    }, [caseData, projectCostLakhs]);
+
+    // Nav items definition for Left Sidebar (Tailored by Loan Product)
+    const navItems = useMemo(() => {
+        const items = [
+            {
+                id: 'intelligence',
+                title: 'Credit Intelligence Hub',
+                subtitle: 'CIBIL CIR, Multi-Bank BSA & GST',
+                badge: '3 Live APIs',
+                badgeType: 'emerald',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                )
+            },
+            {
+                id: 'spreading',
+                title: isSalaried ? 'Salary & FOIR Underwriting' : 'Financial Spreading & SCoA',
+                subtitle: isSalaried ? 'Compensation Grid & Loan Sizing' : 'Multi-Year P&L, Truth Serum & Ratios',
+                badge: isSalaried ? 'FOIR Analyzed' : 'Standardized',
+                badgeType: 'blue',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                )
+            },
+            {
+                id: 'stress_test',
+                title: 'Sensitivity & Stress Test',
+                subtitle: 'What-If Sliders & Waterfall',
+                badge: '2.05x Stressed',
+                badgeType: 'gold',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                )
+            }
+        ];
+
+        // ONLY add Project Cost & Means if this is actually a Project, Machinery, or Capex/WC Loan
+        if (isProjectOrCapexLoan) {
+            items.push({
+                id: 'financials',
+                title: 'Project Cost & Means',
+                subtitle: 'Capex & Financing Sizing',
+                badge: projectCostFormatted,
+                badgeType: 'gold',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                )
+            });
+        }
+
+        items.push(
+            {
+                id: 'scorecard',
+                title: '0–100 Risk Scorecard',
+                subtitle: 'Multi-Pillar Bankability',
+                badge: `${caseData?.scorecard || 88}/100 Tier-1`,
+                badgeType: 'emerald',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                )
+            },
+            {
+                id: 'dossier',
+                title: 'Proposal Dossier & CAM',
+                subtitle: 'PDF, CMA XLSX & Committee Memo',
+                badge: 'Ready',
+                badgeType: 'blue',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                )
+            },
+            {
+                id: 'decision',
+                title: 'Credit Decision & Sanction',
+                subtitle: 'Policy Checklist & Committee Sign-off',
+                badge: '100% Compliant',
+                badgeType: 'emerald',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 11 12 14 22 4"></polyline>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                )
+            },
+            {
+                id: 'promoters',
+                title: isSalaried ? 'Borrower & Co-Applicant' : 'Promoters & Governance',
+                subtitle: isSalaried ? 'Identity & Employment Track' : 'Shareholding & Net Worth',
+                badge: 'Verified',
+                badgeType: 'neutral',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                )
+            },
+            {
+                id: 'security',
+                title: isSalaried ? 'Property Title & Mortgage' : 'Security & Collateral',
+                subtitle: isSalaried ? 'Sale Deed & Legal Search' : 'Hypothecation & Mortgage',
+                badge: '1st Charge',
+                badgeType: 'purple',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                )
+            }
+        );
+
+        return items;
+    }, [caseData, isSalaried, isProjectOrCapexLoan, projectCostFormatted]);
+
 
     return (
         <div className="case-detail-root">
@@ -499,28 +585,73 @@ const PartnerLMSCaseDetail = () => {
                     <div className="case-header-right">
                         <div className="loan-stat-box">
                             <span className="lbl">Requested Loan</span>
-                            <span className="val-cyan">{caseData.loanAmountFormatted}</span>
+                            <span className="val-cyan">
+                                {caseData.loanAmountFormatted || (caseData.loanAmountLakhs ? `₹${caseData.loanAmountLakhs.toFixed(2)} L` : '₹50.00 Lakhs')}
+                            </span>
                         </div>
-                        <div className="loan-stat-box">
-                            <span className="lbl">Total Project Cost</span>
-                            <span className="val-gold">{caseData.projectCostFormatted}</span>
-                        </div>
-                        <div
-                            className="loan-stat-box metric-box-link"
-                            onClick={() => setActiveTab('spreading')}
-                            title="Click to view DSCR Formula & Math"
-                        >
-                            <span className="lbl">DSCR</span>
-                            <span className="val-green">2.05x</span>
-                        </div>
-                        <div
-                            className="loan-stat-box metric-box-link"
-                            onClick={() => setActiveTab('spreading')}
-                            title="Click to view TOL/TNW Leverage Math"
-                        >
-                            <span className="lbl">TOL/TNW</span>
-                            <span className="val-green">1.49x</span>
-                        </div>
+
+                        {/* Top metric adaptively shown based on loan type */}
+                        {isProjectOrCapexLoan ? (
+                            <div className="loan-stat-box">
+                                <span className="lbl">Total Project Cost</span>
+                                <span className="val-gold">{projectCostFormatted}</span>
+                            </div>
+                        ) : isSalaried || (caseData.loanProduct || caseData.loanType || '').toUpperCase().includes('HL') || (caseData.loanProduct || caseData.loanType || '').toUpperCase().includes('LAP') ? (
+                            <div className="loan-stat-box">
+                                <span className="lbl">Property Valuation</span>
+                                <span className="val-gold">
+                                    {caseData.propertyValueFormatted || `₹${((caseData.loanAmountLakhs || 75) * 1.4).toFixed(1)} Lakhs`}
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="loan-stat-box">
+                                <span className="lbl">Annual Turnover</span>
+                                <span className="val-gold">
+                                    {caseData.turnoverFormatted || (caseData.pastFinancials?.sales?.currentEst ? `₹${(caseData.pastFinancials.sales.currentEst / 100).toFixed(2)} Cr` : '₹32.49 Cr')}
+                                </span>
+                            </div>
+                        )}
+
+                        {isSalaried ? (
+                            <>
+                                <div
+                                    className="loan-stat-box metric-box-link"
+                                    onClick={() => setActiveTab('spreading')}
+                                    title="Click to view FOIR (Fixed Obligation to Income Ratio)"
+                                >
+                                    <span className="lbl">FOIR (DTI)</span>
+                                    <span className="val-green">57.0%</span>
+                                </div>
+                                <div
+                                    className="loan-stat-box metric-box-link"
+                                    onClick={() => setActiveTab('spreading')}
+                                    title="Click to view Loan-to-Value (LTV) Ratio"
+                                >
+                                    <span className="lbl">LTV Ratio</span>
+                                    <span className="val-green">71.4%</span>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div
+                                    className="loan-stat-box metric-box-link"
+                                    onClick={() => setActiveTab('spreading')}
+                                    title="Click to view DSCR Formula & Math"
+                                >
+                                    <span className="lbl">DSCR</span>
+                                    <span className="val-green">2.05x</span>
+                                </div>
+                                <div
+                                    className="loan-stat-box metric-box-link"
+                                    onClick={() => setActiveTab('spreading')}
+                                    title="Click to view TOL/TNW Leverage Math"
+                                >
+                                    <span className="lbl">TOL/TNW</span>
+                                    <span className="val-green">1.49x</span>
+                                </div>
+                            </>
+                        )}
+
                         <RedFlagBellDropdown
                             onSelectFlag={(flag) => {
                                 if (flag.targetTab) setActiveTab(flag.targetTab);
@@ -1176,18 +1307,18 @@ const PartnerLMSCaseDetail = () => {
                     )}
 
                     {/* ========================================================================= */}
-                    {/* TAB 2: FINANCIALS & PROJECT COST                                          */}
+                    {/* TAB 2: FINANCIALS & PROJECT COST (PROJECT / CAPEX / WC LOANS ONLY)        */}
                     {/* ========================================================================= */}
-                    {activeTab === 'financials' && (
+                    {isProjectOrCapexLoan && activeTab === 'financials' && (
                         <div className="tab-pane-content">
                             <div className="financials-tab-grid">
                                 <div className="finance-section-card">
                                     <div className="card-header-flex">
                                         <div>
-                                            <h3>Project Cost Sizing ({caseData.projectCostFormatted || '₹36.00 Cr'})</h3>
-                                            <p className="card-sub">Granular Capex schedule and execution outlays</p>
+                                            <h3>Project Cost Sizing ({projectCostFormatted})</h3>
+                                            <p className="card-sub">Granular Capex schedule and execution outlays for {caseData.enterpriseName}</p>
                                         </div>
-                                        <span className="cost-total-badge">{caseData.projectCostFormatted || '₹36.00 Cr'}</span>
+                                        <span className="cost-total-badge">{projectCostFormatted}</span>
                                     </div>
 
                                     <div className="table-responsive-wrap">
@@ -1203,39 +1334,27 @@ const PartnerLMSCaseDetail = () => {
                                             <tbody>
                                                 <tr>
                                                     <td>Land including Site Development & Boundary</td>
-                                                    <td>₹600.00 L</td>
-                                                    <td>₹0.00 L</td>
-                                                    <td><strong>₹600.00 L</strong></td>
+                                                    <td>₹{computedProjectBreakdown.land?.incurred?.toFixed(2) || '0.00'} L</td>
+                                                    <td>₹{computedProjectBreakdown.land?.toIncur?.toFixed(2) || '0.00'} L</td>
+                                                    <td><strong>₹{computedProjectBreakdown.land?.total?.toFixed(2) || '0.00'} L</strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Factory Building & Civil Infrastructure</td>
-                                                    <td>₹200.00 L</td>
-                                                    <td>₹800.00 L</td>
-                                                    <td><strong>₹1,000.00 L</strong></td>
+                                                    <td>₹{computedProjectBreakdown.building?.incurred?.toFixed(2) || '0.00'} L</td>
+                                                    <td>₹{computedProjectBreakdown.building?.toIncur?.toFixed(2) || '0.00'} L</td>
+                                                    <td><strong>₹{computedProjectBreakdown.building?.total?.toFixed(2) || '0.00'} L</strong></td>
                                                 </tr>
                                                 <tr>
-                                                    <td>Plant & Machinery (Indigenous Automated Lines)</td>
-                                                    <td>₹100.00 L</td>
-                                                    <td>₹1,900.00 L</td>
-                                                    <td><strong>₹2,000.00 L</strong></td>
-                                                </tr>
-                                                <tr className="sub-line">
-                                                    <td>Electrification, Utilities & Effluent Treatment (ETP)</td>
-                                                    <td>₹0.00 L</td>
-                                                    <td>₹250.00 L</td>
-                                                    <td><strong>₹250.00 L</strong></td>
-                                                </tr>
-                                                <tr className="sub-line">
-                                                    <td>Margin Money for Working Capital (MMWC)</td>
-                                                    <td>₹0.00 L</td>
-                                                    <td>₹150.00 L</td>
-                                                    <td><strong>₹150.00 L</strong></td>
+                                                    <td>Plant & Machinery (Indigenous / Imported Lines)</td>
+                                                    <td>₹{computedProjectBreakdown.machinery?.incurred?.toFixed(2) || '0.00'} L</td>
+                                                    <td>₹{computedProjectBreakdown.machinery?.toIncur?.toFixed(2) || '0.00'} L</td>
+                                                    <td><strong>₹{computedProjectBreakdown.machinery?.total?.toFixed(2) || '0.00'} L</strong></td>
                                                 </tr>
                                                 <tr className="total-highlight">
                                                     <td><strong>TOTAL PROJECT COST</strong></td>
-                                                    <td><strong>₹900.00 L</strong></td>
-                                                    <td><strong>₹3,100.00 L</strong></td>
-                                                    <td><strong className="text-gold">₹4,000.00 L ({caseData.projectCostFormatted || '₹40.00 Cr'})</strong></td>
+                                                    <td><strong>₹{computedProjectBreakdown.total?.incurred?.toFixed(2) || '0.00'} L</strong></td>
+                                                    <td><strong>₹{computedProjectBreakdown.total?.toIncur?.toFixed(2) || '0.00'} L</strong></td>
+                                                    <td><strong className="text-gold">₹{computedProjectBreakdown.total?.total?.toFixed(2) || projectCostLakhs.toFixed(2)} L ({projectCostFormatted})</strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -1264,27 +1383,27 @@ const PartnerLMSCaseDetail = () => {
                                             <tbody>
                                                 <tr>
                                                     <td>Promoter / Partners Capital (Equity)</td>
-                                                    <td>₹600.00 L</td>
-                                                    <td>₹400.00 L</td>
-                                                    <td><strong>₹1,000.00 L</strong></td>
+                                                    <td>₹{computedMeansOfFinance.promoterCapital?.raised?.toFixed(2) || '0.00'} L</td>
+                                                    <td>₹{computedMeansOfFinance.promoterCapital?.proposed?.toFixed(2) || '0.00'} L</td>
+                                                    <td><strong>₹{computedMeansOfFinance.promoterCapital?.total?.toFixed(2) || '0.00'} L</strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Unsecured Loans (Subordinated to Bank Term Loan)</td>
-                                                    <td>₹300.00 L</td>
-                                                    <td>₹100.00 L</td>
-                                                    <td><strong>₹400.00 L</strong></td>
+                                                    <td>₹{computedMeansOfFinance.unsecuredLoans?.raised?.toFixed(2) || '0.00'} L</td>
+                                                    <td>₹{computedMeansOfFinance.unsecuredLoans?.proposed?.toFixed(2) || '0.00'} L</td>
+                                                    <td><strong>₹{computedMeansOfFinance.unsecuredLoans?.total?.toFixed(2) || '0.00'} L</strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td>Term Loan from Commercial Bank / Lender Desk</td>
-                                                    <td>₹0.00 L</td>
-                                                    <td>₹{(caseData.loanAmountLakhs || 375).toFixed(2)} L</td>
-                                                    <td><strong>₹{(caseData.loanAmountLakhs || 375).toFixed(2)} L</strong></td>
+                                                    <td>₹{computedMeansOfFinance.termLoan?.raised?.toFixed(2) || '0.00'} L</td>
+                                                    <td>₹{computedMeansOfFinance.termLoan?.proposed?.toFixed(2) || (caseData.loanAmountLakhs || 50).toFixed(2)} L</td>
+                                                    <td><strong>₹{computedMeansOfFinance.termLoan?.total?.toFixed(2) || (caseData.loanAmountLakhs || 50).toFixed(2)} L</strong></td>
                                                 </tr>
                                                 <tr className="total-highlight">
                                                     <td><strong>TOTAL MEANS OF FINANCE</strong></td>
-                                                    <td><strong>₹900.00 L</strong></td>
-                                                    <td><strong>₹{(caseData.loanAmountLakhs || 375).toFixed(2)} L</strong></td>
-                                                    <td><strong className="text-gold">₹{(caseData.projectCostLakhs || 500).toFixed(2)} L ({caseData.projectCostFormatted || '₹5.00 Cr'})</strong></td>
+                                                    <td><strong>₹{computedMeansOfFinance.total?.raised?.toFixed(2) || '0.00'} L</strong></td>
+                                                    <td><strong>₹{computedMeansOfFinance.total?.proposed?.toFixed(2) || (caseData.loanAmountLakhs || 50).toFixed(2)} L</strong></td>
+                                                    <td><strong className="text-gold">₹{computedMeansOfFinance.total?.total?.toFixed(2) || projectCostLakhs.toFixed(2)} L ({projectCostFormatted})</strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
