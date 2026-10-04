@@ -18,7 +18,7 @@ const PartnerLMSCaseDetail = () => {
     const caseData = getCaseById(id);
 
     // Left Sidebar Navigation state
-    const [activeTab, setActiveTab] = useState('spreading'); // vault | spreading | stress_test | intelligence | financials | scorecard | dossier | promoters | security
+    const [activeTab, setActiveTab] = useState('spreading'); // vault | spreading | stress_test | intelligence | financials | scorecard | dossier | decision | promoters | security
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [traceabilityDocType, setTraceabilityDocType] = useState(null);
 
@@ -426,6 +426,19 @@ const PartnerLMSCaseDetail = () => {
             )
         },
         {
+            id: 'decision',
+            title: 'Credit Decision & Sanction',
+            subtitle: 'Policy Checklist & Committee Sign-off',
+            badge: '100% Compliant',
+            badgeType: 'emerald',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+            )
+        },
+        {
             id: 'promoters',
             title: 'Promoters & Governance',
             subtitle: 'Shareholding & Net Worth',
@@ -534,32 +547,32 @@ const PartnerLMSCaseDetail = () => {
             {/* Workflow Progress Bar */}
             <div className="case-progress-strip">
                 <div className="progress-strip-container">
-                    <div className="progress-step-item done">
+                    <div className={`progress-step-item ${activeTab === 'vault' ? 'active' : 'done'}`} onClick={() => setActiveTab('vault')} style={{ cursor: 'pointer' }} title="Click to view Document Vault">
                         <span className="step-badge">1</span>
                         <span>Data Verified</span>
                     </div>
                     <span className="step-arrow">→</span>
-                    <div className="progress-step-item done">
+                    <div className={`progress-step-item ${activeTab === 'intelligence' ? 'active' : 'done'}`} onClick={() => setActiveTab('intelligence')} style={{ cursor: 'pointer' }} title="Click to view CIBIL Bureau">
                         <span className="step-badge">2</span>
                         <span>CIBIL 758</span>
                     </div>
                     <span className="step-arrow">→</span>
-                    <div className="progress-step-item done">
+                    <div className={`progress-step-item ${activeTab === 'intelligence' ? 'active' : 'done'}`} onClick={() => setActiveTab('intelligence')} style={{ cursor: 'pointer' }} title="Click to view Bank Analyzer">
                         <span className="step-badge">3</span>
                         <span>BSA Parsed</span>
                     </div>
                     <span className="step-arrow">→</span>
-                    <div className="progress-step-item done">
+                    <div className={`progress-step-item ${activeTab === 'intelligence' ? 'active' : 'done'}`} onClick={() => setActiveTab('intelligence')} style={{ cursor: 'pointer' }} title="Click to view GST Reconciliation">
                         <span className="step-badge">4</span>
                         <span>GST Matched</span>
                     </div>
                     <span className="step-arrow">→</span>
-                    <div className="progress-step-item done">
+                    <div className={`progress-step-item ${activeTab === 'scorecard' ? 'active' : 'done'}`} onClick={() => setActiveTab('scorecard')} style={{ cursor: 'pointer' }} title="Click to view Risk Scorecard">
                         <span className="step-badge">5</span>
                         <span>Score: 88/100</span>
                     </div>
                     <span className="step-arrow">→</span>
-                    <div className="progress-step-item active">
+                    <div className={`progress-step-item ${activeTab === 'decision' ? 'active' : 'done'}`} onClick={() => setActiveTab('decision')} style={{ cursor: 'pointer' }} title="Click to view Credit Decision & Sanction Matrix">
                         <span className="step-badge">6</span>
                         <span>Sanction Ready</span>
                     </div>
@@ -2120,17 +2133,21 @@ const PartnerLMSCaseDetail = () => {
                         </div>
                     )}
 
-                    {/* Persistent Credit Decision & Deviation Matrix Cockpit */}
-                    <div className="case-bottom-cockpit-section">
-                        <DecisionMatrixPanel
-                            caseData={caseData}
-                            onAction={(actionType, payload) => {
-                                if (actionType === 'EXPORT_CAM') {
-                                    handleExportPDF();
-                                }
-                            }}
-                        />
-                    </div>
+                    {/* ========================================================================= */}
+                    {/* TAB: CREDIT DECISION & SANCTION MATRIX                                    */}
+                    {/* ========================================================================= */}
+                    {activeTab === 'decision' && (
+                        <div className="tab-pane-content">
+                            <DecisionMatrixPanel
+                                caseData={caseData}
+                                onAction={(actionType, payload) => {
+                                    if (actionType === 'EXPORT_CAM') {
+                                        handleExportPDF();
+                                    }
+                                }}
+                            />
+                        </div>
+                    )}
                 </main>
             </div>
 
