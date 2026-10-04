@@ -3,73 +3,127 @@ import './LeadCategoryModal.css';
 
 export const LOAN_PRODUCT_CONFIGS = [
     {
-        id: 'UNSECURED_BUSINESS',
-        title: 'Unsecured Business Loan (BL)',
-        tagline: 'Zero Collateral • 12M Banking & GST Based',
-        ticketRange: '₹5L to ₹1.5 Cr',
-        categoryType: 'business',
+        id: 'HL',
+        title: 'Home Loan (HL)',
+        tagline: 'Residential Mortgage • Purchase & Construction • 70-80% LTV',
+        ticketRange: '₹15L to ₹10 Cr',
+        categoryType: 'retail_niche',
         icon: (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
         )
     },
     {
-        id: 'WORKING_CAPITAL',
-        title: 'Working Capital (OD / CC)',
-        tagline: 'Revolving Line • Stock & Debtors Hypothecation',
+        id: 'LAP',
+        title: 'Loan Against Property (LAP)',
+        tagline: 'Commercial & Residential Mortgage • 55-65% LTV',
         ticketRange: '₹25L to ₹25 Cr',
         categoryType: 'business',
         icon: (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
         )
     },
     {
-        id: 'MACHINERY_TERM',
-        title: 'Term Loan / Machinery Loan (ML)',
-        tagline: 'Capex Financing • OEM Supplier Quotations',
-        ticketRange: '₹20L to ₹15 Cr',
+        id: 'ML',
+        title: 'Machinery Loan / Equipment (ML)',
+        tagline: 'Plant & Equipment Capex • OEM Quotations & Hypothecation',
+        ticketRange: '₹20L to ₹30 Cr',
         categoryType: 'business',
         icon: (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
         )
     },
     {
-        id: 'PROJECT_FINANCE',
-        title: 'Project Finance & Industrial Capex',
-        tagline: 'Land, Civil, Plant Setup • Means of Finance',
-        ticketRange: '₹1 Cr to ₹50 Cr',
+        id: 'BL',
+        title: 'Business Loan (BL)',
+        tagline: 'MSME Growth Capital • 12M Banking & GST Inflow Based',
+        ticketRange: '₹10L to ₹5 Cr',
         categoryType: 'business',
         icon: (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 20h20"></path><path d="M6 20V10l6-4v14"></path><path d="M18 20V4l-6 2"></path></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
         )
     },
     {
-        id: 'HOME_LAP',
-        title: 'Home Loan (HL) / Loan Against Property (LAP)',
-        tagline: 'Residential / Commercial Mortgage • 70-80% LTV',
-        ticketRange: '₹15L to ₹15 Cr',
+        id: 'PL',
+        title: 'Personal Loan (PL)',
+        tagline: 'Instant Unsecured Cash • Salaried FOIR & Net Pay Based',
+        ticketRange: '₹1L to ₹40 Lakhs',
         categoryType: 'retail_niche',
         icon: (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
         )
     },
     {
-        id: 'AUTO_CV',
-        title: 'Auto Loan / Commercial Vehicle (AL / CV)',
-        tagline: 'HCV / LCV / Fleet & Passenger Cars',
-        ticketRange: '₹5L to ₹5 Cr',
+        id: 'AL',
+        title: 'Auto / Commercial Vehicle (AL)',
+        tagline: 'Commercial Fleet & Passenger Cars • RTO Lien Hypothecation',
+        ticketRange: '₹5L to ₹3 Cr',
         categoryType: 'retail_niche',
         icon: (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
         )
     },
     {
-        id: 'PERSONAL_GOLD',
-        title: 'Personal Loan (PL) / Gold Loan',
-        tagline: 'Fast Disbursal • Salary & Asset Backed',
-        ticketRange: '₹50K to ₹40 Lakhs',
-        categoryType: 'retail_niche',
+        id: 'PROJECT',
+        title: 'Project Funding',
+        tagline: 'Greenfield & Brownfield Industrial Capex • Detailed DPR & TEV',
+        ticketRange: '₹5 Cr to ₹100 Cr',
+        categoryType: 'business',
         icon: (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M2 20h20"></path>
+                <path d="M6 20V10l6-4v14"></path>
+                <path d="M18 20V4l-6 2"></path>
+            </svg>
+        )
+    },
+    {
+        id: 'OD_CC',
+        title: 'Overdraft / Cash Credit (OD/CC)',
+        tagline: 'Revolving Working Capital • Stock & Debtors MPBF Method II',
+        ticketRange: '₹25L to ₹50 Cr',
+        categoryType: 'business',
+        icon: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        )
+    },
+    {
+        id: 'BILL_DISCOUNTING',
+        title: 'Bill / Invoice Discounting',
+        tagline: 'Supply Chain Liquidity • Accepted Commercial Invoices & POD',
+        ticketRange: '₹15L to ₹20 Cr',
+        categoryType: 'business',
+        icon: (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
         )
     }
 ];
@@ -96,23 +150,29 @@ export const NICHE_OPTIONS = [
 ];
 
 const LeadCategoryModal = ({ isOpen, onClose, onSelectCategory }) => {
-    const [selectedProduct, setSelectedProduct] = useState('UNSECURED_BUSINESS');
+    const [selectedProduct, setSelectedProduct] = useState('BL');
     const [selectedNiche, setSelectedNiche] = useState('SALARIED');
     const [borrowerName, setBorrowerName] = useState('');
-    const [estimatedAmount, setEstimatedAmount] = useState('35');
+    const [estimatedAmount, setEstimatedAmount] = useState('50');
 
     if (!isOpen) return null;
 
-    const currentProductConfig = LOAN_PRODUCT_CONFIGS.find(p => p.id === selectedProduct) || LOAN_PRODUCT_CONFIGS[0];
-    const isRetailNicheProduct = currentProductConfig.categoryType === 'retail_niche';
+    const currentProductConfig = LOAN_PRODUCT_CONFIGS.find(p => p.id === selectedProduct) || LOAN_PRODUCT_CONFIGS[3];
+    const isRetailNicheProduct = currentProductConfig.categoryType === 'retail_niche' || selectedProduct === 'HL' || selectedProduct === 'PL' || selectedProduct === 'AL';
 
     const handleLaunchWizard = () => {
+        const amt = parseFloat(estimatedAmount) || 50.0;
+        const formattedAmt = amt >= 100 ? `₹${(amt / 100).toFixed(2)} Cr` : `₹${amt.toFixed(2)} Lakhs`;
+
         onSelectCategory({
-            loanType: selectedProduct,
-            loanTypeTitle: currentProductConfig.title,
-            borrowerNiche: isRetailNicheProduct ? selectedNiche : 'BUSINESS_ENTITY',
-            borrowerName: borrowerName || (isRetailNicheProduct ? 'Applicant Name' : 'Enterprise Name'),
-            estimatedAmountLakhs: parseFloat(estimatedAmount) || 35.0
+            loanProduct: selectedProduct,
+            loanType: currentProductConfig.title,
+            borrowerNiche: isRetailNicheProduct ? selectedNiche : 'SENP',
+            entityType: isRetailNicheProduct ? (selectedNiche === 'SALARIED' ? 'INDIVIDUAL_SALARIED' : 'INDIVIDUAL_SELF_EMPLOYED') : 'PROPRIETORSHIP',
+            enterpriseName: isRetailNicheProduct ? '' : (borrowerName || 'New Enterprise Proposal'),
+            applicantName: isRetailNicheProduct ? (borrowerName || 'Applicant Name') : '',
+            loanAmountLakhs: amt,
+            loanAmountFormatted: formattedAmt
         });
     };
 
@@ -124,15 +184,20 @@ const LeadCategoryModal = ({ isOpen, onClose, onSelectCategory }) => {
                     <div>
                         <span className="lead-modal-badge">LEAD ORIGINATION GATE</span>
                         <h2>Select Loan Product & Underwriting Niche</h2>
-                        <p>Questions and underwriting modules will automatically tailor to your selected loan category.</p>
+                        <p>Underwriting questions, ratio spreading, and validation workflows automatically adapt across all 9 loan products.</p>
                     </div>
-                    <button type="button" onClick={onClose} className="btn-lead-modal-close" aria-label="Close">✕</button>
+                    <button type="button" onClick={onClose} className="btn-lead-modal-close" aria-label="Close">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
 
                 <div className="lead-modal-body">
                     {/* SECTION 1: LOAN PRODUCT SELECTION */}
                     <div className="lead-section">
-                        <label className="lead-section-title">1. Choose Loan Product Category *</label>
+                        <label className="lead-section-title">1. Choose Loan Product Category (All 9 Institutional Products) *</label>
                         <div className="product-cards-grid">
                             {LOAN_PRODUCT_CONFIGS.map(prod => (
                                 <div
@@ -151,7 +216,7 @@ const LeadCategoryModal = ({ isOpen, onClose, onSelectCategory }) => {
                         </div>
                     </div>
 
-                    {/* SECTION 2: NICHE SELECTION (FOR HL/LAP, AUTO/CV, PL/GOLD) */}
+                    {/* SECTION 2: NICHE SELECTION (FOR HL, PL, AL) */}
                     {isRetailNicheProduct && (
                         <div className="lead-section niche-section-animated">
                             <label className="lead-section-title">
@@ -217,7 +282,11 @@ const LeadCategoryModal = ({ isOpen, onClose, onSelectCategory }) => {
                         Cancel
                     </button>
                     <button type="button" onClick={handleLaunchWizard} className="btn-lead-launch">
-                        Launch Tailored Underwriting Wizard →
+                        <span>Launch Tailored Underwriting Wizard</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '6px' }}>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
                     </button>
                 </div>
             </div>

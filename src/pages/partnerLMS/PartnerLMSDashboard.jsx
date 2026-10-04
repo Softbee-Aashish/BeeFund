@@ -124,11 +124,11 @@ const PartnerLMSDashboard = () => {
                     </div>
 
                     <div className="stat-card stat-action-card">
-                        <button type="button" onClick={() => navigate('/partnerLMS/case/new')} className="btn-new-case">
+                        <button type="button" onClick={() => setIsLeadModalOpen(true)} className="btn-new-case">
                             <span className="plus-sym">+</span>
                             <span>Create New Credit Case</span>
                         </button>
-                        <div className="stat-hint">Universal KYC & Dynamic Sizing Wizard</div>
+                        <div className="stat-hint">Universal KYC & Dynamic Sizing Wizard (9 Products)</div>
                     </div>
                 </div>
 
@@ -166,7 +166,7 @@ const PartnerLMSDashboard = () => {
                                 <th>App ID / Ack No</th>
                                 <th>Applicant Enterprise</th>
                                 <th>Facility & Sizing</th>
-                                <th>Project Cost</th>
+                                <th>Key Asset / Sizing Metric</th>
                                 <th>Target Lender</th>
                                 <th>Score</th>
                                 <th>Case Status</th>
@@ -176,6 +176,24 @@ const PartnerLMSDashboard = () => {
                         <tbody>
                             {filteredCases.map(c => {
                                 const statusCfg = STATUS_BADGES[c.status] || STATUS_BADGES.DRAFT;
+                                const pCode = (c.loanProduct || c.loanType || '').toUpperCase();
+                                let metricLabel = c.projectCostFormatted;
+                                if (pCode.includes('HL') || pCode.includes('LAP') || pCode.includes('HOME') || pCode.includes('PROPERTY')) {
+                                    metricLabel = c.propertyValueFormatted || 'Property Mortgage';
+                                } else if (pCode.includes('PL') || pCode.includes('PERSONAL')) {
+                                    metricLabel = c.monthlySalaryFormatted ? `In-Hand: ${c.monthlySalaryFormatted}` : 'Salaried Net Pay';
+                                } else if (pCode.includes('AL') || pCode.includes('AUTO') || pCode.includes('VEHICLE')) {
+                                    metricLabel = c.vehicleValuationFormatted ? `Fleet: ${c.vehicleValuationFormatted}` : 'Vehicle Invoices';
+                                } else if (pCode.includes('OD') || pCode.includes('CC') || pCode.includes('WORKING')) {
+                                    metricLabel = c.mpbfFormatted ? `MPBF: ${c.mpbfFormatted}` : (c.turnoverFormatted || 'Working Capital');
+                                } else if (pCode.includes('BILL') || pCode.includes('DISCOUNTING')) {
+                                    metricLabel = c.eligibleInvoicesFormatted ? `Invoices: ${c.eligibleInvoicesFormatted}` : 'Supply Chain';
+                                } else if (pCode.includes('ML') || pCode.includes('MACHINERY')) {
+                                    metricLabel = c.capexCostFormatted ? `Capex: ${c.capexCostFormatted}` : (c.projectCostFormatted || 'Equipment');
+                                } else if (pCode.includes('BL') || pCode.includes('BUSINESS')) {
+                                    metricLabel = c.turnoverFormatted ? `Sales: ${c.turnoverFormatted}` : 'Operating Cash Flow';
+                                }
+
                                 return (
                                     <tr key={c.id}>
                                         <td>
@@ -193,7 +211,7 @@ const PartnerLMSDashboard = () => {
                                             <div className="loan-type-sub">{c.loanType}</div>
                                         </td>
                                         <td>
-                                            <div className="project-cost-txt">{c.projectCostFormatted || 'N/A'}</div>
+                                            <div className="project-cost-txt">{metricLabel || 'Assessed'}</div>
                                             <div className="industry-sub">{c.industry}</div>
                                         </td>
                                         <td>
@@ -215,7 +233,11 @@ const PartnerLMSDashboard = () => {
                                         </td>
                                         <td>
                                             <Link to={`/partnerLMS/case/${c.id}`} className="btn-open-command">
-                                                <span>Command Center →</span>
+                                                <span>Command Center</span>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+                                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                                </svg>
                                             </Link>
                                         </td>
                                     </tr>

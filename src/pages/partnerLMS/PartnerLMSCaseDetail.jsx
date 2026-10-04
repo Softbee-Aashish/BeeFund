@@ -185,7 +185,7 @@ const PartnerLMSCaseDetail = () => {
         setTimeout(() => {
             setCibilState({ run: true, score: 758, loading: false });
             updateCase(caseData.id, { cibilScore: 758 });
-            setExportNotice('✓ TransUnion CIBIL Bureau refreshed successfully (₹50 deducted).');
+            setExportNotice('TransUnion CIBIL Bureau refreshed successfully (₹50 deducted).');
             setTimeout(() => setExportNotice(''), 4000);
         }, 800);
     };
@@ -200,7 +200,7 @@ const PartnerLMSCaseDetail = () => {
         setBsaState(prev => ({ ...prev, loading: true }));
         setTimeout(() => {
             setBsaState(prev => ({ ...prev, run: true, loading: false }));
-            setExportNotice(`✓ BSA Cash Flow Re-parsed for ${bsaState.selectedAccounts.length} accounts (₹${cost} deducted).`);
+            setExportNotice(`BSA Cash Flow Re-parsed for ${bsaState.selectedAccounts.length} accounts (₹${cost} deducted).`);
             setTimeout(() => setExportNotice(''), 4000);
         }, 1000);
     };
@@ -215,7 +215,7 @@ const PartnerLMSCaseDetail = () => {
         setGstState(prev => ({ ...prev, loading: true }));
         setTimeout(() => {
             setGstState(prev => ({ ...prev, run: true, loading: false }));
-            setExportNotice('✓ GSTR-3B & GSTR-1 Turnover reconciled with 100% tax match (₹40 deducted).');
+            setExportNotice('GSTR-3B & GSTR-1 Turnover reconciled with 100% tax match (₹40 deducted).');
             setTimeout(() => setExportNotice(''), 4000);
         }, 700);
     };
@@ -223,7 +223,7 @@ const PartnerLMSCaseDetail = () => {
     const handleExportPDF = () => {
         setExportNotice('Generating Institutional Bank Proposal Dossier PDF...');
         setTimeout(() => {
-            setExportNotice('✓ Dossier exported successfully: ' + (caseData.enterpriseName || 'Credit_Case').replace(/\s+/g, '_') + '_Credit_Proposal.pdf');
+            setExportNotice('Dossier exported successfully: ' + (caseData.enterpriseName || 'Credit_Case').replace(/\s+/g, '_') + '_Credit_Proposal.pdf');
             setTimeout(() => setExportNotice(''), 4500);
         }, 1200);
     };
@@ -231,7 +231,7 @@ const PartnerLMSCaseDetail = () => {
     const handleExportExcel = () => {
         setExportNotice('Exporting Multi-Sheet Financial Model Workbook (.xlsx)...');
         setTimeout(() => {
-            setExportNotice('✓ Financial model exported: ' + (caseData.enterpriseName || 'Credit_Case').replace(/\s+/g, '_') + '_Financial_Model.xlsx');
+            setExportNotice('Financial model exported: ' + (caseData.enterpriseName || 'Credit_Case').replace(/\s+/g, '_') + '_Financial_Model.xlsx');
             setTimeout(() => setExportNotice(''), 4500);
         }, 1000);
     };
@@ -261,7 +261,7 @@ const PartnerLMSCaseDetail = () => {
                 }
                 return d;
             }));
-            setExportNotice(`✓ Document ${docId} successfully re-verified and synchronized.`);
+            setExportNotice(`Document ${docId} successfully re-verified and synchronized.`);
             setTimeout(() => setExportNotice(''), 3500);
         }, 800);
     };
@@ -285,7 +285,7 @@ const PartnerLMSCaseDetail = () => {
         setQueries(prev => [newQ, ...prev]);
         setNewQueryText('');
         setNewQueryDocId(null);
-        setExportNotice(`✓ Underwriting query logged for ${targetDoc?.docName || 'Document'}.`);
+        setExportNotice(`Underwriting query logged for ${targetDoc?.docName || 'Document'}.`);
         setTimeout(() => setExportNotice(''), 3500);
     };
 
@@ -300,7 +300,7 @@ const PartnerLMSCaseDetail = () => {
             }
             return q;
         }));
-        setExportNotice(`✓ Query #${queryId} marked as resolved.`);
+        setExportNotice(`Query #${queryId} marked as resolved.`);
         setTimeout(() => setExportNotice(''), 3500);
     };
 
