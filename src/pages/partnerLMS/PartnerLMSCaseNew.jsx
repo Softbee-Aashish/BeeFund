@@ -187,34 +187,52 @@ const PartnerLMSCaseNew = () => {
     const [validationErrors, setValidationErrors] = useState([]);
 
     // Master Form State
-    const [formData, setFormData] = useState({
-        enterpriseName: '',
-        applicantName: '',
-        entityType: loanConfig.entityType,
-        loanProduct: loanConfig.loanProduct,
-        constitution: 'Partnership',
-        pan: '',
-        aadhaarNo: '',
-        udyamNo: '',
-        yearsOfOperation: 'Enterprise having 3 years ITR or more',
-        industry: 'Manufacturing & Processing',
-        msmeCategory: 'MICRO / SMALL',
-        targetLender: 'State Bank of India (MSME Desk)',
-        loanAmountLakhs: loanConfig.loanAmountLakhs,
-        loanAmountFormatted: '₹50.00 Lakhs',
-        loanTenureMonths: 60,
-        borrowerNiche: loanConfig.borrowerNiche,
-        registeredOffice: '',
-        residentialAddress: '',
-        cityState: 'New Delhi, Delhi',
-        pincode: '110001',
-        contactMobile: '',
-        contactEmail: '',
-        loanPurpose: 'Business expansion & working capital procurement',
-        promoters: [
-            { id: 1, name: '', pan: '', aadhaar: '', shareholding: 100, cibil: 758, netWorthLakhs: 150.0, designation: 'Managing Director / Partner' }
-        ],
-        documentStatuses: {}
+    const [formData, setFormData] = useState(() => {
+        const state = location.state || {};
+        const amt = state.loanAmountLakhs || 50.0;
+        const formattedAmt = state.loanAmountFormatted || (amt >= 100 ? `₹${(amt / 100).toFixed(2)} Cr` : `₹${amt.toFixed(2)} Lakhs`);
+        const eName = state.enterpriseName || '';
+        const aName = state.applicantName || '';
+
+        return {
+            enterpriseName: eName,
+            applicantName: aName,
+            entityType: state.entityType || 'PROPRIETORSHIP',
+            loanProduct: state.loanProduct || 'BL',
+            loanType: state.loanType || 'Business Loan (BL)',
+            constitution: state.entityType === 'INDIVIDUAL_SALARIED' ? 'Individual (Salaried)' : state.entityType === 'INDIVIDUAL_SELF_EMPLOYED' ? 'Individual (Self-Employed)' : 'Partnership',
+            pan: '',
+            aadhaarNo: '',
+            udyamNo: '',
+            yearsOfOperation: 'Enterprise having 3 years ITR or more',
+            industry: 'Manufacturing & Processing',
+            msmeCategory: 'MICRO / SMALL',
+            targetLender: 'State Bank of India (MSME Desk)',
+            loanAmountLakhs: amt,
+            loanAmountFormatted: formattedAmt,
+            loanTenureMonths: 60,
+            borrowerNiche: state.borrowerNiche || 'SENP',
+            registeredOffice: '',
+            residentialAddress: '',
+            cityState: 'New Delhi, Delhi',
+            pincode: '110001',
+            contactMobile: '',
+            contactEmail: '',
+            loanPurpose: 'Business expansion & working capital procurement',
+            promoters: [
+                {
+                    id: 1,
+                    name: aName || eName || 'Primary Applicant / Promoter',
+                    pan: '',
+                    aadhaar: '',
+                    shareholding: 100,
+                    cibil: 758,
+                    netWorthLakhs: 150.0,
+                    designation: state.entityType === 'INDIVIDUAL_SALARIED' ? 'Primary Applicant' : 'Managing Director / Partner'
+                }
+            ],
+            documentStatuses: {}
+        };
     });
 
     useEffect(() => {

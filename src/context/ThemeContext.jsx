@@ -19,8 +19,21 @@ export const ThemeProvider = ({ children }) => {
 
     useEffect(() => {
         try {
-            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            localStorage.setItem('beefund-theme', isDark ? 'dark' : 'light');
+            const themeVal = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', themeVal);
+            document.body.setAttribute('data-theme', themeVal);
+            if (isDark) {
+                document.documentElement.classList.add('dark-theme', 'dark-mode');
+                document.documentElement.classList.remove('light-theme', 'light-mode');
+                document.body.classList.add('dark-theme', 'dark-mode');
+                document.body.classList.remove('light-theme', 'light-mode');
+            } else {
+                document.documentElement.classList.add('light-theme', 'light-mode');
+                document.documentElement.classList.remove('dark-theme', 'dark-mode');
+                document.body.classList.add('light-theme', 'light-mode');
+                document.body.classList.remove('dark-theme', 'dark-mode');
+            }
+            localStorage.setItem('beefund-theme', themeVal);
         } catch (e) {
             console.warn('Error saving theme preference:', e);
         }

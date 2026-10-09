@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import initialBlogPosts from '../data/blogPosts.json';
 
 const BlogContext = createContext(null);
-const STORAGE_KEY = 'beefund_blogs_v1';
+const STORAGE_KEY = 'beefund_blogs_v2';
 const PRIMARY_SHEET_KEY = 'beefund_sheet_url';
 const LEGACY_SHEET_KEY = 'beefund_articles_sheet_url';
 

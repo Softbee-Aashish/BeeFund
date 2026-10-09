@@ -4,7 +4,7 @@ import starterCards from '../data/sampleCreditCardsTemplate.json';
 
 const CardsContext = createContext();
 
-const STORAGE_KEY = 'beefund_credit_cards_v3';
+const STORAGE_KEY = 'beefund_credit_cards_v4';
 const PRIMARY_SHEET_KEY = 'beefund_sheet_url';
 const LEGACY_SHEET_KEY = 'beefund_articles_sheet_url';
 
@@ -15,14 +15,17 @@ export const CardsProvider = ({ children }) => {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved !== null) {
                 const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed)) {
+                if (Array.isArray(parsed) && parsed.length > 0) {
                     return parsed;
                 }
             }
         } catch (e) {
             console.error('Failed to parse saved credit cards:', e);
         }
-        return Array.isArray(initialCards) ? initialCards : [];
+        // Use starterCards as fallback when initialCards is empty — prevents
+        // "Coming Soon" empty state that triggers AdSense rejection
+        const base = Array.isArray(initialCards) && initialCards.length > 0 ? initialCards : starterCards;
+        return Array.isArray(base) ? base : [];
     });
 
     // Google Sheets integration state (shares with BlogContext)

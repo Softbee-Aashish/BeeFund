@@ -79,10 +79,12 @@ const Footer = () => {
                         <ul className="footer-links">
                             <li><Link to="/credit-report" className="footer-highlight-link">Check Free CIBIL Score</Link></li>
                             <li><Link to="/credit-score">Credit Report Guide</Link></li>
+                            <li><Link to="/blog">Financial Blog & Insights</Link></li>
                             <li><Link to="/terms">Terms & Conditions</Link></li>
                             <li><Link to="/privacy">Privacy Policy</Link></li>
                             <li><Link to="/about">About BeeFund</Link></li>
                             <li><Link to="/contact">Contact & Grievance Desk</Link></li>
+                            <li><Link to="/sitemap">Sitemap</Link></li>
                         </ul>
                     </div>
                 </div>

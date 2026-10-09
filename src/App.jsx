@@ -30,6 +30,7 @@ const ThankYouPage = React.lazy(() => import('./pages/ThankYouPage'));
 const CreditReportPage = React.lazy(() => import('./pages/CreditReportPage'));
 const TermsPage = React.lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
+const SitemapPage = React.lazy(() => import('./pages/SitemapPage'));
 const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 const AdminStudioPage = React.lazy(() => import('./pages/admin/AdminStudioPage'));
 const ArticleEditorPage = React.lazy(() => import('./pages/admin/ArticleEditorPage'));
@@ -175,6 +176,7 @@ const AppContent = () => {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/sitemap" element={<SitemapPage />} />
             <Route path="/disclaimer" element={<TermsPage />} />
             <Route path="/thank-you" element={<ThankYouPage />} />
 

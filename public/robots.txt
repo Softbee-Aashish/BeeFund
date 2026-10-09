@@ -29,6 +29,8 @@ Allow: /privacy
 Allow: /blog
 Allow: /about
 Allow: /contact
+Allow: /credit-cards
+Allow: /sitemap
 
 # Sitemaps
 Sitemap: https://beefund.pages.dev/sitemap.xml

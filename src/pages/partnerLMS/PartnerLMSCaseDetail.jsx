@@ -8,19 +8,38 @@ import DecisionMatrixPanel from './components/DecisionMatrixPanel';
 import RedFlagBellDropdown from './components/RedFlagBellDropdown';
 import TraceabilityDrawer from './components/TraceabilityDrawer';
 import PartnerThemeToggle from './components/PartnerThemeToggle';
+import CaseKYCTab from './components/CaseKYCTab';
 import './PartnerLMSCaseDetail.css';
 
 const PartnerLMSCaseDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { getCaseById, deductWallet, walletBalance, updateCase, partnerProfile } = usePartnerLMS();
+    const { getCaseById, deductWallet, walletBalance, updateCase, deleteCase, partnerProfile } = usePartnerLMS();
 
     const caseData = getCaseById(id);
 
-    // Left Sidebar Navigation state
-    const [activeTab, setActiveTab] = useState('spreading'); // vault | spreading | stress_test | intelligence | financials | scorecard | dossier | decision | promoters | security
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    // Left Sidebar Navigation state - Default to 1st tab KYC
+    const [activeTab, setActiveTab] = useState('kyc'); // kyc | vault | spreading | stress_test | intelligence | financials | scorecard | dossier | decision | promoters | security
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+        try {
+            return localStorage.getItem('beefund_lms_sidebar_collapsed') === 'true';
+        } catch {
+            return false;
+        }
+    });
+
+    const toggleSidebar = () => {
+        setIsSidebarCollapsed(prev => {
+            const next = !prev;
+            try {
+                localStorage.setItem('beefund_lms_sidebar_collapsed', String(next));
+            } catch (e) { }
+            return next;
+        });
+    };
+
     const [traceabilityDocType, setTraceabilityDocType] = useState(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     // Document Vault & Verification Hub States
     const [trafficFilter, setTrafficFilter] = useState('ALL'); // ALL | GREEN | YELLOW | RED
@@ -147,31 +166,6 @@ const PartnerLMSCaseDetail = () => {
     });
     const [exportNotice, setExportNotice] = useState('');
     const [intelSubTab, setIntelSubTab] = useState('all'); // 'all' | 'bureau' | 'bsa' | 'gst' | 'ratios'
-
-    if (!caseData) {
-        return (
-            <div className="lms-case-notfound">
-                <div className="notfound-card">
-                    <div className="notfound-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="8" x2="12" y2="12"></line>
-                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                    </div>
-                    <h2>Credit Case #{id} Not Found</h2>
-                    <p>The requested borrower proposal record could not be located in your LMS portfolio.</p>
-                    <Link to="/partnerLMS/dashboard" className="btn-lms-primary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="19" y1="12" x2="5" y2="12"></line>
-                            <polyline points="12 19 5 12 12 5"></polyline>
-                        </svg>
-                        <span>Return to Case Dashboard</span>
-                    </Link>
-                </div>
-            </div>
-        );
-    }
 
     // Handlers for running intelligence APIs with wallet deduction
     const handleRunCIBIL = () => {
@@ -427,12 +421,27 @@ const PartnerLMSCaseDetail = () => {
 
         const items = [];
 
-        // 1. Intelligence Module
+        // 1. Universal KYC & Applicant Profile Module (Stage 1 Master KYC)
+        items.push({
+            id: 'kyc',
+            title: 'KYC',
+            subtitle: isSalaried ? 'Identity, Salary & Workplace' : 'Identity, Business & GST',
+            badge: 'Verified',
+            badgeType: 'emerald',
+            icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            )
+        });
+
+        // 2. Intelligence Module (Credit Bureau, BSA, GST)
         if (isSalaried || isPL) {
             items.push({
                 id: 'intelligence',
                 title: 'Salary & Bureau Intel',
-                subtitle: 'CIBIL CIR, Salary BSA & Form 16',
+                subtitle: 'CIBIL CIR & Salary BSA',
                 badge: 'Verified',
                 badgeType: 'emerald',
                 icon: (
@@ -445,7 +454,7 @@ const PartnerLMSCaseDetail = () => {
             items.push({
                 id: 'intelligence',
                 title: 'Credit Intelligence Hub',
-                subtitle: 'CIBIL CIR, Multi-Bank BSA & GST',
+                subtitle: 'CIBIL CIR, BSA & GST',
                 badge: '3 Live APIs',
                 badgeType: 'emerald',
                 icon: (
@@ -456,13 +465,13 @@ const PartnerLMSCaseDetail = () => {
             });
         }
 
-        // 2. Financial Spreading & SCoA / FOIR
+        // 3. Financial Spreading & SCoA / FOIR
         if (isSalaried || isPL) {
             items.push({
                 id: 'spreading',
-                title: 'Salary & FOIR Underwriting',
-                subtitle: 'Compensation Grid & Loan Sizing',
-                badge: 'FOIR Analyzed',
+                title: 'Salary & FOIR Sizing',
+                subtitle: 'Compensation & Loan Sizing',
+                badge: 'FOIR Sized',
                 badgeType: 'blue',
                 icon: (
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -476,7 +485,7 @@ const PartnerLMSCaseDetail = () => {
             items.push({
                 id: 'spreading',
                 title: 'Financial Spreading & SCoA',
-                subtitle: 'Multi-Year P&L, Truth Serum & Ratios',
+                subtitle: 'Multi-Year P&L & Ratios',
                 badge: 'Standardized',
                 badgeType: 'blue',
                 icon: (
@@ -489,12 +498,12 @@ const PartnerLMSCaseDetail = () => {
             });
         }
 
-        // 3. Sensitivity & Stress Testing
+        // 4. Sensitivity & Stress Testing
         items.push({
             id: 'stress_test',
-            title: isSalaried ? 'Rate & EMI Sensitivity' : 'Sensitivity & Stress Test',
-            subtitle: isSalaried ? 'Floating Rate Shock & Tenure' : 'What-If Sliders & Waterfall',
-            badge: isSalaried ? 'Stress Tested' : '2.05x Stressed',
+            title: isSalaried || isPL ? 'Rate & EMI Sensitivity' : 'Sensitivity & Stress Test',
+            subtitle: isSalaried || isPL ? 'Rate Shock & Tenure' : 'What-If Sliders & Waterfall',
+            badge: isSalaried || isPL ? 'Stress Tested' : '2.05x Stressed',
             badgeType: 'gold',
             icon: (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -503,8 +512,8 @@ const PartnerLMSCaseDetail = () => {
             )
         });
 
-        // 4. Project Cost & Means (Only for Project, Machinery, and Working Capital / Capex)
-        if (isProjectOrCapexLoan) {
+        // 5. Project Cost & Means (Only for Project, Machinery, and Working Capital / Capex - NEVER for PL)
+        if (isProjectOrCapexLoan && !isPL) {
             let costTitle = 'Project Cost & Means';
             let costSub = 'Capex & Financing Sizing';
             if (isML) {
@@ -530,12 +539,12 @@ const PartnerLMSCaseDetail = () => {
             });
         }
 
-        // 5. 0–100 Risk Scorecard
+        // 6. 0–100 Risk Scorecard
         items.push({
             id: 'scorecard',
             title: '0–100 Risk Scorecard',
-            subtitle: isSalaried ? 'Multi-Pillar Housing Risk' : 'Multi-Pillar Bankability',
-            badge: `${caseData?.scorecard || 88}/100 Tier-1`,
+            subtitle: isSalaried || isPL ? 'Clean Credit Matrix' : 'Multi-Pillar Bankability',
+            badge: `${caseData?.scorecard || 89}/100 Tier-1`,
             badgeType: 'emerald',
             icon: (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -544,11 +553,11 @@ const PartnerLMSCaseDetail = () => {
             )
         });
 
-        // 6. Proposal Dossier & CAM
+        // 7. Proposal Dossier & CAM
         items.push({
             id: 'dossier',
-            title: isSalaried ? 'Home Loan CAM Dossier' : 'Proposal Dossier & CAM',
-            subtitle: isSalaried ? 'PDF & Committee Memo' : 'PDF, CMA XLSX & Committee Memo',
+            title: isPL ? 'Personal Loan CAM Dossier' : isSalaried ? 'Home Loan CAM Dossier' : 'Proposal Dossier & CAM',
+            subtitle: isPL || isSalaried ? 'PDF & Committee Memo' : 'PDF, CMA XLSX & Memo',
             badge: 'Ready',
             badgeType: 'blue',
             icon: (
@@ -562,7 +571,7 @@ const PartnerLMSCaseDetail = () => {
             )
         });
 
-        // 7. Credit Decision & Sanction Matrix
+        // 8. Credit Decision & Sanction Matrix
         items.push({
             id: 'decision',
             title: 'Credit Decision & Sanction',
@@ -577,29 +586,31 @@ const PartnerLMSCaseDetail = () => {
             )
         });
 
-        // 8. Promoters & Governance / Applicant Profile
-        items.push({
-            id: 'promoters',
-            title: isSalaried ? 'Applicant & Co-Borrower' : 'Promoters & Governance',
-            subtitle: isSalaried ? 'Identity & Employment Track' : 'Shareholding & Net Worth',
-            badge: 'Verified',
-            badgeType: 'neutral',
-            icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-            )
-        });
+        // 9. Promoters & Governance (Only for commercial entities, not personal loans)
+        if (!isPL && !isSalaried) {
+            items.push({
+                id: 'promoters',
+                title: 'Promoters & Governance',
+                subtitle: 'Shareholding & Net Worth',
+                badge: 'Verified',
+                badgeType: 'neutral',
+                icon: (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                )
+            });
+        }
 
-        // 9. Security & Collateral
-        if (!isPL) {
+        // 10. Security & Collateral (Only for secured loans like HL, LAP, ML - NEVER for PL)
+        if (!isPL && (isHL || isLAP || isML || isODCC || isProjectOrCapexLoan)) {
             items.push({
                 id: 'security',
-                title: isSalaried || isHL || isLAP ? 'Property Title & Mortgage' : isML ? 'Machinery Hypothecation' : 'Security & Collateral',
-                subtitle: isSalaried || isHL || isLAP ? 'Sale Deed, Legal Search & LTV' : isML ? 'Equipment 1st Charge' : 'Hypothecation & Mortgage',
+                title: isHL || isLAP ? 'Property Title & Mortgage' : isML ? 'Machinery Hypothecation' : 'Security & Collateral',
+                subtitle: isHL || isLAP ? 'Sale Deed, Legal & LTV' : isML ? 'Equipment 1st Charge' : 'Hypothecation & Mortgage',
                 badge: '1st Charge',
                 badgeType: 'purple',
                 icon: (
@@ -613,229 +624,111 @@ const PartnerLMSCaseDetail = () => {
         return items;
     }, [caseData, isSalaried, isProjectOrCapexLoan, projectCostFormatted]);
 
-
-    return (
-        <div className="case-detail-root">
-            {/* Top Bar Header */}
-            <header className="case-detail-top">
-                <div className="case-detail-top-inner">
-                    <div className="case-header-left">
-                        <div className="header-nav-actions">
-                            <button
-                                type="button"
-                                className="btn-toggle-sidebar"
-                                onClick={() => setIsSidebarCollapsed(prev => !prev)}
-                                title={isSidebarCollapsed ? 'Expand Navigation Sidebar' : 'Collapse Navigation Sidebar'}
-                                aria-label="Toggle Navigation Sidebar"
-                            >
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                                </svg>
-                                <span className="toggle-sidebar-text">{isSidebarCollapsed ? 'Expand Menu' : 'Menu'}</span>
-                            </button>
-                            <Link to="/partnerLMS/dashboard" className="back-link-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="15 18 9 12 15 6"></polyline>
-                                </svg>
-                                <span>Dashboard</span>
-                            </Link>
-                        </div>
-                        <div className="case-header-titles">
-                            <div className="title-row">
-                                <h1>{caseData.enterpriseName}</h1>
-                                <span className="case-category-pill">{caseData.loanType || 'Project Loan'}</span>
-                            </div>
-                            <div className="case-ack-chips">
-                                <span>App ID: <strong>{caseData.id}</strong></span>
-                                <span>Ack: <strong>{caseData.ackNo}</strong></span>
-                                <span>PAN: <strong>{caseData.pan}</strong></span>
-                                <span>{caseData.constitution}</span>
-                            </div>
-                        </div>
+    if (!caseData) {
+        return (
+            <div className="lms-case-notfound">
+                <div className="notfound-card">
+                    <div className="notfound-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
                     </div>
-
-                    <div className="case-header-right">
-                        <div className="loan-stat-box">
-                            <span className="lbl">Requested Loan</span>
-                            <span className="val-cyan">
-                                {caseData.loanAmountFormatted || (caseData.loanAmountLakhs ? `₹${caseData.loanAmountLakhs.toFixed(2)} L` : '₹50.00 Lakhs')}
-                            </span>
-                        </div>
-
-                        {/* Top metric adaptively shown based on loan type */}
-                        {isProjectOrCapexLoan ? (
-                            <div className="loan-stat-box">
-                                <span className="lbl">Total Project Cost</span>
-                                <span className="val-gold">{projectCostFormatted}</span>
-                            </div>
-                        ) : isSalaried || (caseData.loanProduct || caseData.loanType || '').toUpperCase().includes('HL') || (caseData.loanProduct || caseData.loanType || '').toUpperCase().includes('LAP') ? (
-                            <div className="loan-stat-box">
-                                <span className="lbl">Property Valuation</span>
-                                <span className="val-gold">
-                                    {caseData.propertyValueFormatted || `₹${((caseData.loanAmountLakhs || 75) * 1.4).toFixed(1)} Lakhs`}
-                                </span>
-                            </div>
-                        ) : (
-                            <div className="loan-stat-box">
-                                <span className="lbl">Annual Turnover</span>
-                                <span className="val-gold">
-                                    {caseData.turnoverFormatted || (caseData.pastFinancials?.sales?.currentEst ? `₹${(caseData.pastFinancials.sales.currentEst / 100).toFixed(2)} Cr` : '₹32.49 Cr')}
-                                </span>
-                            </div>
-                        )}
-
-                        {isSalaried ? (
-                            <>
-                                <div
-                                    className="loan-stat-box metric-box-link"
-                                    onClick={() => setActiveTab('spreading')}
-                                    title="Click to view FOIR (Fixed Obligation to Income Ratio)"
-                                >
-                                    <span className="lbl">FOIR (DTI)</span>
-                                    <span className="val-green">57.0%</span>
-                                </div>
-                                <div
-                                    className="loan-stat-box metric-box-link"
-                                    onClick={() => setActiveTab('spreading')}
-                                    title="Click to view Loan-to-Value (LTV) Ratio"
-                                >
-                                    <span className="lbl">LTV Ratio</span>
-                                    <span className="val-green">71.4%</span>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div
-                                    className="loan-stat-box metric-box-link"
-                                    onClick={() => setActiveTab('spreading')}
-                                    title="Click to view DSCR Formula & Math"
-                                >
-                                    <span className="lbl">DSCR</span>
-                                    <span className="val-green">2.05x</span>
-                                </div>
-                                <div
-                                    className="loan-stat-box metric-box-link"
-                                    onClick={() => setActiveTab('spreading')}
-                                    title="Click to view TOL/TNW Leverage Math"
-                                >
-                                    <span className="lbl">TOL/TNW</span>
-                                    <span className="val-green">1.49x</span>
-                                </div>
-                            </>
-                        )}
-
-                        <RedFlagBellDropdown
-                            onSelectFlag={(flag) => {
-                                if (flag.targetTab) setActiveTab(flag.targetTab);
-                            }}
-                        />
-                        <PartnerThemeToggle />
-                    </div>
-                </div>
-            </header>
-
-            {/* Workflow Progress Bar */}
-            <div className="case-progress-strip">
-                <div className="progress-strip-container">
-                    <div className={`progress-step-item ${activeTab === 'vault' ? 'active' : 'done'}`} onClick={() => setActiveTab('vault')} style={{ cursor: 'pointer' }} title="Click to view Document Vault">
-                        <span className="step-badge">1</span>
-                        <span>Data Verified</span>
-                    </div>
-                    <span className="step-arrow">→</span>
-                    <div className={`progress-step-item ${activeTab === 'intelligence' ? 'active' : 'done'}`} onClick={() => setActiveTab('intelligence')} style={{ cursor: 'pointer' }} title="Click to view CIBIL Bureau">
-                        <span className="step-badge">2</span>
-                        <span>CIBIL 758</span>
-                    </div>
-                    <span className="step-arrow">→</span>
-                    <div className={`progress-step-item ${activeTab === 'intelligence' ? 'active' : 'done'}`} onClick={() => setActiveTab('intelligence')} style={{ cursor: 'pointer' }} title="Click to view Bank Analyzer">
-                        <span className="step-badge">3</span>
-                        <span>BSA Parsed</span>
-                    </div>
-                    <span className="step-arrow">→</span>
-                    <div className={`progress-step-item ${activeTab === 'intelligence' ? 'active' : 'done'}`} onClick={() => setActiveTab('intelligence')} style={{ cursor: 'pointer' }} title="Click to view GST Reconciliation">
-                        <span className="step-badge">4</span>
-                        <span>GST Matched</span>
-                    </div>
-                    <span className="step-arrow">→</span>
-                    <div className={`progress-step-item ${activeTab === 'scorecard' ? 'active' : 'done'}`} onClick={() => setActiveTab('scorecard')} style={{ cursor: 'pointer' }} title="Click to view Risk Scorecard">
-                        <span className="step-badge">5</span>
-                        <span>Score: 88/100</span>
-                    </div>
-                    <span className="step-arrow">→</span>
-                    <div className={`progress-step-item ${activeTab === 'decision' ? 'active' : 'done'}`} onClick={() => setActiveTab('decision')} style={{ cursor: 'pointer' }} title="Click to view Credit Decision & Sanction Matrix">
-                        <span className="step-badge">6</span>
-                        <span>Sanction Ready</span>
-                    </div>
+                    <h2>Credit Case #{id} Not Found</h2>
+                    <p>The requested borrower proposal record could not be located in your LMS portfolio.</p>
+                    <Link to="/partnerLMS/dashboard" className="btn-lms-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        <span>Return to Case Dashboard</span>
+                    </Link>
                 </div>
             </div>
+        );
+    }
 
-            {/* Notification Banner */}
-            {exportNotice && (
-                <div className="export-alert-banner">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 14 14"></polyline>
-                    </svg>
-                    <span>{exportNotice}</span>
-                </div>
-            )}
+    return (
+        <div className={`case-detail-layout ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+            {/* STICKY LEFT SIDEBAR MENU BAR (Never scrolls with site) */}
+            <aside className={`case-sticky-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+                <div className="sidebar-inner-wrap">
+                    {/* Brand & Back Button */}
+                    <div className="case-sidebar-top-box">
+                        <Link to="/partnerLMS/dashboard" className="back-link-btn" title="Return to Partner Dashboard">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                            <span>Back to Dashboard</span>
+                        </Link>
+                        <button
+                            type="button"
+                            className="btn-sidebar-collapse-toggle"
+                            onClick={toggleSidebar}
+                            title={isSidebarCollapsed ? 'Expand Sidebar' : 'Hide Sidebar'}
+                            aria-label="Toggle Sidebar"
+                        >
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                {isSidebarCollapsed ? (
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                ) : (
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                )}
+                            </svg>
+                        </button>
+                    </div>
 
-            {/* Main Application Shell: Left Sidebar + Content Canvas */}
-            <div className={`case-app-shell ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-                {/* Collapsible Left Sidebar */}
-                <aside className="case-sidebar-panel">
-                    <div className="sidebar-brand-box">
+                    {/* Case Overview Card */}
+                    <div className="case-overview-card">
                         <div className="sidebar-box-top">
-                            <span className="sidebar-box-label">PORTFOLIO CASE</span>
+                            <span className="sidebar-box-label">COMMAND CENTER DOSSIER</span>
                             <span className="sidebar-box-rating">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                </svg>
-                                {caseData.scorecard || 88}/100
+                                ★ {caseData.scorecard || 88}/100
                             </span>
                         </div>
+                        <div className="sidebar-case-title">{caseData.enterpriseName}</div>
                         <div className="sidebar-target-bank">
                             <span className="target-bank-lbl">Target Lender:</span>
                             <strong>{targetLenderName}</strong>
                         </div>
                     </div>
 
-                    <div className="sidebar-menu-section-header">
-                        <span>NAVIGATION MODULES</span>
+                    {/* Navigation Section */}
+                    <div className="lms-sidebar-nav-section">
+                        <div className="nav-section-title">ASSESSMENT MODULES</div>
+                        <nav className="case-sidebar-nav">
+                            {navItems.map(item => {
+                                const isActive = activeTab === item.id;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        className={`case-sidebar-item ${isActive ? 'active' : ''}`}
+                                        onClick={() => setActiveTab(item.id)}
+                                        title={item.title}
+                                    >
+                                        <div className="sidebar-item-icon">
+                                            {item.icon}
+                                        </div>
+                                        <div className="sidebar-item-content">
+                                            <div className="item-title-row">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.badge && (
+                                                    <span className={`item-badge badge-${item.badgeType}`}>
+                                                        {item.badge}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <span className="item-subtitle">{item.subtitle}</span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </nav>
                     </div>
 
-                    <nav className="case-sidebar-nav">
-                        {navItems.map(item => {
-                            const isActive = activeTab === item.id;
-                            return (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    className={`case-sidebar-item ${isActive ? 'active' : ''}`}
-                                    onClick={() => setActiveTab(item.id)}
-                                    title={item.title}
-                                >
-                                    <div className="sidebar-item-icon">
-                                        {item.icon}
-                                    </div>
-                                    <div className="sidebar-item-content">
-                                        <div className="item-title-row">
-                                            <span className="item-title">{item.title}</span>
-                                            {item.badge && (
-                                                <span className={`item-badge badge-${item.badgeType}`}>
-                                                    {item.badge}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <span className="item-subtitle">{item.subtitle}</span>
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </nav>
-
+                    {/* Sidebar Bottom Utilities */}
                     <div className="sidebar-bottom-actions">
                         <div className="facilitator-mini-card">
                             <div className="fac-icon">
@@ -863,11 +756,253 @@ const PartnerLMSCaseDetail = () => {
                             </svg>
                             <span>Quick Export Dossier</span>
                         </button>
-                    </div>
-                </aside>
 
-                {/* Main Content Area */}
-                <main className="case-content-area">
+                        <div className="sidebar-theme-row">
+                            <span className="theme-row-label">Workspace Theme</span>
+                            <PartnerThemeToggle />
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            {/* MAIN CONTENT CANVAS (Scrolls smoothly beside sticky sidebar) */}
+            <main className="case-main-canvas">
+                {/* Sticky Header */}
+                <header className="case-main-topbar">
+                    <div className="topbar-left-wrap">
+                        <button
+                            type="button"
+                            className="btn-toggle-lms-sidebar"
+                            onClick={toggleSidebar}
+                            title={isSidebarCollapsed ? 'Expand Sidebar' : 'Hide Sidebar'}
+                            aria-label="Toggle Sidebar"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                        <div className="topbar-case-left">
+                            <div className="title-row">
+                                <h1 className="case-main-title">{caseData.enterpriseName}</h1>
+                                <span className="case-category-pill">{caseData.loanType || 'Personal Loan'}</span>
+                                <span className="case-command-badge">⚡ Command Center</span>
+                            </div>
+                            <div className="case-ack-chips">
+                                <span>App ID: <strong>{caseData.id}</strong></span>
+                                <span>Ack: <strong>{caseData.ackNo}</strong></span>
+                                <span>PAN: <strong>{caseData.pan}</strong></span>
+                                <span>{caseData.constitution}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="topbar-case-right">
+                        <div className="loan-stat-box">
+                            <span className="lbl">Requested Loan</span>
+                            <span className="val-cyan">
+                                {caseData.loanAmountFormatted || (caseData.loanAmountLakhs ? `₹${caseData.loanAmountLakhs.toFixed(2)} L` : '₹15.00 Lakhs')}
+                            </span>
+                        </div>
+
+                        {/* Top metric adaptively shown based on loan type */}
+                        {isPL ? (
+                            isSalaried ? (
+                                <>
+                                    <div className="loan-stat-box">
+                                        <span className="lbl">Net Monthly Salary</span>
+                                        <span className="val-gold">
+                                            {caseData.monthlySalaryFormatted || (caseData.salariedDetails?.monthlyNet ? `₹${(caseData.salariedDetails.monthlyNet / 100000).toFixed(2)} L/mo` : '₹1.55 L/mo')}
+                                        </span>
+                                    </div>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('spreading')}
+                                        title="Click to view Net FOIR (Debt-to-Income)"
+                                    >
+                                        <span className="lbl">Net FOIR</span>
+                                        <span className="val-green">{caseData.foir ? `${caseData.foir}%` : '42.8%'}</span>
+                                    </div>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('stress_test')}
+                                        title="Max Eligible Personal Loan Limit"
+                                    >
+                                        <span className="lbl">Max Eligibility</span>
+                                        <span className="val-cyan">
+                                            {caseData.maxEligibleFormatted || (caseData.salariedDetails?.monthlyNet ? `₹${((caseData.salariedDetails.monthlyNet * 0.55 * 36) / 100000).toFixed(2)} L` : '₹28.50 L')}
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="loan-stat-box">
+                                        <span className="lbl">Annual Turnover</span>
+                                        <span className="val-gold">
+                                            {caseData.turnoverFormatted || (caseData.turnoverLakhs ? `₹${caseData.turnoverLakhs.toFixed(2)} L` : '₹85.00 L')}
+                                        </span>
+                                    </div>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('spreading')}
+                                        title="Click to view Debt Burden / FOIR"
+                                    >
+                                        <span className="lbl">Net FOIR</span>
+                                        <span className="val-green">{caseData.foir ? `${caseData.foir}%` : '45.2%'}</span>
+                                    </div>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('stress_test')}
+                                        title="Max Business PL Sizing"
+                                    >
+                                        <span className="lbl">Max Eligibility</span>
+                                        <span className="val-cyan">₹18.00 L</span>
+                                    </div>
+                                </>
+                            )
+                        ) : isProjectOrCapexLoan ? (
+                            <div className="loan-stat-box">
+                                <span className="lbl">Total Project Cost</span>
+                                <span className="val-gold">{projectCostFormatted}</span>
+                            </div>
+                        ) : (isHL || isLAP) ? (
+                            <div className="loan-stat-box">
+                                <span className="lbl">Property Valuation</span>
+                                <span className="val-gold">
+                                    {caseData.propertyValueFormatted || `₹${((caseData.loanAmountLakhs || 75) * 1.4).toFixed(1)} Lakhs`}
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="loan-stat-box">
+                                <span className="lbl">Annual Turnover</span>
+                                <span className="val-gold">
+                                    {caseData.turnoverFormatted || (caseData.pastFinancials?.sales?.currentEst ? `₹${(caseData.pastFinancials.sales.currentEst / 100).toFixed(2)} Cr` : '₹32.49 Cr')}
+                                </span>
+                            </div>
+                        )}
+
+                        {!isPL && (
+                            (isHL || isLAP || isSalaried) ? (
+                                <>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('spreading')}
+                                        title="Click to view FOIR (Fixed Obligation to Income Ratio)"
+                                    >
+                                        <span className="lbl">FOIR (DTI)</span>
+                                        <span className="val-green">57.0%</span>
+                                    </div>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('spreading')}
+                                        title="Click to view Loan-to-Value (LTV) Ratio"
+                                    >
+                                        <span className="lbl">LTV Ratio</span>
+                                        <span className="val-green">71.4%</span>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('spreading')}
+                                        title="Click to view DSCR Formula & Math"
+                                    >
+                                        <span className="lbl">DSCR</span>
+                                        <span className="val-green">2.05x</span>
+                                    </div>
+                                    <div
+                                        className="loan-stat-box metric-box-link"
+                                        onClick={() => setActiveTab('spreading')}
+                                        title="Click to view TOL/TNW Leverage Math"
+                                    >
+                                        <span className="lbl">TOL/TNW</span>
+                                        <span className="val-green">1.49x</span>
+                                    </div>
+                                </>
+                            )
+                        )}
+
+                        <RedFlagBellDropdown
+                            onSelectFlag={(flag) => {
+                                if (flag.targetTab) setActiveTab(flag.targetTab);
+                            }}
+                        />
+
+                        <button
+                            type="button"
+                            onClick={() => setIsDeleteModalOpen(true)}
+                            className="btn-delete-case-header"
+                            title="Delete this case proposal"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            <span>Delete</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div className="case-main-inner-content">
+                    {/* Workflow Progress Bar */}
+                    <div className="case-progress-strip">
+                        <div className="progress-strip-container">
+                            <div className={`progress-step-item ${activeTab === 'kyc' ? 'active' : 'done'}`} onClick={() => setActiveTab('kyc')} style={{ cursor: 'pointer' }} title="Click to view KYC & Applicant Profile">
+                                <span className="step-badge">1</span>
+                                <span>KYC Verified</span>
+                            </div>
+                            <span className="step-arrow">→</span>
+                            <div className={`progress-step-item ${activeTab === 'intelligence' ? 'active' : 'done'}`} onClick={() => setActiveTab('intelligence')} style={{ cursor: 'pointer' }} title="Click to view Bureau & Banking Intel">
+                                <span className="step-badge">2</span>
+                                <span>{caseData?.cibilScore ? `CIBIL ${caseData.cibilScore}` : 'CIBIL 790'}</span>
+                            </div>
+                            <span className="step-arrow">→</span>
+                            <div className={`progress-step-item ${activeTab === 'spreading' ? 'active' : 'done'}`} onClick={() => setActiveTab('spreading')} style={{ cursor: 'pointer' }} title="Click to view Salary & FOIR Sizing">
+                                <span className="step-badge">3</span>
+                                <span>{isSalaried ? 'Salary FOIR' : 'Cashflow Sizing'}</span>
+                            </div>
+                            <span className="step-arrow">→</span>
+                            <div className={`progress-step-item ${activeTab === 'stress_test' ? 'active' : 'done'}`} onClick={() => setActiveTab('stress_test')} style={{ cursor: 'pointer' }} title="Click to view Sensitivity Sizing">
+                                <span className="step-badge">4</span>
+                                <span>Sensitivity Tested</span>
+                            </div>
+                            <span className="step-arrow">→</span>
+                            <div className={`progress-step-item ${activeTab === 'scorecard' ? 'active' : 'done'}`} onClick={() => setActiveTab('scorecard')} style={{ cursor: 'pointer' }} title="Click to view Risk Scorecard">
+                                <span className="step-badge">5</span>
+                                <span>Score: {caseData?.scorecard || 89}/100</span>
+                            </div>
+                            <span className="step-arrow">→</span>
+                            <div className={`progress-step-item ${activeTab === 'decision' ? 'active' : 'done'}`} onClick={() => setActiveTab('decision')} style={{ cursor: 'pointer' }} title="Click to view Credit Decision & Sanction Matrix">
+                                <span className="step-badge">6</span>
+                                <span>Sanction Ready</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Notification Banner */}
+                    {exportNotice && (
+                        <div className="export-alert-banner">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 14 14"></polyline>
+                            </svg>
+                            <span>{exportNotice}</span>
+                        </div>
+                    )}
+
+                    {/* ========================================================================= */}
+                    {/* TAB 1: KYC & CUSTOMER IDENTITY PROFILE (UNIVERSAL MASTER STAGE 1)         */}
+                    {/* ========================================================================= */}
+                    {activeTab === 'kyc' && (
+                        <div className="tab-pane-content">
+                            <CaseKYCTab
+                                caseData={caseData}
+                                onUpdateCase={updateCase}
+                            />
+                        </div>
+                    )}
                     {/* ========================================================================= */}
                     {/* TAB: FINANCIAL SPREADING (P&L, BALANCE SHEET, TRUTH SERUM & RATIOS)        */}
                     {/* ========================================================================= */}
@@ -1772,8 +1907,67 @@ const PartnerLMSCaseDetail = () => {
                             />
                         </div>
                     )}
-                </main>
-            </div>
+                </div>
+            </main>
+
+            {/* Delete Case Confirmation Modal */}
+            {isDeleteModalOpen && (
+                <div className="lms-modal-backdrop" onClick={() => setIsDeleteModalOpen(false)}>
+                    <div className="lms-modal-card lms-delete-modal-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header delete-modal-header">
+                            <div className="delete-modal-title-group">
+                                <div className="delete-warning-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </div>
+                                <h3>Delete Case #{caseData?.id || id}</h3>
+                            </div>
+                            <button type="button" className="btn-close-modal" onClick={() => setIsDeleteModalOpen(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <p className="delete-confirm-prompt">
+                                Are you sure you want to permanently delete this credit dossier?
+                            </p>
+                            <div className="delete-case-summary-box">
+                                <div className="delete-summary-row">
+                                    <span className="lbl">Enterprise:</span>
+                                    <strong>{caseData?.enterpriseName}</strong>
+                                </div>
+                                <div className="delete-summary-row">
+                                    <span className="lbl">Proposal ID:</span>
+                                    <span className="mono-val">{caseData?.id} ({caseData?.ackNo})</span>
+                                </div>
+                                <div className="delete-summary-row">
+                                    <span className="lbl">Facility Sizing:</span>
+                                    <span className="cyan-val">{caseData?.loanAmountFormatted} • {caseData?.loanType}</span>
+                                </div>
+                            </div>
+                            <div className="delete-warning-note">
+                                ⚠️ <strong>Warning:</strong> Deleting this case will remove all financial spreading models, stress test scenarios, verification status, and CAM dossiers.
+                            </div>
+                            <div className="delete-modal-actions">
+                                <button type="button" className="btn-cancel-delete" onClick={() => setIsDeleteModalOpen(false)}>
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn-confirm-delete"
+                                    onClick={() => {
+                                        deleteCase(id);
+                                        navigate('/partnerLMS/dashboard');
+                                    }}
+                                >
+                                    Yes, Delete Case
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Source Audit Traceability Drawer */}
             <TraceabilityDrawer
